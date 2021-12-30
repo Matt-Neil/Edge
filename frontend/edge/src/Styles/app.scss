@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+@import "variables";
+@import "mixins";
+@import "components";
+@import "home";
+@import "newProject";
+@import "project";
+@import "signin";
+@import "account.scss";
+@import "project.scss";
+
+body {
+    margin: 0;
+}
+p {
+    font-family: 'Poppins', sans-serif;
+}
+label {
+    font-family: 'Poppins', sans-serif;
+}
+h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: $dark-grey;
+}
+input, textarea {
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+    color: $dark-grey;
+}
+.wholeBody {
+    width: 100%;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    border-bottom: 1px $mid-grey solid;
+    font-size: 14px;
+    font-weight: 500;
+    color: $dark-grey;
+
+    .header-home {
+        display: flex;
+        justify-content: center;
+        margin: 0 25px 0 15px;
+        text-decoration: none;
+        font-family: 'Poppins', sans-serif;
+        color: $dark-grey;
+    }
+    .header-open {
+        display: flex;
+        width: fit-content;
+        margin: 0 10px 0 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        -ms-overflow-style: none;
+        scrollbar-width: thin;
+        scrollbar-color: $mid-grey white;
+        scrollbar-track-color: none;
+
+        p {
+            font-size: 12px;
+        }
+    }
+    .header-open::-webkit-scrollbar {
+        height: 3px;
+        cursor: auto;
+    }
+    .header-open::-webkit-scrollbar-thumb {
+        background-color: #dbdbdb;
+    }
+    .header-new-project {
+        display: flex;
+        align-items: center;
+        color: $dark-grey;
+        text-decoration: none;
+        font-size: 14px;
+        font-family: 'Poppins', sans-serif;
+        cursor: pointer;
+        margin: 0 25px 0 10px;
+    }
+    span {
+        flex: 1;
+    }
+    .header-account {
+        display: flex;
+        align-items: center;
+        margin: 0 15px 0 0;
+        text-decoration: none;
+    }
+    .header-account p {
+        margin: 0 0 0 7px;
+        color: $dark-grey;
+    }
+}
