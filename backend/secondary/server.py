@@ -21,7 +21,7 @@ def train_model():
 def predict_model():
     configuration_data = request.get_json()
 
-    return ""
+    return "OK"
 
 @app.route('/api/file/upload', methods = ['POST'])
 def upload_file():
@@ -29,13 +29,13 @@ def upload_file():
     filename = secure_filename(file.filename)
     file.save('files/' + filename)
 
-    return ""
+    return "OK"
 
 @app.route('/api/file/remove')
 def remove_file():
     os.remove('files/file.csv')
     
-    return ""
+    return "OK"
 
 @app.route('/files/<path:path>')
 def get_data(path):
