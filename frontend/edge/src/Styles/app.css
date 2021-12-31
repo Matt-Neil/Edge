@@ -254,37 +254,58 @@
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
-  margin: 25vh 0 0 0;
-  text-align: center;
+  margin: 15vh 0 0 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
 }
 
-.new-project .new-project-setup input {
-  height: 40px;
-  max-width: 400px;
+.new-project .new-project-setup .new-project-setup-information {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  max-width: 500px;
   width: 60%;
+}
+
+.new-project .new-project-setup .new-project-setup-information .new-project-title {
+  height: 40px;
   background-color: #FBFBFB;
   border: 1px #E6E5E5 solid;
   border-radius: 10px;
   padding: 0 10px;
 }
 
-.new-project .new-project-setup ::-webkit-input-placeholder {
-  font-family: 'Poppins', sans-serif;
-  color: #474747;
+.new-project .new-project-setup .new-project-setup-information .new-project-description {
+  height: 150px;
+  background-color: #FBFBFB;
+  border: 1px #E6E5E5 solid;
+  border-radius: 10px;
+  padding: 10px;
+  margin: 25px 0 0 0;
+  resize: none;
 }
 
-.new-project .new-project-setup ::-moz-placeholder {
-  font-family: 'Poppins', sans-serif;
-  color: #474747;
+.new-project .new-project-setup .new-project-setup-information .new-project-setup-visibility {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin: 25px 0 0 0;
 }
 
-.new-project .new-project-setup :-ms-input-placeholder {
-  font-family: 'Poppins', sans-serif;
-  color: #474747;
-}
-
-.new-project .new-project-setup :-moz-placeholder {
-  font-family: 'Poppins', sans-serif;
+.new-project .new-project-setup .new-project-setup-information .new-project-setup-visibility .new-project-setup-visibility-label {
+  margin: 0 10px 0 0;
+  font-size: 14px;
   color: #474747;
 }
 
@@ -293,12 +314,7 @@
       -ms-flex: 1;
           flex: 1;
   margin: 25vh 0 0 0;
-}
-
-.new-project .new-project-import p {
-  font-size: 14px;
   text-align: center;
-  margin: 0 0 30px 0;
 }
 
 .new-project .new-project-import .new-project-import-options {
@@ -308,10 +324,22 @@
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin: 0 0 50px 0;
+}
+
+.new-project .new-project-import .new-project-import-options p {
+  font-size: 16px;
+  margin: 0 15px 0 0;
 }
 
 .new-project .new-project-import .new-project-import-options button {
-  width: 110px;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  padding: 0 15px;
   height: 30px;
   border: none;
   border-radius: 7px;
@@ -321,67 +349,14 @@
   cursor: pointer;
 }
 
-.new-project .new-project-processing {
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
-  margin: 40px 0 0 40px;
-}
-
-.new-project .new-project-processing .new-project-processing-top {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  margin: 0 0 40px 0;
-}
-
-.new-project .new-project-processing .new-project-processing-top .new-project-processing-split {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  width: -webkit-fit-content;
-  width: -moz-fit-content;
-  width: fit-content;
-  height: 30px;
-  color: #474747;
-  margin: 0 30px 0 0;
-  font-size: 14px;
-}
-
-.new-project .new-project-processing .new-project-processing-top .new-project-processing-split input {
-  width: 35px;
-  height: 25px;
-  margin: 0 0 0 12px;
+.new-project .new-project-import .new-project-import-projectid {
+  height: 40px;
+  background-color: #FBFBFB;
   border: 1px #E6E5E5 solid;
-  border-radius: 7px;
-  background-color: #F2F2F2;
-  text-align: center;
-}
-
-.new-project .new-project-processing .new-project-processing-top button {
-  width: -webkit-fit-content;
-  width: -moz-fit-content;
-  width: fit-content;
-  padding: 0 15px;
-  height: 30px;
-  border: 1px #E6E5E5 solid;
-  border-radius: 7px;
-  background-color: #F2F2F2;
-  color: #474747;
-  margin: 0 0 0 15px;
-  cursor: pointer;
-}
-
-.new-project .new-project-processing .new-project-processing-table {
-  height: calc(100vh - 235px);
-  margin: 0 40px 0 0;
-  overflow-y: auto;
+  border-radius: 10px;
+  padding: 0 10px;
+  max-width: 500px;
+  width: 60%;
 }
 
 .new-project .new-project-nav {
@@ -407,6 +382,7 @@
   text-decoration: none;
   font-size: 14px;
   cursor: pointer;
+  margin: 0 20px 0 0;
 }
 
 .new-project .new-project-next {
@@ -419,7 +395,26 @@
   text-decoration: none;
   font-size: 14px;
   cursor: pointer;
-  margin: 0 0 0 20px;
+}
+
+.new-project ::-webkit-input-placeholder {
+  font-family: 'Poppins', sans-serif;
+  color: #474747;
+}
+
+.new-project ::-moz-placeholder {
+  font-family: 'Poppins', sans-serif;
+  color: #474747;
+}
+
+.new-project :-ms-input-placeholder {
+  font-family: 'Poppins', sans-serif;
+  color: #474747;
+}
+
+.new-project :-moz-placeholder {
+  font-family: 'Poppins', sans-serif;
+  color: #474747;
 }
 
 .project {

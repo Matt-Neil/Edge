@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react'
 import {Link, useParams} from "react-router-dom"
 import projectsAPI from '../API/projects'
 import ViewTable from "../Components/View-Data"
-import EditTable from "../Components/Edit-Data"
 import ViewModel from "../Components/View-Model"
 import EditModel from "../Components/Edit-Model"
 import ProjectCard from "../Components/Project-Card"
@@ -100,7 +99,7 @@ const Project = ({currentUser}) => {
                     {displayData &&
                         <div className="project-data">
                             <div className="project-data-table">
-                                {editData ? <EditTable /> : <ViewTable />}
+                                <ViewTable />
                             </div>
                         </div>
                     }

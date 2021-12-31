@@ -1,19 +1,21 @@
 import React, {useState, useEffect} from 'react'
 import {Link, useHistory} from "react-router-dom"
-import ViewTable from "../Components/View-Data"
-import EditTable from "../Components/Edit-Data"
 import projectsAPI from '../API/projects'
+import fileAPI from '../API/files'
 
 const NewProject = () => {
     const [setupStage, setSetupStage] = useState(true);
     const [dataStage, setDataStage] = useState(false);
-    const [importStage, setImportStage] = useState(true);
-    const [processingStage, setProcessingStage] = useState(false);
-    const [modelStage, setModelStage] = useState(false);
-    const [evaluationStage, setEvaluationStage] = useState(false);
-    const [deployStage, setDeployStage] = useState(false);
+    const [codeStage, setCodeStage] = useState(false);
     const [title, setTitle] = useState("");
-    const [normalised, setNormalised] = useState(false);
+    const [description, setDescription] = useState("");
+    const [visibility, setVisibility] = useState(false);
+    const [data, setData] = useState();
+    const [importMethod, setImportMethod] = useState("")
+    const [picture, setPicture] = useState();
+    const [projectID, setProjectID] = useState("")
+    const [code, setCode] = useState();
+    const [experiment, setExperiment] = useState();
     const [trainingSplit, setTrainingSplit] = useState(80);
     const [validationSplit, setValidationSplit] = useState(20);
     const [projects, setProjects] = useState([]);
@@ -36,19 +38,13 @@ const NewProject = () => {
 
     const next = () => {
         if (setupStage) {
-            if (title !== "" && !projects.includes(title)) {
+            if ((title !== "" || description !== "") && !projects.includes(title)) {
                 setSetupStage(false)
                 setDataStage(true)
             }
-        } else if (dataStage && processingStage) {
+        } else if (dataStage) {
             setDataStage(false)
-            setModelStage(true)
-        } else if (modelStage) {
-            setModelStage(false)
-            setEvaluationStage(true)
-        } else if (evaluationStage) {
-            setEvaluationStage(false)
-            setDeployStage(true)
+            setCodeStage(true)
         } else {
             history.replace(`/project/`)
         }
@@ -57,46 +53,20 @@ const NewProject = () => {
     const changeStageSetup = () => {
         setSetupStage(true)
         setDataStage(false)
-        setModelStage(false)
-        setEvaluationStage(false)
-        setDeployStage(false)
+        setCodeStage(false)
     }
 
     const changeStageData = () => {
         setSetupStage(false)
         setDataStage(true)
-        setModelStage(false)
-        setEvaluationStage(false)
-        setDeployStage(false)
-    }
-
-    const changeStageModel = () => {
-        setSetupStage(false)
-        setDataStage(false)
-        setModelStage(true)
-        setEvaluationStage(false)
-        setDeployStage(false)
-    }
-
-    const changeStageEvaluation = () => {
-        setSetupStage(false)
-        setDataStage(false)
-        setModelStage(false)
-        setEvaluationStage(true)
-        setDeployStage(false)
-    }
-
-    const changeSubstageImport = () => {
-        setImportStage(true)
-        setProcessingStage(false)
-    }
-
-    const changeSubstageProcessing = () => {
-        setImportStage(false)
-        setProcessingStage(true)
+        setCodeStage(false)
     }
 
     const cancel = () => {
+        history.goBack();
+    }
+
+    const create = () => {
         
     }
 
@@ -115,31 +85,33 @@ const NewProject = () => {
                         <button className={`${"sidebar-stage"} ${dataStage ? "sidebar-stage-selected" : "sidebar-stage-unselected"}`}
                                 disabled={dataStage || setupStage}
                                 onClick={() => {changeStageData()}}>Data</button>
-                        {dataStage && 
-                            <p className={`${"sidebar-substage"} ${importStage && "sidebar-substage-selected"}`}
-                                disabled={importStage}
-                                onClick={() => {changeSubstageImport()}}>Import</p>
-                        }
-                        {/* DISABLE STAGE IF DATA NOT UPLOADED */}
-                        {dataStage && 
-                            <p className={`${"sidebar-substage"} ${processingStage && "sidebar-substage-selected"}`}
-                                disabled={processingStage || importStage}
-                                onClick={() => {changeSubstageProcessing()}}>Preprocessing</p>
-                        }
-                        <button className={`${"sidebar-stage"} ${modelStage ? "sidebar-stage-selected" : "sidebar-stage-unselected"}`}
-                                disabled={modelStage || setupStage || dataStage}
-                                onClick={() => {changeStageModel()}}>Modelling</button>
-                        <button className={`${"sidebar-stage"} ${evaluationStage ? "sidebar-stage-selected" : "sidebar-stage-unselected"}`}
-                                disabled={evaluationStage || setupStage || dataStage || modelStage}
-                                onClick={() => {changeStageEvaluation()}}>Evaluation</button>
-                        <button className={`${"sidebar-stage"} ${deployStage ? "sidebar-stage-selected" : "sidebar-stage-unselected"}`}
-                                disabled>Deployment</button>
+                        <button className={`${"sidebar-stage"} ${codeStage ? "sidebar-stage-selected" : "sidebar-stage-unselected"}`}
+                                disabled={codeStage || setupStage || dataStage}>Code</button>
                     </div>
                     { setupStage &&
                         <div className="new-project-setup">
-                            <input placeholder="Title"
-                                    onChange={e => {setTitle(e.target.value)}}
-                                    value={title} />
+                            <div className="new-project-setup-information">
+                                <input className="new-project-title"
+                                        placeholder="Title"
+                                        onChange={e => {setTitle(e.target.value)}}
+                                        value={title} />
+                                <textarea className="new-project-description"
+                                            placeholder="Description"
+                                            onChange={e => {setDescription(e.target.value)}}
+                                            value={description} />
+                                <div className="new-project-setup-visibility">
+                                    <label className="new-project-setup-visibility-label">Public?</label>
+                                    <input type="checkbox" 
+                                            onClick={() => {setVisibility(previous => !previous)}}
+                                            value={visibility} />
+                                </div>
+                                <div className="new-project-setup-visibility">
+                                    <label className="new-project-setup-visibility-label">Picture</label>
+                                    <input type="file" 
+                                            name="picture" 
+                                            onChange={e => {setPicture(e.target.files[0])}} />
+                                </div>
+                            </div>
                             <div className="new-project-nav">   
                                 <button className="new-project-cancel"
                                         onClick={() => {cancel()}}>Cancel</button>
@@ -150,93 +122,48 @@ const NewProject = () => {
                     }
                     { dataStage &&
                         <>
-                            { importStage &&
-                                <div className="new-project-import">
-                                    <p>Import Data...</p>
-                                    <div className="new-project-import-options">
-                                        <button>Other Project</button>
-                                        <button>Upload File</button>
-                                        <button>API</button>
-                                    </div>
+                            <div className="new-project-import">
+                                <div className="new-project-import-options">
+                                    <p>Import Data</p>
+                                    <button onClick={() => {setImportMethod("existing")}}>Existing Project</button>
+                                    <button onClick={() => {setImportMethod("file")}}>Upload File</button>
                                 </div>
-                            }
-                            { processingStage &&
-                                <div className="new-project-processing">
-                                    <div className="new-project-processing-top">
-                                        <div className="new-project-processing-split">
-                                            <p>Training (%)</p>
-                                            <input value={trainingSplit}
-                                                    onChange={e => {setTrainingSplit(e.target.value)}} />
-                                        </div>
-                                        <div className="new-project-processing-split">
-                                            <p>Validation (%)</p>
-                                            <input value={validationSplit}
-                                                    onChange={e => {setValidationSplit(e.target.value)}} />
-                                        </div>
-                                        <button onClick={() => {setNormalised(value => !value)}}>
-                                            {normalised ? "Denormalise" : "Normalise"} Data
-                                        </button>
-                                    </div>
-                                    <div className="new-project-processing-table">
-                                        <ViewTable />
-                                    </div>
-                                </div>
-                            }
+                                {importMethod !== "" &&
+                                    <>
+                                        {importMethod === "file" ?
+                                            <input type="file" 
+                                                    name="data" 
+                                                    onChange={e => {setData(e.target.files[0])}} />
+                                        :
+                                            <input className="new-project-import-projectid"
+                                                    placeholder="Project ID"
+                                                    onChange={e => {setProjectID(e.target.value)}}
+                                                    value={projectID} />
+                                        }
+                                    </>
+                                }
+                            </div>
                             <div className="new-project-nav">  
                                 <button className="new-project-cancel"
                                         onClick={() => {cancel()}}>Cancel</button>
-                                { processingStage &&
-                                    <button className="new-project-next"
-                                            onClick={() => {next()}}>Next</button>
-                                }
+                                <button className="new-project-next"
+                                        onClick={() => {next()}}>Next</button>
                             </div>
                         </>
                     }
-                    { modelStage &&
-                        <div className="new-project-data">
-                            <p>Import Data...</p>
-                            <div className="new-project-data-options">
-                                <button>Other Project</button>
-                                <button>Upload File</button>
-                                <button>API</button>
+                    { codeStage &&
+                        <div className="new-project-import">
+                            <div className="new-project-import-options">
+                                <p>Upload Code</p>
+                                <input type="file" 
+                                        name="code" 
+                                        onChange={e => {setCode(e.target.files[0])}} />
                             </div>
                             <div className="new-project-nav">  
                                 <button className="new-project-cancel"
                                         onClick={() => {cancel()}}>Cancel</button>
                                 <button className="new-project-next"
-                                        onClick={() => {next()}}>Next</button>
-                            </div>
-                        </div>
-                    }
-                    { evaluationStage &&
-                        <div className="new-project-data">
-                            <p>Import Data...</p>
-                            <div className="new-project-data-options">
-                                <button>Other Project</button>
-                                <button>Upload File</button>
-                                <button>API</button>
-                            </div>
-                            <div className="new-project-nav">  
-                                <button className="new-project-cancel"
-                                        onClick={() => {cancel()}}>Cancel</button>
-                                <button className="new-project-next"
-                                        onClick={() => {next()}}>Next</button>
-                            </div>
-                        </div>
-                    }
-                    { deployStage &&
-                        <div className="new-project-data">
-                            <p>Import Data...</p>
-                            <div className="new-project-data-options">
-                                <button>Other Project</button>
-                                <button>Upload File</button>
-                                <button>API</button>
-                            </div>
-                            <div className="new-project-nav">  
-                                <button className="new-project-cancel"
-                                        onClick={() => {cancel()}}>Cancel</button>
-                                <button className="new-project-next"
-                                        onClick={() => {next()}}>Next</button>
+                                        onClick={() => {create()}}>Create</button>
                             </div>
                         </div>
                     }

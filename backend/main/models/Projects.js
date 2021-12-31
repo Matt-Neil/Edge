@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
 
-const ModelsSchema = new mongoose.Schema({
-    epoch: {
-        type: Number,
+const ExperimentsSchema = new mongoose.Schema({
+    name: {
+        type: String,
         required: true
     }
-}, { _id : false })
+})
 
 const ProjectsSchema = new mongoose.Schema({
     creator: {
@@ -16,14 +16,34 @@ const ProjectsSchema = new mongoose.Schema({
         type: String, 
         required: true
     },
-    data: { 
-        type: [], 
+    description: { 
+        type: String, 
         required: true
     },
-    model: { 
-        type: [ModelsSchema], 
+    visibility: {
+        type: Boolean,
+        required: true
+    },
+    picture: {
+        type: String,
+        required: true
+    },
+    upvotes: {
+        type: Number,
+        required: true
+    },
+    data: {
+        type: String,
+        required: true
+    },
+    code: {
+        type: String,
+        required: true
+    },
+    experiments: {
+        type: [ExperimentsSchema],
         required: true
     }
-})
+}, {timestamps: true})
 
 module.exports = mongoose.model('Project', ProjectsSchema);
