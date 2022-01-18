@@ -1,8 +1,8 @@
 from flask import Flask, request, jsonify, send_from_directory
-from werkzeug.utils import secure_filename
 import os
 import training_model
-import predict_model
+import prediction_model
+import test
 
 ALLOWED_EXTENSIONS = {'csv'}
 
@@ -11,22 +11,30 @@ app = Flask(__name__)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/api/train-model', methods=['POST'])
-def train_model():
-    configuration_data = request.get_json()
-
-    return training_model.model(configuration_data['rate'], configuration_data['epoch'])
-
-@app.route('/api/predict-model', methods=['POST'])
+@app.route('/api/predict-model')
 def predict_model():
-    configuration_data = request.get_json()
+    return prediction_model.model()
 
-    return "OK"
+@app.route('/api/train-model')
+def train_model():
+
+    return training_model.model()
+
+@app.route('/api/test')
+def test_model():
+
+    return test.model()
+
+# @app.route('/api/predict-model', methods=['POST'])
+# def prediction_model():
+#     configuration_data = request.get_json()
+
+#     return "OK"
 
 @app.route('/api/file/upload', methods = ['POST'])
 def upload_file():
-    file = request.files['picture']
-    filename = secure_filename(file.filename)
+    file = request.files['data']
+    filename = request.form['id'] + "-data.csv"
     file.save('files/' + filename)
 
     return "OK"

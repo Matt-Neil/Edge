@@ -9,6 +9,7 @@ const SignIn = () => {
     const [createUsername, setCreateUsername] = useState("");
     const [createEmail, setCreateEmail] = useState("");
     const [createPassword, setCreatePassword] = useState("");
+    const [createName, setCreateName] = useState("")
     const {changeCurrentUser} = useContext(CurrentUserContext);
 
     const signinUser = async (e) => {
@@ -25,6 +26,7 @@ const SignIn = () => {
                 changeCurrentUser({
                     id: response.data.data._id,
                     username: response.data.data.username,
+                    name: response.data.data.name,
                     email: response.data.data.email,
                     password: response.data.data.password
                 })
@@ -44,6 +46,7 @@ const SignIn = () => {
                 const response = await authAPI.post("/signup", 
                 {
                     username: createUsername,
+                    name: createName,
                     email: createEmail,
                     password: createPassword
                 });
@@ -52,6 +55,7 @@ const SignIn = () => {
                     changeCurrentUser({
                         id: response.data.data._id,
                         username: response.data.data.username,
+                        name: response.data.data.name,
                         email: response.data.data.email,
                         password: response.data.data.password
                     })
@@ -82,6 +86,8 @@ const SignIn = () => {
             :
                 <form className="signin-side" method="POST" onSubmit={signupUser}>
                     <h1>Create an Account</h1>
+                    <label>Name</label>
+                    <input type="text" value={createName} onChange={e => {setCreateName(e.target.value)}} />
                     <label>Username</label>
                     <input type="text" value={createUsername} onChange={e => {setCreateUsername(e.target.value)}} />
                     <label>Email Address</label>

@@ -1,8 +1,9 @@
 require("dotenv").config();
 const express = require("express");
 const users = require('./routes/users');
-const projects = require('./routes/projects');
+const workspaces = require('./routes/workspaces');
 const auth = require('./routes/auth');
+const images = require('./routes/images');
 const { checkUser } = require('./middleware/auth');
 const port = process.env.PORT || 8000;
 const connectDB = require('./db');
@@ -16,13 +17,15 @@ app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
+app.use('/images', express.static('images'));
 
 app.get('*', checkUser);
 app.post('*', checkUser);
 app.put('*', checkUser);
 app.delete('*', checkUser);
 app.use('/api/users', users);
-app.use('/api/projects', projects);
+app.use('/api/workspaces', workspaces);
 app.use('/api/auth', auth);
+app.use('/api/images', images);
 
 app.listen(port, console.log(`Server running on port ${port}.`));

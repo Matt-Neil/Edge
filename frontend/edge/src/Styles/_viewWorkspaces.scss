@@ -1,0 +1,66 @@
+.view-workspaces-body {
+    display: flex;
+    flex-direction: column;
+    max-width: 990px;
+    min-width: 400px;
+    margin: 0 auto;
+
+    .view-workspaces-search {
+        display: flex;
+        align-items: center;
+        margin: 0 15px 30px 15px;
+        height: 40px;
+        border: 1px solid $mid-grey2;
+        border-radius: 10px;
+        background-color: $light-grey1;
+    
+        .view-workspaces-search-input {
+            flex: 1;
+            height: 100%;
+            border: none;
+            background: none;
+            padding: 0 10px;
+            margin: 0 8px 0 0;
+            border-radius: 10px;
+        }
+        .view-workspaces-search-icon {
+            font-size: 26px;
+            color: $mid-grey1;
+            cursor: pointer;
+            margin: 0 10px 0 0;
+        }
+    }
+    .view-workspaces-top {
+        display: flex;
+        align-items: center;
+        margin: -15px 15px 0 15px;
+    
+        h1 {
+            flex: 1;
+        }
+    }
+    .view-workspaces-middle {
+        display: flex;
+        align-items: center;
+        margin: 0 15px 50px 15px;
+
+        p {
+            flex: 1;
+        }
+        .view-workspaces-row-icon {
+            font-size: 24px;
+            color: $dark-grey1;
+            cursor: pointer;
+            margin: 0 10px 0 0;
+        }
+        .view-workspaces-grid-icon {
+            font-size: 22px;
+            color: $dark-grey1;
+            cursor: pointer;
+        }
+    }
+    .view-workspaces-list {
+        display: flex;
+        flex-wrap: wrap;
+    }
+}

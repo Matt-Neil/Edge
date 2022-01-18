@@ -1,15 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
-import OpenProjectsContextProvider from './Contexts/openProjectsContext';
+import OpenWorkspacesContextProvider from './Contexts/openWorkspacesContext';
 import CurrentUserContextProvider from './Contexts/currentUserContext';
 
 ReactDOM.render(
   <React.StrictMode>
     <CurrentUserContextProvider>
-      <OpenProjectsContextProvider>
+      <OpenWorkspacesContextProvider>
         <App />
-      </OpenProjectsContextProvider>
+      </OpenWorkspacesContextProvider>
     </CurrentUserContextProvider>
   </React.StrictMode>,
   document.getElementById('root')

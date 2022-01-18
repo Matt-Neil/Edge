@@ -1,0 +1,237 @@
+.new-project {
+    display: flex;
+    height: calc(100vh - 41px);
+
+    .sidebar {
+        width: 180px;
+        max-height: 100%;
+        background-color: $light-grey2;
+        border-right: 1px $mid-grey2 solid;
+        overflow-x: hidden;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+
+        h1 {
+            margin: 40px 15px;
+        }
+        .new-project-header {
+            height: 40px;
+            margin: 0 15px 20px 15px;
+
+            .new-project-title {
+                @include not-selectable();
+                width: 150px;
+                white-space: nowrap;
+                overflow-x: auto;
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+                color: $dark-grey1;
+            }
+            .new-project-title::-webkit-scrollbar {
+                display: none;
+            }
+        }
+        .sidebar-substage {
+            @include not-selectable();
+            font-size: 14px;
+            margin: 12px 0 12px 40px;
+            padding: 0 0 0 10px;
+            cursor: pointer;
+        }
+        .sidebar-substage:disabled {
+            cursor: default;
+        }
+        .sidebar-substage-selected {
+            border-left: 1px $dark-grey1 solid;
+        }
+        .sidebar-stage {
+            @include not-selectable();
+            width: 150px;
+            height: 60px;
+            border-radius: 10px;
+            margin: 8px 15px;
+            cursor: pointer;
+        }
+        .sidebar-stage:disabled {
+            cursor: default;
+        }
+        .sidebar-stage-selected {
+            border: none;
+            background-color: $blue1;
+            text-align: start;
+            font-size: 16px;
+            color: white;
+            padding: 0 0 0 15px;
+        }
+        .sidebar-stage-unselected {
+            border: 1px $mid-grey2 solid;
+            background-color: $light-grey1;
+            text-align: start;
+            font-size: 16px;
+            color: $dark-grey1;
+            padding: 0 0 0 15px;
+        }
+    }
+    .sidebar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .new-project-setup {
+        flex: 1;
+        margin: 15vh 0 0 0;
+        display: flex;
+        justify-content: center;
+
+        .new-project-setup-information {
+            display: flex;
+            flex-direction: column;
+            max-width: 500px;
+            width: 60%;
+
+            .new-project-title {
+                height: 40px;
+                background-color: $light-grey2;
+                border: 1px $mid-grey2 solid;
+                border-radius: 10px;
+                padding: 0 10px;
+            }
+            .new-project-description {
+                height: 150px;
+                background-color: $light-grey2;
+                border: 1px $mid-grey2 solid;
+                border-radius: 10px;
+                padding: 10px;
+                margin: 25px 0 0 0;
+                resize: none;
+            }
+            .new-project-setup-visibility {
+                display: flex;
+                align-items: center;
+                margin: 25px 0 0 0;
+
+                .new-project-setup-visibility-label {
+                    margin: 0 10px 0 0;
+                    font-size: 14px;
+                    color: $dark-grey1;
+                }
+
+                input {
+                    margin: 0 0 0 5px;
+                }
+            }
+        }
+    }
+
+    .new-project-import {
+        flex: 1;
+        margin: 15vh 0 0 0;
+        text-align: center;
+
+        .new-project-import-options {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 0 50px 0;
+
+            p {
+                font-size: 16px;
+                margin: 0 15px 0 0;
+            }
+            button {
+                width: fit-content;
+                padding: 0 15px;
+                height: 30px;
+                border: none;
+                border-radius: 7px;
+                background-color: $blue1;
+                color: white;
+                margin: 0 15px;
+                cursor: pointer;
+            }
+        }
+        .new-project-import-method {
+            height: 100px;
+
+            .new-project-import-projectid {
+                height: 40px;
+                background-color: $light-grey2;
+                border: 1px $mid-grey2 solid;
+                border-radius: 10px;
+                padding: 0 10px;
+                max-width: 300px;
+                width: 60%;
+                margin: 0 25px 0 0;
+            }
+        }
+        .new-project-data {
+            width: 90%;
+            margin: 25px auto 0 auto;
+
+            .new-project-filename {
+                text-align: left;
+                margin: 0 25px 0 0;
+            }
+
+            .new-project-data-information {
+                display: flex;
+                align-items: center;
+                margin: 0 0 25px 0;
+            }
+
+            .new-project-data-table {
+                max-height: calc(100vh - 600px);
+                overflow-y: auto;
+            }
+        }
+    }
+
+    .new-project-nav {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        margin: 15px;
+        display: flex;
+        align-items: center;
+    }
+    .new-project-cancel {
+        width: fit-content;
+        height: 40px;
+        padding: 0 15px;
+        color: $dark-grey1;
+        border: 1px $mid-grey2 solid;
+        border-radius: 10px;
+        background-color: white;
+        text-decoration: none;
+        font-size: 14px;
+        cursor: pointer;
+        margin: 0 20px 0 0;
+    }
+    .new-project-next {
+        width: fit-content;
+        height: 40px;
+        padding: 0 15px;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        background-color: $blue1;
+        text-decoration: none;
+        font-size: 14px;
+        cursor: pointer;
+    }
+    ::-webkit-input-placeholder {
+        font-family: 'Poppins', sans-serif;
+        color: $dark-grey1;
+    }
+    ::-moz-placeholder {
+        font-family: 'Poppins', sans-serif;
+        color: $dark-grey1;
+    }
+    :-ms-input-placeholder {
+        font-family: 'Poppins', sans-serif;
+        color: $dark-grey1;
+    }
+    :-moz-placeholder {
+        font-family: 'Poppins', sans-serif;
+        color: $dark-grey1;
+    }
+}

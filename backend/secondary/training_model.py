@@ -1,7 +1,7 @@
 import numpy as np
 import csv
 
-def model(input_rate, input_epoch):
+def model():
     #Opens file containing the training data set and stores each row in a list
     with open("files/training_data.csv") as training_data_set:
         training_data = []
@@ -23,7 +23,7 @@ def model(input_rate, input_epoch):
     for i in range(len(number_hidden_nodes)):
         number_hidden_nodes[i] = 2
     #Receives user input for the learning rate
-    learning_rate = input_rate
+    learning_rate = 0.1
 
     #Creates a list containing a column vector for each layer and its nodes along with a final layer storing the target output
     training_layers = [None for i in range(number_hidden_layers + 3)]
@@ -93,7 +93,7 @@ def model(input_rate, input_epoch):
             training_deltas[i] = np.empty(shape=[number_hidden_nodes[i], 1])
             
     #Initialises a counter for epochs
-    epoch = input_epoch
+    epoch = 500
     #Initialises a variable to store the MSE of the validation set after each epoch - initial value is 1 as it can never be larger than 1
     validation_previous_error = 1
     #Stores the best weight matrices

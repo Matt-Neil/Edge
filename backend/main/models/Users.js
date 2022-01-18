@@ -23,7 +23,7 @@ const UsersSchema = new mongoose.Schema({
         type: [mongoose.Schema.Types.ObjectId],
         required: true
     },
-    following: {
+    bookmarked: {
         type: [mongoose.Schema.Types.ObjectId],
         required: true
     }

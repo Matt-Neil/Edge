@@ -17,6 +17,7 @@ const CurrentUserContextProvider = (props) => {
                     setCurrentUser({
                         id: response.data.data._id,
                         username: response.data.data.username,
+                        name: response.data.data.name,
                         email: response.data.data.email,
                         password: response.data.data.password,
                         loaded: true,

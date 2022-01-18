@@ -69,8 +69,10 @@ exports.postSignup = async (req, res, next) => {
         const user = await Users.create({
             username: req.body.username,
             email: req.body.email,
+            name: req.body.name,
             password: hashedPassword,
-            projects: []
+            projects: [],
+            bookmarked: []
         });
         const token = createToken(user._id);
 

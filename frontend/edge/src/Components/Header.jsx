@@ -2,31 +2,32 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AddIcon from '@mui/icons-material/Add';
-import ProjectHeader from '../Components/Project-Header'
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import HeaderOpenWorkspaces from '../Components/Header-Open-Workspaces'
 
-const Header = ({currentUser, openProjects}) => {
+const Header = ({currentUser, openWorkspaces}) => {
     return (
         <div className="header">
-            <Link to="/home" className="header-home">Home</Link>
+            <Link to="/home" className="header-link">Home</Link>
+            <Link to="/my-workspaces" className="header-link">Workspaces</Link>
+            <Link to="/bookmarked-workspaces" className="header-link">Bookmarked</Link>
             <div className="header-open">
-                {openProjects.length !== 0 ?
+                {openWorkspaces.length !== 0 ?
                     <>
-                        {openProjects.map((project, i) => {
-                            return <ProjectHeader project={project} key={i} />
+                        {openWorkspaces.map((project, i) => {
+                            return <HeaderOpenWorkspaces project={project} key={i} />
                         })}
                     </>
                 :
-                    <p>No Projects Open</p>
+                    <p>No Workspaces Open</p>
                 }
             </div>
             <Link to="/new-project" className="header-new-project">
-                <AddIcon style={{ fontSize: 20, color: "#2383F3" }} />
+                <AddIcon className="header-new-project-icon" />
             </Link>
             <span />
             <Link to="/account" className="header-account">
-                <AccountCircleIcon style={{ fontSize: 20, color: "#474747" }} />
-                <p>{currentUser.username}</p>
+                <AccountCircleIcon className="header-account-icon" />
+                <p>{currentUser.name}</p>
             </Link>
         </div>
     )
