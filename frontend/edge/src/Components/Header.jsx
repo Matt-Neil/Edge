@@ -21,7 +21,7 @@ const Header = ({currentUser, openWorkspaces}) => {
                     <p>No Workspaces Open</p>
                 }
             </div>
-            <Link to="/new-project" className="header-new-project">
+            <Link to="/new-workspaces" className="header-new-project">
                 <AddIcon className="header-new-project-icon" />
             </Link>
             <span />
