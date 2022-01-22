@@ -1,4 +1,4 @@
-import React, {useContext} from 'react';
+import React, {useState, useContext} from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import "./Styles/app.css";
 
@@ -8,8 +8,7 @@ import ViewWorkspaces from "./Pages/View-Workspaces"
 import Home from "./Pages/Home"
 import Account from "./Pages/Account"
 import NewWorkspace from "./Pages/New-Workspace"
-import SelfWorkspace from "./Pages/Self-Workspace"
-import OtherWorkspace from "./Pages/Other-Workspace"
+import Workspace from "./Pages/Workspace"
 import SearchWorkspaces from "./Pages/Search-Workspaces"
 import SignIn from "./Pages/Sign-In"
 import NewExperiment from "./Pages/New-Experiment"
@@ -18,6 +17,7 @@ import NotFound from "./Pages/Not-Found"
 import Header from "./Components/Header"
 
 export default function App() {
+    const [searchPhrase, setSearchPhrase] = useState(null);
     const {currentUser} = useContext(CurrentUserContext);
     const {openWorkspaces} = useContext(OpenWorkspacesContext);
 
@@ -59,24 +59,22 @@ export default function App() {
                                 <div className="whole-body">
                                     <Header currentUser={currentUser} openWorkspaces={openWorkspaces} />
                                     <Route exact path="/home">
-                                        <Home />
+                                        <Home setSearchPhrase={setSearchPhrase} />
                                     </Route>
                                     <Route exact path="/my-workspaces">
-                                        <ViewWorkspaces type={"self"} />
+                                        <ViewWorkspaces type={"created"} />
                                     </Route>
                                     <Route exact path="/bookmarked-workspaces">
-                                        <ViewWorkspaces type={"bookmark"} />
+                                        <ViewWorkspaces type={"bookmark"} currentUser={currentUser} />
                                     </Route>
-                                    <Route exact path="/popular-workspaces">
-                                        <ViewWorkspaces type={"popular"} />
+                                    <Route exact path="/discover-workspaces">
+                                        <ViewWorkspaces type={"discover"} currentUser={currentUser} setSearchPhrase={setSearchPhrase} />
                                     </Route>
                                     <Route exact path="/all-workspaces">
-                                        <ViewWorkspaces type={"all"} />
+                                        <ViewWorkspaces type={"all"} currentUser={currentUser} setSearchPhrase={setSearchPhrase} />
                                     </Route>
-                                    <Route exact path="/search-results">
-                                        <SearchWorkspaces />
-                                    </Route>
-                                    <Route exact path="/workspace/:id" render={(props) => <SelfWorkspace currentUser={currentUser} key={props.location.key} />} />
+                                    <Route path="/search-results/:id" render={(props) => <SearchWorkspaces currentUser={currentUser} searchPhrase={searchPhrase} setSearchPhrase={setSearchPhrase} key={props.location.key} />} />
+                                    <Route exact path="/workspace/:id" render={(props) => <Workspace currentUser={currentUser} key={props.location.key} />} />
                                     <Route exact path="/new-workspace">
                                         <NewWorkspace currentUser={currentUser} />
                                     </Route>

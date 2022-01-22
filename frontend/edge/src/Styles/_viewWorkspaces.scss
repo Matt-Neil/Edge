@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     max-width: 990px;
-    min-width: 400px;
+    min-width: 990px;
     margin: 0 auto;
 
     .view-workspaces-search {
@@ -48,14 +48,14 @@
             flex: 1;
         }
         .view-workspaces-row-icon {
-            font-size: 24px;
-            color: $dark-grey1;
+            width: 18px;
+            height: 18px;
             cursor: pointer;
             margin: 0 10px 0 0;
         }
         .view-workspaces-grid-icon {
-            font-size: 22px;
-            color: $dark-grey1;
+            width: 18px;
+            height: 18px;
             cursor: pointer;
         }
     }

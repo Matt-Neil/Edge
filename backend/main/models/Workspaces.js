@@ -7,6 +7,17 @@ const ExperimentsSchema = new mongoose.Schema({
     }
 })
 
+const CommentsSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true
+    },
+    comment: {
+        type: String,
+        required: true
+    }
+}, {timestamps: true})
+
 const WorkspacesSchema = new mongoose.Schema({
     creator: {
         type: mongoose.Schema.Types.ObjectId,
@@ -14,34 +25,42 @@ const WorkspacesSchema = new mongoose.Schema({
     },
     title: { 
         type: String, 
-        required: true
+        required: true,
+        index: true,
+        text: true
     },
     description: { 
         type: String, 
-        required: true
-    },
-    visibility: {
-        type: Boolean,
-        required: true
+        required: true,
+        index: true,
+        text: true
     },
     picture: {
         type: String,
         required: true
     },
     upvotes: {
-        type: Number,
+        type: [mongoose.Schema.Types.ObjectId],
         required: true
     },
-    data: {
-        type: String,
+    visibility: {
+        type: Boolean,
+        required: true
+    },
+    comments: {
+        type: [CommentsSchema],
+        required: true
+    },
+    deployed: {
+        type: mongoose.Schema.Types.ObjectId,
         required: true
     },
     experiments: {
         type: [ExperimentsSchema],
         required: true
     },
-    projects: {
-        type: [mongoose.Schema.Types.ObjectId],
+    data: {
+        type: String,
         required: true
     }
 }, {timestamps: true})

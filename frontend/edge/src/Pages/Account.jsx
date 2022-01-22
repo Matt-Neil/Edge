@@ -3,15 +3,12 @@ import usersAPI from '../API/users'
 import authAPI from "../API/auth"
 import ViewSelfWorkspaces from '../Components/View-Self-Workspaces';
 import { CurrentUserContext } from '../Contexts/currentUserContext';
-import { Link, useHistory } from 'react-router-dom';
-import AddIcon from '@mui/icons-material/Add';
 
-const Account = ({currentUser}) => {
+const Account = () => {
     const [user, setUser] = useState();
     const [loaded, setLoaded] = useState(false);
     const [password, setPassword] = useState("")
     const {removeCurrentUser} = useContext(CurrentUserContext);
-    const history = useHistory();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -54,9 +51,9 @@ const Account = ({currentUser}) => {
                         <form className="account-form">
                             <label>Password</label>
                             <input placeholder="Change Password" value={password} onChange={e => {setPassword(e.target.value)}} />
-                            <button disabled={password === ""}>Save Changes</button>
+                            <button className="blue-button" disabled={password === ""}>Save Changes</button>
                         </form>
-                        <button onClick={() => {signout()}}>Sign Out</button>
+                        <button className="grey-button" onClick={() => {signout()}}>Sign Out</button>
                     </div>
                 </div>
             }

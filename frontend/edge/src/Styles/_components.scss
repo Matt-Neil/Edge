@@ -1,4 +1,4 @@
-.project-card {
+.workspace-card {
     width: 200px;
     height: 60px;
     margin: 0 15px 0 0;
@@ -15,7 +15,7 @@
     white-space: nowrap;
 }
 
-.project-data-table {
+.workspace-data-table {
     border-collapse: collapse;
     font-family: 'Poppins', sans-serif;
     font-size: 12px;
@@ -40,43 +40,50 @@
     }
 }
 
-.project-header {
+.workspace-header {
     display: flex;
     align-items: center;
     min-width: 120px;
     margin: 5px 15px 5px 0;
     height: 30px;
     border-radius: 5px;
+    cursor: pointer;
     
-    .project-header-link {
+    .workspace-header-link {
         text-decoration: none;
         width: 80px;
         margin: 0 20px 0 0;
 
-        .project-header-title-selected {
+        .workspace-header-title-selected {
             padding: 0 0 0 8px;
             font-size: 12px;
             color: $blue1;
             width: 80px;
             overflow: hidden;
             white-space: nowrap;
+            cursor: pointer;
         }
-        .project-header-title {
+        .workspace-header-title {
             padding: 0 0 0 8px;
             font-size: 12px;
             color: $dark-grey1;
             width: 80px;
             overflow: hidden;
             white-space: nowrap;
+            cursor: pointer;
         }
     }
-    .project-header-close:hover {
+    .workspace-header-close {
+        font-size: 14px;
+        cursor: pointer;
+    }
+    .workspace-header-close:hover {
         background-color: white;
         border-radius: 10px;
     }
 }
 
-.project-header:hover {
+.workspace-header:hover {
     background-color: $light-grey1;
 }
 
@@ -108,7 +115,7 @@
     overflow-x: hidden;
     
     img {
-        height: 400px;
+        height: 405px;
         margin: 0 20px 0 0; 
         @include not-selectable();
     }
@@ -116,11 +123,13 @@
         width: 100%;
         display: flex;
         flex-direction: column;
+        margin: 15px 0 0 0;
 
         img {
             height: 200px;
             width: 100%;
             border-radius: 10px;
+            object-fit: cover;
         }
         .feed-workspace-heading {
             font-size: 24px;
@@ -166,12 +175,10 @@
             .feed-workspace-upvotes {
                 margin: 0 15px 0 8px;
                 font-size: 14px;
-                color: $blue2;
             }
             .feed-workspace-icon {
                 margin: 0 0 0 15px;
                 font-size: 22px;
-                color: $blue2;
                 cursor: pointer;
             }
         }
@@ -193,8 +200,9 @@
         p {
             font-weight: 500;
             flex: 1;
+            @include not-selectable()
         }
-        .home-my-workspaces-new-project-icon {
+        .home-my-workspaces-new-workspace-icon {
             font-size: 20px;
             color: $blue1;
         }
@@ -210,6 +218,7 @@
             align-items: center;
             height: 50px;
             margin: 0 15px;
+            text-decoration: none;
             
             img {
                 height: 36px;
@@ -219,6 +228,7 @@
             }
             p {
                 font-size: 14px;
+                color: $dark-grey1;
             }
         }
         .home-my-workspaces-all {
@@ -236,7 +246,6 @@
     width: 300px;
     display: flex;
     flex-direction: column;
-    text-decoration: none;
     margin: 0 15px 30px 15px;
     padding: 0 0 15px 0;
     border-radius: 10px;
@@ -245,11 +254,19 @@
         height: 200px;
         width: 100%;
         border-radius: 10px;
+        object-fit: cover;
+        text-decoration: none;
+        @include not-selectable();
     }
     .workspace-square-card-heading {
         font-size: 18px;
         margin: 15px 15px 10px 15px;
         color: $dark-grey1;
+        text-decoration: none;
+        font-family: 'Poppins', sans-serif;
+    }
+    .workspace-square-card-heading:hover {
+        color: $blue1;
     }
     div {
         display: flex;
@@ -273,12 +290,10 @@
     .workspace-square-card-upvotes {
         margin: 0 15px 0 8px;
         font-size: 14px;
-        color: $blue2;
     }
     .workspace-square-card-icon {
         margin: 0 0 0 15px;
         font-size: 22px;
-        color: $blue2;
         cursor: pointer;
     }
     .workspace-square-card-other {
@@ -304,6 +319,9 @@
         height: 90px;
         width: 90px;
         border-radius: 10px;
+        object-fit: cover;
+        text-decoration: none;
+        @include not-selectable();
     }
     .workspace-row-card-information {
         flex: 1;
@@ -315,6 +333,12 @@
             font-size: 18px;
             margin: 0 15px 10px 15px;
             color: $dark-grey1;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            text-decoration: none;
+        }
+        .workspace-row-card-heading:hover {
+            color: $blue1;
         }
         div {
             .workspace-row-card-visibility {
@@ -323,7 +347,7 @@
                 margin: 0 15px 0 0;
             }
             .workspace-row-card-meta {
-                margin: 0 25px 0 0;
+                margin: 0 20px 0 0;
                 color: $dark-grey2;
                 font-size: 12px;
             }
@@ -337,12 +361,10 @@
         .workspace-row-card-upvotes {
             margin: 0 0 0 8px;
             font-size: 14px;
-            color: $blue2;
         }
         .workspace-row-card-icon {
             margin: 0 0 0 10px;
             font-size: 22px;
-            color: $blue2;
             cursor: pointer;
         }
     }

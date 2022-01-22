@@ -8,7 +8,7 @@
     background-color: $light-grey1;
 
     .home-search-input {
-        height: 100%;
+        height: 40px;
         width: 100%;
         border: none;
         background: none;
@@ -24,11 +24,19 @@
 }
 
 .home-left-column {
+    position: fixed;
     display: flex;
     flex-direction: column;
+    height: calc(100vh - 81px);
     max-width: 325px;
     width: 100%;
     min-width: 250px;
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.home-left-column::-webkit-scrollbar {
+    display: none;
 }
 
 .home-filter-workspaces {
@@ -73,23 +81,15 @@
         display: flex;
         flex-direction: column;
 
-        .home-feed-heading {
-            margin: 0 0 20px 0;
-            font-weight: 500;
-        }
-        .home-feed-workspaces {
-            height: calc(100vh - 136px);
-            overflow-y: scroll;
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        .home-feed-workspaces::-webkit-scrollbar {
-            display: none;
+        p {
+            color: $blue2;
         }
     }
 }
 
 .home-right-column {
+    position: fixed;
+    right: 30px;
     display: flex;
     flex-direction: column;
     max-width: 325px;

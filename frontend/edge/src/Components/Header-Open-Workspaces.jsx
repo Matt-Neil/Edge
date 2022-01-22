@@ -4,7 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { OpenWorkspacesContext } from '../Contexts/openWorkspacesContext';
 
 const HeaderOpenWorkspaces = ({workspace}) => {
-    const workspaceID = useLocation().pathname.substring(9);
+    const workspaceID = useLocation().pathname.substring(11);
     const history = useHistory();
     const {removeOpenWorkspaces} = useContext(OpenWorkspacesContext);
 
@@ -21,8 +21,7 @@ const HeaderOpenWorkspaces = ({workspace}) => {
             <Link to={`/workspace/${workspace.id}`} className="workspace-header-link">
                 <p className={workspaceID === workspace.id ? "workspace-header-title-selected" : "workspace-header-title"}>{workspace.title}</p>
             </Link>
-            <CloseIcon className="workspace-header-close" 
-                        style={{ fontSize: 14, color: workspaceID === workspace.id ? "#2383F3" : "#474747", cursor: "pointer" }}
+            <CloseIcon className={`workspace-header-close ${workspaceID === workspace.id && "blue"}`}
                         onClick={() => {closeWorkspace()}} />
         </div>
     )

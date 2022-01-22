@@ -13,8 +13,8 @@ const Header = ({currentUser, openWorkspaces}) => {
             <div className="header-open">
                 {openWorkspaces.length !== 0 ?
                     <>
-                        {openWorkspaces.map((project, i) => {
-                            return <HeaderOpenWorkspaces project={project} key={i} />
+                        {openWorkspaces.map((workspace, i) => {
+                            return <HeaderOpenWorkspaces workspace={workspace} key={i} />
                         })}
                     </>
                 :

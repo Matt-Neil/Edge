@@ -1,0 +1,53 @@
+.other-workspace-body {
+    display: flex;
+    flex-direction: column;
+    max-width: 990px;
+    min-width: 990px;
+    margin: 0 auto;
+
+    .other-workspace-top {
+        margin: 0 0 50px 0;
+        
+        img {
+            width: 100%;
+            height: 180px;
+            border-radius: 10px;
+        }
+        div {
+            display: flex;
+            align-items: center;
+    
+            .other-workspace-meta {
+                margin: 0 20px 0 0;
+                color: $dark-grey2;
+                font-size: 12px;
+            }
+            .other-workspace-meta:nth-child(2) {
+                flex: 1;
+            }
+            .other-workspace-upvotes {
+                margin: 0 0 0 8px;
+                font-size: 14px;
+            }
+            .other-workspace-icon {
+                margin: 0 0 0 15px;
+                font-size: 22px;
+                cursor: pointer;
+            }
+        }
+        .other-workspace-description {
+            font-size: 13px;
+            margin: 25px 0 40px 0;
+            letter-spacing: 0.05mm;
+            color: $dark-grey1;
+        }
+        .other-workspace-select {
+            padding: 5px 10px 5px 5px;
+            border-radius: 5px;
+            border: 1px solid $mid-grey2;
+            background-color: white;
+        }
+    }
+    .other-workspace-bottom {
+    }
+}

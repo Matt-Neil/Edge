@@ -1,8 +1,14 @@
 const mongoose = require('mongoose');
-const { isEmail } = require('validator');
-const bcrypt = require('bcrypt');
 
 const UsersSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    username: {
+        type: String,
+        required: true
+    },
     email: { 
         type: String, 
         required: true
@@ -11,15 +17,11 @@ const UsersSchema = new mongoose.Schema({
         type: String, 
         required: true
     },
-    username: {
+    skill: {
         type: String,
         required: true
     },
-    name: {
-        type: String,
-        required: true
-    },
-    projects: {
+    workspaces: {
         type: [mongoose.Schema.Types.ObjectId],
         required: true
     },
