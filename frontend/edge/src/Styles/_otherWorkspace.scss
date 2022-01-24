@@ -6,7 +6,7 @@
     margin: 0 auto;
 
     .other-workspace-top {
-        margin: 0 0 50px 0;
+        margin: 0 0 35px 0;
         
         img {
             width: 100%;
@@ -49,5 +49,109 @@
         }
     }
     .other-workspace-bottom {
+        .other-workspace-comment-form {
+            display: flex;
+            flex-direction: column;
+            margin: 10px 0 15px 0;
+
+            .other-workspace-comment-input {
+                max-height: 80px;
+                min-height: 80px;
+                width: calc(100% - 20px);
+                resize: none;
+                border: none;
+                background: none;
+                padding: 10px;
+                border: 1px solid $mid-grey2;
+                border-radius: 10px;
+                background-color: $light-grey1;
+            }
+            button {
+                margin: 10px 0 0 auto;
+            }
+        }
+        .other-workspace-comments {
+            margin: 50px 0 0 0;
+
+            .comment-card {
+                height: fit-content;
+                margin: 0 0 35px 0;
+
+                div {
+                    display: flex; 
+                    align-items: baseline;
+
+                    .comment-card-user {
+                        font-size: 14px;
+                        font-weight: 500;
+                    }
+                    .comment-card-date {
+                        margin: 0 0 0 20px;
+                        font-size: 12px;
+                    }
+                }
+                .comment-card-comment {
+                    margin: -5px 0 0 0;
+                    font-size: 14px;
+                }
+            }
+        }
+
+        .other-workspace-data {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin: 0 0 15px 0;
+
+            .other-workspace-copy {
+                display: flex;
+                align-items: center;
+                height: 24px;
+                width: 100px;
+                border-radius: 7px;
+                border: 1px solid $mid-grey2;
+                background-color: white;
+                margin: 0 20px 0 0;
+
+                p {
+                    margin: 0 auto 0 7px;
+                    font-size: 11px;
+                    color: $dark-grey1;
+                    @include not-selectable();
+                }
+                button {
+                    display: flex;
+                    align-items: center;
+                    height: 24px;
+                    width: 24px;
+                    background-color: $light-grey1;
+                    border-left: 1px solid $mid-grey2;
+                    border-top: none;
+                    border-right: none;
+                    border-bottom: none;
+                    border-top-right-radius: 6px;
+                    border-bottom-right-radius: 6px;
+                    cursor: pointer;
+
+                    .other-workspace-copy-icon {
+                        margin: 0 0 0 1px;
+                        font-size: 12px;
+                        color: $dark-grey1;
+                    }
+                }
+            }
+            a {
+                height: 26px;
+                width: 90px;
+                background-color: $blue1;
+                border-radius: 7px;
+                text-decoration: none;
+                text-align: center;
+                line-height: 26px;
+                font-size: 11px;
+                font-family: 'Poppins', sans-serif;
+                color: white;
+            }
+        }
     }
 }

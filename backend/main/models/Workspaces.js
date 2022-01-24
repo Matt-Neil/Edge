@@ -5,18 +5,19 @@ const ExperimentsSchema = new mongoose.Schema({
         type: String,
         required: true
     }
-})
+}, { _id: false })
 
 const CommentsSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true
     },
     comment: {
         type: String,
         required: true
     }
-}, {timestamps: true})
+}, { _id : false, timestamps: true})
 
 const WorkspacesSchema = new mongoose.Schema({
     creator: {
@@ -43,6 +44,10 @@ const WorkspacesSchema = new mongoose.Schema({
         type: [mongoose.Schema.Types.ObjectId],
         required: true
     },
+    bookmarked: {
+        type: [mongoose.Schema.Types.ObjectId],
+        required: true
+    },
     visibility: {
         type: Boolean,
         required: true
@@ -61,6 +66,10 @@ const WorkspacesSchema = new mongoose.Schema({
     },
     data: {
         type: String,
+        required: true
+    },
+    updated: {
+        type: Date,
         required: true
     }
 }, {timestamps: true})

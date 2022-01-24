@@ -142,10 +142,10 @@ const AccountWorkspaces = ({type, currentUser, setSearchPhrase}) => {
                         </div>
                         {type !== "discover" &&
                             <>
-                                {workspaces.length > 0 && finishedWorkspaces ?
-                                    <p className="endWorkspaces">No More Workspaces</p>
+                                {workspaces.length >= 0 && finishedWorkspaces ?
+                                    <p className="end-workspaces">No More Workspaces</p>
                                     :
-                                    <p className="loadWorkspaces" onClick={() => {loadMore()}}>Load More</p>
+                                    <p className="load-workspaces" onClick={() => {loadMore()}}>Load More</p>
                                 }
                             </>
                         }

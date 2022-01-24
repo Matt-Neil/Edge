@@ -19,8 +19,8 @@ exports.getCreated = async (req, res, next) => {
                     'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
                     'upvotes': { $size: '$upvotes' },
                     'visibility': 1,
-                    'updatedAt': 1,
-                    'page': { $lt: ['$updatedAt', new Date(req.query.date)] }
+                    'updated': 1,
+                    'page': { $lt: ['$updated', new Date(req.query.date)] }
                 }
             }, {
                 $match: {
@@ -28,7 +28,7 @@ exports.getCreated = async (req, res, next) => {
                 }
             }, { 
                 $sort: { 
-                    'updatedAt': -1
+                    'updated': -1
                 } 
             }
         ]).limit(21);
@@ -58,11 +58,11 @@ exports.getCreatedShort = async (req, res, next) => {
                     '_id': 1,
                     'title': 1,
                     'picture': 1,
-                    'updatedAt': 1
+                    'updated': 1
                 }
             }, { 
                 $sort: { 
-                    'updatedAt': -1
+                    'updated': -1
                 } 
             }
         ]).limit(3);
@@ -87,6 +87,15 @@ exports.getBookmarked = async (req, res, next) => {
                     visibility: true
                 }
             }, { 
+                $lookup: { 
+                    from: 'users', 
+                    localField: 'creator', 
+                    foreignField: '_id', 
+                    as: 'creatorName' 
+                }
+            }, {
+                $unwind: '$creatorName'
+            }, { 
                 $project: {
                     _id: 0,
                     '_id': 1,
@@ -96,8 +105,9 @@ exports.getBookmarked = async (req, res, next) => {
                     'bookmarked': { $in: [res.locals.currentUser._id, '$bookmarked'] },
                     'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
                     'upvotes': { $size: '$upvotes' },
-                    'updatedAt': 1,
-                    'page': { $lt: ['$createdAt', new Date(req.query.date)] }
+                    'updated': 1,
+                    'page': { $lt: ['$createdAt', new Date(req.query.date)] },
+                    'creatorName.name': 1
                 }
             }, {
                 $match: {
@@ -111,30 +121,8 @@ exports.getBookmarked = async (req, res, next) => {
                     ]
                 }
             }, { 
-                $lookup: { 
-                    from: 'users', 
-                    localField: 'creator', 
-                    foreignField: '_id', 
-                    as: 'creatorName' 
-                }
-            }, {
-                $unwind: '$creatorName'
-            }, {
-                $project: {
-                    _id: 0,
-                    '_id': 1,
-                    'creator': 1,
-                    'title': 1,
-                    'picture': 1,
-                    'upvoted': 1,
-                    'upvotes': 1,
-                    'bookmarked': 1,
-                    'updatedAt': 1,
-                    'creatorName.name': 1
-                }
-            }, { 
                 $sort: { 
-                    'updatedAt': -1
+                    'updated': -1
                 } 
             }
         ]).limit(21);
@@ -165,7 +153,7 @@ exports.getBookmarkedShort = async (req, res, next) => {
                     'title': 1,
                     'picture': 1,
                     'bookmarked': { $in: [res.locals.currentUser._id, '$bookmarked'] },
-                    'updatedAt': 1
+                    'updated': 1
                 }
             }, {
                 $match: {
@@ -173,7 +161,7 @@ exports.getBookmarkedShort = async (req, res, next) => {
                 }
             }, { 
                 $sort: { 
-                    'updatedAt': -1
+                    'updated': -1
                 } 
             }
         ]).limit(3);

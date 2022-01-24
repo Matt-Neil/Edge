@@ -57,9 +57,9 @@ const Home = ({setSearchPhrase}) => {
                     <div className="home-middle-column">
                         <div className="home-feed">
                             {workspaces.map((workspace, i) => {
-                                return <FeedWorkspaceCard workspace={workspace} creator={workspace.creatorName.name} />
+                                return <FeedWorkspaceCard workspace={workspace} creator={workspace.creatorName.name} key={i} />
                             })}
-                            <p>End of Feed</p>
+                            <p className="blue">End of Feed</p>
                         </div>
                     </div>
                     <div className="home-right-column">

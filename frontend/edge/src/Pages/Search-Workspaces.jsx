@@ -107,7 +107,7 @@ const AccountWorkspaces = ({searchPhrase, setSearchPhrase, currentUser}) => {
                                 </>
                             }
                         </div>
-                        {workspaces.length > 0 && finishedWorkspaces ?
+                        {workspaces.length >= 0 && finishedWorkspaces ?
                             <p className="endWorkspaces">No More Workspaces</p>
                             :
                             <p className="loadWorkspaces" onClick={() => {loadMore()}}>Load More</p>
