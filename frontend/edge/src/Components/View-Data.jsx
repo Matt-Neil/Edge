@@ -8,10 +8,13 @@ const ViewData = ({dataTable}) => {
         setHeader([])
         setData([])
         
+        const tempHeader = dataTable.slice(0, dataTable.indexOf('\n')).split(',')
+        tempHeader.unshift("Row")
         const tempData = dataTable.slice(dataTable.indexOf('\n')+1).split('\n');
-        setHeader(dataTable.slice(0, dataTable.indexOf('\n')).split(','))
+        setHeader(tempHeader)
 
-        tempData.map((row) => {
+        tempData.map((row, i) => {
+            row = `${i},${row}`
             setData(previous => [...previous, row.split(',')])
         })
     }, [dataTable])

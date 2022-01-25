@@ -106,8 +106,8 @@
             .other-workspace-copy {
                 display: flex;
                 align-items: center;
-                height: 24px;
-                width: 100px;
+                height: 30px;
+                width: 110px;
                 border-radius: 7px;
                 border: 1px solid $mid-grey2;
                 background-color: white;
@@ -115,15 +115,15 @@
 
                 p {
                     margin: 0 auto 0 7px;
-                    font-size: 11px;
+                    font-size: 12px;
                     color: $dark-grey1;
                     @include not-selectable();
                 }
                 button {
                     display: flex;
                     align-items: center;
-                    height: 24px;
-                    width: 24px;
+                    height: 30px;
+                    width: 30px;
                     background-color: $light-grey1;
                     border-left: 1px solid $mid-grey2;
                     border-top: none;
@@ -134,21 +134,21 @@
                     cursor: pointer;
 
                     .other-workspace-copy-icon {
-                        margin: 0 0 0 1px;
-                        font-size: 12px;
+                        margin: 0 0 0 4px;
+                        font-size: 14px;
                         color: $dark-grey1;
                     }
                 }
             }
             a {
-                height: 26px;
+                height: 30px;
                 width: 90px;
                 background-color: $blue1;
                 border-radius: 7px;
                 text-decoration: none;
                 text-align: center;
-                line-height: 26px;
-                font-size: 11px;
+                line-height: 30px;
+                font-size: 12px;
                 font-family: 'Poppins', sans-serif;
                 color: white;
             }

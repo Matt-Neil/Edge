@@ -44,6 +44,7 @@ input, textarea {
 }
 .inner-body {
     display: flex;
+    width: calc(100% - 335px);
     margin: 30px;
 }
 .blue-button {
@@ -201,4 +202,12 @@ input, textarea {
 }
 .grey {
     color: $mid-grey1;
+}
+.page-not-found {
+    position: absolute;
+    margin: 0 auto;
+    left: 0;
+    right: 0;
+    top: 30%;
+    text-align: center;
 }

@@ -2,112 +2,6 @@ const Workspaces = require('../models/Workspaces');
 const Users = require('../models/Users');
 const mongoose = require('mongoose');
 
-exports.getFeed = async (req, res, next) => {
-    try {
-        const workspaces = await Workspaces.aggregate([
-            { 
-                $match: {
-                    visibility: true,
-                    creator: {$ne: mongoose.Types.ObjectId(res.locals.currentUser._id)}
-                }
-            }, { 
-                $lookup: { 
-                    from: 'users', 
-                    localField: 'creator', 
-                    foreignField: '_id', 
-                    as: 'creatorName' 
-                }
-            }, {
-                $unwind: '$creatorName'
-            }, { 
-                $project: {
-                    _id: 0,
-                    '_id': 1,
-                    'creator': 1,
-                    'description': 1,
-                    'title': 1,
-                    'picture': 1,
-                    'bookmarked': { $in: [res.locals.currentUser._id, '$bookmarked'] },
-                    'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
-                    'upvotes': { $size: '$upvotes' },
-                    'updated': 1,
-                    'creatorName.name': 1
-                }
-            }, { 
-                $sort: { 
-                    'updated': -1
-                } 
-            }
-        ]).limit(50);
-    
-        res.status(201).json({
-            success: true,
-            data: workspaces
-        })
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            error: 'Server Error'
-        })
-    }
-}
-
-exports.getDiscover = async (req, res, next) => {
-    try {
-        const workspaces = await Workspaces.aggregate([
-            { 
-                $match: { 
-                    visibility: true,
-                    creator: {$ne: mongoose.Types.ObjectId(res.locals.currentUser._id)}
-                }
-            }, { 
-                $sample: { 
-                    size: 21
-                }
-            }, { 
-                $lookup: { 
-                    from: 'users', 
-                    localField: 'creator', 
-                    foreignField: '_id', 
-                    as: 'creatorName' 
-                }
-            }, {
-                $unwind: '$creatorName'
-            }, {
-                $project: {
-                    _id: 0,
-                    '_id': 1,
-                    'creator': 1,
-                    'title': 1,
-                    'picture': 1,
-                    'upvoted': 1,
-                    'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
-                    'upvotes': { $size: '$upvotes' },
-                    'bookmarked': { $in: [res.locals.currentUser._id, '$bookmarked'] },
-                    'updated': 1,
-                    'creatorName.name': 1
-                }
-            }, {
-                $match: {
-                    'bookmarked': false,
-                    'upvoted': false
-                }
-            }
-        ]);
-    
-        res.status(201).json({
-            success: true,
-            data: workspaces
-        })
-    } catch (err) {
-        console.log(err)
-        res.status(500).json({
-            success: false,
-            error: 'Server Error'
-        })
-    }
-}
-
 exports.getAll = async (req, res, next) => {
     try {
         const workspaces = await Workspaces.aggregate([
@@ -131,13 +25,14 @@ exports.getAll = async (req, res, next) => {
                     'creator': 1,
                     'title': 1,
                     'picture': 1,
-                    'bookmarked': { $in: [res.locals.currentUser._id, '$bookmarked'] },
+                    'bookmarks': { $in: [res.locals.currentUser._id, '$bookmarks'] },
                     'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
                     'upvotes': { $size: '$upvotes' },
                     'updated': 1,
                     'createdAt': 1,
                     'page': { $lt: ['$createdAt', new Date(req.query.date)] },
-                    'creatorName.name': 1
+                    'creatorName.name': 1,
+                    'type': "workspace"
                 }
             }, {
                 $match: {
@@ -156,63 +51,6 @@ exports.getAll = async (req, res, next) => {
         })
     } catch (err) {
         console.log(err)
-        res.status(500).json({
-            success: false,
-            error: 'Server Error'
-        })
-    }
-}
-
-exports.getSearch = async (req, res, next) => {
-    try {
-        const workspaces = await Workspaces.aggregate([
-            { 
-                $match: { 
-                    $text: { 
-                        $search: req.query.phrase
-                    },
-                    visibility: true
-                }
-            }, { 
-                $lookup: { 
-                    from: 'users', 
-                    localField: 'creator', 
-                    foreignField: '_id', 
-                    as: 'creatorName' 
-                }
-            }, {
-                $unwind: '$creatorName'
-            }, {
-                $project: {
-                    _id: 0,
-                    '_id': 1,
-                    'creator': 1,
-                    'title': 1,
-                    'picture': 1,
-                    'bookmarked': { $in: [res.locals.currentUser._id, '$bookmarked'] },
-                    'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
-                    'upvotes': { $size: '$upvotes' },
-                    'updated': 1,
-                    'createdAt': 1,
-                    'page': { $lt: ['$_id', mongoose.Types.ObjectId(req.query.id)] },
-                    'creatorName.name': 1
-                }
-            }, {
-                $match: {
-                    page: true
-                }
-            }, { 
-                $sort: { 
-                    '_id': -1
-                } 
-            }
-        ]).limit(21);
-    
-        res.status(201).json({
-            success: true,
-            data: workspaces
-        })
-    } catch (err) {
         res.status(500).json({
             success: false,
             error: 'Server Error'
@@ -248,11 +86,12 @@ exports.getWorkspace = async (req, res, next) => {
                     'deployed': 1,
                     'visibility': 1,
                     'self': { $eq: [mongoose.Types.ObjectId(res.locals.currentUser._id), '$creator']},
-                    'bookmarked': { $in: [res.locals.currentUser._id, '$bookmarked'] },
+                    'bookmarks': { $in: [res.locals.currentUser._id, '$bookmarks'] },
                     'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
                     'upvotes': { $size: '$upvotes' },
                     'updated': 1,
-                    'creatorName.name': 1
+                    'creatorName.name': 1,
+                    'type': "workspace"
                 }
             }, {
                 $match: {
@@ -413,17 +252,17 @@ exports.putBookmark = async (req, res, next) => {
                 error: "No Workspace Found."
             })
         } else {
-            let bookmarked
+            let bookmarks
 
             if (req.query.state === "true") {
-                bookmarked = workspace.bookmarked
-                bookmarked.splice(bookmarked.indexOf(res.locals.currentUser._id), 1)
+                bookmarks = workspace.bookmarks
+                bookmarks.splice(bookmarks.indexOf(res.locals.currentUser._id), 1)
             } else {
-                bookmarked = workspace.bookmarked
-                bookmarked.push(res.locals.currentUser._id)
+                bookmarks = workspace.bookmarks
+                bookmarks.push(res.locals.currentUser._id)
             }
 
-            workspace.bookmarked = bookmarked
+            workspace.bookmarks = bookmarks
 
             await workspace.save();
 
@@ -466,6 +305,40 @@ exports.putVisibility = async (req, res, next) => {
 }
 
 exports.putComment = async (req, res, next) => {
+    try {
+        const workspace = await Workspaces.findById(req.params.id);
+
+        if (!workspace) {
+            res.status(404).json({
+                success: false,
+                error: "No Workspace Found."
+            })
+        } else {
+            const addComment = {
+                user: res.locals.currentUser._id,
+                comment: req.body.comment
+            }
+
+            const comments = workspace.comments
+
+            comments.unshift(addComment)
+            workspace.comments = comments
+
+            await workspace.save();
+
+            res.status(201).json({
+                success: true
+            })
+        }
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        })
+    }
+}
+
+exports.putData = async (req, res, next) => {
     try {
         const workspace = await Workspaces.findById(req.params.id);
 

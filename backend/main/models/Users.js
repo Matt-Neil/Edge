@@ -20,14 +20,6 @@ const UsersSchema = new mongoose.Schema({
     skill: {
         type: String,
         required: true
-    },
-    workspaces: {
-        type: [mongoose.Schema.Types.ObjectId],
-        required: true
-    },
-    bookmarked: {
-        type: [mongoose.Schema.Types.ObjectId],
-        required: true
     }
 })
 

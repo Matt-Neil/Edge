@@ -40,21 +40,26 @@
     }
 }
 
-.workspace-header {
+.item-header {
     display: flex;
     align-items: center;
-    min-width: 120px;
-    margin: 5px 15px 5px 0;
+    min-width: 140px;
+    margin: 5px 10px 5px 0;
     height: 30px;
     border-radius: 5px;
     cursor: pointer;
     
-    .workspace-header-link {
+    img {
+        height: 12px;
+        width: 12px;
+        margin: 0 0 0 8px;
+    }
+    .item-header-link {
         text-decoration: none;
         width: 80px;
         margin: 0 20px 0 0;
 
-        .workspace-header-title-selected {
+        .item-header-title-selected {
             padding: 0 0 0 8px;
             font-size: 12px;
             color: $blue1;
@@ -63,7 +68,7 @@
             white-space: nowrap;
             cursor: pointer;
         }
-        .workspace-header-title {
+        .item-header-title {
             padding: 0 0 0 8px;
             font-size: 12px;
             color: $dark-grey1;
@@ -73,17 +78,17 @@
             cursor: pointer;
         }
     }
-    .workspace-header-close {
+    .item-header-close {
         font-size: 14px;
         cursor: pointer;
     }
-    .workspace-header-close:hover {
+    .item-header-close:hover {
         background-color: white;
         border-radius: 10px;
     }
 }
 
-.workspace-header:hover {
+.item-header:hover {
     background-color: $light-grey1;
 }
 
@@ -110,44 +115,54 @@
     }
 }
 
-.feed-workspace-card {
+.item-feed-card-card {
     display: flex;
-    overflow-x: hidden;
     
-    img {
+    .item-feed-card-bar {
         height: 405px;
         margin: 0 20px 0 0; 
         @include not-selectable();
     }
-    .feed-workspace-body {
+    .item-feed-card-body {
         width: 100%;
         display: flex;
         flex-direction: column;
         margin: 15px 0 0 0;
+        border-radius: 10px;
 
-        img {
+        .item-feed-card-picture {
             height: 200px;
             width: 100%;
             border-radius: 10px;
             object-fit: cover;
         }
-        .feed-workspace-heading {
-            font-size: 24px;
-            margin: 10px 15px;
-            text-decoration: none;
-            color: $dark-grey1;
-            font-family: 'Poppins', sans-serif;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 1;
-            line-clamp: 1; 
-            -webkit-box-orient: vertical;
+        .item-feed-card-heading {
+            display: flex;
+            align-items: center;
+
+            img {
+                height: 20px;
+                width: 20px;
+            }
+            .item-feed-card-title {
+                font-size: 24px;
+                width: fit-content;
+                margin: 10px 15px;
+                text-decoration: none;
+                color: $dark-grey1;
+                font-family: 'Poppins', sans-serif;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                line-clamp: 1; 
+                -webkit-box-orient: vertical;
+            }
         }
-        .feed-workspace-heading:hover {
+        .item-feed-card-title:hover {
             color: $blue1;
         }
-        .feed-workspace-description {
+        .item-feed-card-description {
             font-size: 13px;
             margin: 25px 15px 40px 15px;
             letter-spacing: 0.05mm;
@@ -164,37 +179,40 @@
             align-items: center;
             margin: 0 0 0 15px;
     
-            .feed-workspace-meta {
+            .item-feed-card-meta {
                 margin: 0 15px 0 0;
                 color: $dark-grey2;
                 font-size: 12px;
             }
-            .feed-workspace-meta:nth-child(2) {
+            .item-feed-card-meta:nth-child(2) {
                 flex: 1;
             }
-            .feed-workspace-upvotes {
+            .item-feed-card-upvotes {
                 margin: 0 15px 0 8px;
                 font-size: 14px;
                 cursor: default;
                 @include not-selectable()
             }
-            .feed-workspace-icon {
+            .item-feed-card-icon {
                 margin: 0 0 0 15px;
                 font-size: 22px;
                 cursor: pointer;
             }
         }
     }
+    .item-feed-card-body:hover {
+        background-color: $light-grey2;
+    }
 }
 
-.home-my-workspaces-container {
+.shortcut-items-container {
     height: fit-content;
     background-color: $light-grey2;
     border: 1px solid $mid-grey2;
     border-radius: 10px;
     margin: 0 0 20px 0;
 
-    .home-my-workspaces-heading {
+    .shortcut-items-heading {
         display: flex;
         align-items: center;
         margin: 0 15px;
@@ -204,22 +222,26 @@
             flex: 1;
             @include not-selectable()
         }
-        .home-my-workspaces-new-workspace-icon {
+        .shortcut-items-new-workspace-icon {
             font-size: 20px;
             color: $blue1;
         }
     }
-    .home-my-workspaces-list {
+    .shortcut-items-list {
         display: flex;
         flex-direction: column;
         padding: 15px 0;
         border-top: 1px solid $mid-grey2;
 
-        .home-my-workspaces-item {
+        .shortcut-items-list-none {
+            margin: 0 0 0 15px;
+            font-size: 12px;
+        }
+        .shortcut-items-item {
             display: flex;
             align-items: center;
-            height: 50px;
-            margin: 0 15px;
+            height: 36px;
+            margin: 7px 15px;
             text-decoration: none;
             
             img {
@@ -233,7 +255,7 @@
                 color: $dark-grey1;
             }
         }
-        .home-my-workspaces-all {
+        .shortcut-items-all {
             margin: 15px auto 0 auto;
             color: $blue2;
             text-decoration: none;
@@ -244,7 +266,7 @@
     }
 }
 
-.workspace-square-card {
+.item-square-card {
     width: 300px;
     display: flex;
     flex-direction: column;
@@ -252,7 +274,7 @@
     padding: 0 0 15px 0;
     border-radius: 10px;
 
-    img {
+    .item-square-card-picture {
         height: 200px;
         width: 100%;
         border-radius: 10px;
@@ -260,14 +282,25 @@
         text-decoration: none;
         @include not-selectable();
     }
-    .workspace-square-card-heading {
-        font-size: 18px;
-        margin: 15px 15px 10px 15px;
-        color: $dark-grey1;
-        text-decoration: none;
-        font-family: 'Poppins', sans-serif;
+    .item-square-card-heading {
+        display: flex;
+        align-items: center;
+
+        img {
+            height: 18px;
+            width: 18px;
+            margin: 15px 0 10px 0;
+        }
+        .item-square-card-title {
+            font-size: 18px;
+            margin: 15px 15px 10px 15px;
+            color: $dark-grey1;
+            text-decoration: none;
+            font-family: 'Poppins', sans-serif;
+            width: fit-content;
+        }
     }
-    .workspace-square-card-heading:hover {
+    .item-square-card-title:hover {
         color: $blue1;
     }
     div {
@@ -275,42 +308,44 @@
         align-items: center;
         margin: 0 0 0 15px;
 
-        .workspace-square-card-visibility {
-            color: $dark-grey1;
-            font-size: 20px;
-            margin: 0 15px 0 0;
-            cursor: pointer;
-        }
-        .workspace-square-card-meta {
+        .item-square-card-meta {
             margin: 0 15px 0 0;
             color: $dark-grey2;
             font-size: 12px;
         }
-        .workspace-square-card-meta:nth-child(2) {
+        .item-square-card-meta:nth-child(2) {
             flex: 1;
         }
     }
-    .workspace-square-card-upvotes {
+    .item-square-card-upvotes {
         margin: 0 15px 0 8px;
         font-size: 14px;
         cursor: default;
         @include not-selectable()
     }
-    .workspace-square-card-icon {
+    .item-square-card-icon {
         margin: 0 0 0 15px;
         font-size: 22px;
         cursor: pointer;
     }
-    .workspace-square-card-other {
+    .item-square-card-visibility {
+        color: $dark-grey1;
+        font-size: 20px;
+        cursor: pointer;
+    }
+    .item-square-card-bottom {
+        margin: 0 15px 0 auto;
+    }
+    .item-square-card-other {
         margin: 20px -10px 0 0;
     }
 }
 
-.workspace-square-card:hover {
+.item-square-card:hover {
     background-color: $light-grey2;
 }
 
-.workspace-row-card {
+.item-row-card {
     width: 100%;
     height: 100px;
     display: flex;
@@ -320,7 +355,7 @@
     padding: 10px 15px;
     border-radius: 10px;
 
-    img {
+    .item-row-card-picture {
         height: 90px;
         width: 90px;
         border-radius: 10px;
@@ -328,31 +363,36 @@
         text-decoration: none;
         @include not-selectable();
     }
-    .workspace-row-card-information {
+    .item-row-card-information {
         flex: 1;
         display: flex;
         flex-direction: column;
         align-items: flex-start;
 
-        .workspace-row-card-heading {
-            font-size: 18px;
-            margin: 0 15px 10px 15px;
-            color: $dark-grey1;
-            font-size: 14px;
-            font-family: 'Poppins', sans-serif;
-            text-decoration: none;
+        .item-row-card-heading {
+            display: flex;
+            align-items: center;
+
+            img {
+                height: 18px;
+                width: 18px;
+                margin: 0 0 10px 0;
+            }
+            .item-row-card-title {
+                font-size: 18px;
+                margin: 0 15px 10px 15px;
+                color: $dark-grey1;
+                font-size: 14px;
+                font-family: 'Poppins', sans-serif;
+                text-decoration: none;
+                width: fit-content;
+            }
         }
-        .workspace-row-card-heading:hover {
+        .item-row-card-title:hover {
             color: $blue1;
         }
         div {
-            .workspace-row-card-visibility {
-                color: $dark-grey1;
-                font-size: 20px;
-                margin: 0 15px 0 0;
-                cursor: pointer;
-            }
-            .workspace-row-card-meta {
+            .item-row-card-meta {
                 margin: 0 20px 0 0;
                 color: $dark-grey2;
                 font-size: 12px;
@@ -364,20 +404,26 @@
         align-items: center;
         margin: 0 0 0 15px;
 
-        .workspace-row-card-upvotes {
+        .item-row-card-upvotes {
             margin: 0 0 0 8px;
             font-size: 14px;
             cursor: default;
             @include not-selectable()
         }
-        .workspace-row-card-icon {
+        .item-row-card-icon {
             margin: 0 0 0 10px;
             font-size: 22px;
+            cursor: pointer;
+        }
+        .item-row-card-visibility {
+            color: $dark-grey1;
+            font-size: 20px;
+            margin: 0 15px 0 20px;
             cursor: pointer;
         }
     }
 }
 
-.workspace-row-card:hover {
+.item-row-card:hover {
     background-color: $light-grey2;
 }

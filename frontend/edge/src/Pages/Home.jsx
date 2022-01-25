@@ -1,13 +1,13 @@
 import React, {useState, useEffect} from 'react'
 import { Link, useHistory } from 'react-router-dom'
-import workspacesAPI from '../API/workspaces'
-import FeedWorkspaceCard from '../Components/Feed-Workspace-Card'
-import ViewSelfWorkspaces from '../Components/View-Self-Workspaces';
+import globalAPI from '../API/global'
+import ItemFeedCard from '../Components/Item-Feed-Card'
+import Shortcut from '../Components/Shortcut';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const Home = ({setSearchPhrase}) => {
-    const [workspaces, setWorkspaces] = useState()
+    const [feed, setFeed] = useState()
     const [loaded, setLoaded] = useState(false)
     const [input, setInput] = useState("");
     const history = useHistory();
@@ -15,9 +15,9 @@ const Home = ({setSearchPhrase}) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const workspaces = await workspacesAPI.get("/feed");
+                const feed = await globalAPI.get("/feed");
 
-                setWorkspaces(workspaces.data.data);
+                setFeed(feed.data.data);
                 setLoaded(true);
             } catch (err) {}
         }
@@ -51,13 +51,15 @@ const Home = ({setSearchPhrase}) => {
                                     onKeyPress={searchFunctionKey} />
                             <SearchIcon className="home-search-icon" onClick={e => searchFunctionButton()} />
                         </div>
-                        <ViewSelfWorkspaces bookmarked={false} />
-                        <ViewSelfWorkspaces bookmarked={true} />
+                        <Shortcut type="workspaces" />
+                        <Shortcut type="datasets" />
+                        <Shortcut type="bookmarked-workspaces" />
+                        <Shortcut type="bookmarked-datasets" />
                     </div>
                     <div className="home-middle-column">
                         <div className="home-feed">
-                            {workspaces.map((workspace, i) => {
-                                return <FeedWorkspaceCard workspace={workspace} creator={workspace.creatorName.name} key={i} />
+                            {feed.map((item, i) => {
+                                return <ItemFeedCard item={item} creator={item.creatorName.name} key={i} />
                             })}
                             <p className="blue">End of Feed</p>
                         </div>
@@ -67,8 +69,8 @@ const Home = ({setSearchPhrase}) => {
                             <p className="home-filter-workspaces-heading">All Workspaces</p>
                             <ArrowForwardIosIcon className="home-filter-workspaces-icon" />
                         </Link>
-                        <Link to="/discover-workspaces" className="home-filter-workspaces">
-                            <p className="home-filter-workspaces-heading">Discover Workspaces</p>
+                        <Link to="/all-datasets" className="home-filter-workspaces">
+                            <p className="home-filter-workspaces-heading">All Datasets</p>
                             <ArrowForwardIosIcon className="home-filter-workspaces-icon" />
                         </Link>
                     </div>

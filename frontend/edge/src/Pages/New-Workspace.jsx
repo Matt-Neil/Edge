@@ -167,7 +167,7 @@ const NewWorkspace = ({currentUser}) => {
                                     <label className="new-workspace-setup-visibility-label">Public?</label>
                                     <input type="checkbox" 
                                             onClick={() => {setVisibility(previous => !previous)}}
-                                            value={visibility} />
+                                            checked={visibility} />
                                 </div>
                                 <div className="new-workspace-setup-visibility">
                                     <label className="new-workspace-setup-visibility-label">Picture</label>

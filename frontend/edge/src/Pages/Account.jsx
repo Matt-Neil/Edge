@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useContext} from 'react'
 import usersAPI from '../API/users'
 import authAPI from "../API/auth"
-import ViewSelfWorkspaces from '../Components/View-Self-Workspaces';
+import Shortcut from '../Components/Shortcut';
 import { CurrentUserContext } from '../Contexts/currentUserContext';
 
 const Account = () => {
@@ -37,8 +37,9 @@ const Account = () => {
             {loaded &&
                 <div className="width-body">
                     <div className="home-left-column">
-                        <ViewSelfWorkspaces bookmarked={false} />
-                        <ViewSelfWorkspaces bookmarked={true} />
+                        <Shortcut type="workspace" />
+                        <Shortcut type="dataset" />
+                        <Shortcut type="bookmarked" />
                     </div>
                     <div className="account-information home-middle-column">
                         <h1>Account Settings</h1>

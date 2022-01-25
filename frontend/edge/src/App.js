@@ -3,13 +3,13 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-d
 import "./Styles/app.css";
 
 import { CurrentUserContext } from './Contexts/currentUserContext';
-import { OpenWorkspacesContext } from './Contexts/openWorkspacesContext';
-import ViewWorkspaces from "./Pages/View-Workspaces"
+import { OpenItemsContext } from './Contexts/openItemsContext';
+import ViewItems from "./Pages/View-Items"
 import Home from "./Pages/Home"
 import Account from "./Pages/Account"
 import NewWorkspace from "./Pages/New-Workspace"
 import Workspace from "./Pages/Workspace"
-import SearchWorkspaces from "./Pages/Search-Workspaces"
+import Search from "./Pages/Search"
 import SignIn from "./Pages/Sign-In"
 import NewExperiment from "./Pages/New-Experiment"
 import Experiment from "./Pages/Experiment"
@@ -19,7 +19,7 @@ import Header from "./Components/Header"
 export default function App() {
     const [searchPhrase, setSearchPhrase] = useState(null);
     const {currentUser} = useContext(CurrentUserContext);
-    const {openWorkspaces} = useContext(OpenWorkspacesContext);
+    const {openItems} = useContext(OpenItemsContext);
 
     const redirectPage = () => {
         if (currentUser.loaded) {
@@ -57,23 +57,29 @@ export default function App() {
                         :
                             <>
                                 <div className="whole-body">
-                                    <Header currentUser={currentUser} openWorkspaces={openWorkspaces} />
+                                    <Header currentUser={currentUser} openItems={openItems} />
                                     <Route exact path="/home">
                                         <Home setSearchPhrase={setSearchPhrase} />
                                     </Route>
-                                    <Route exact path="/my-workspaces">
-                                        <ViewWorkspaces type={"created"} />
+                                    <Route exact path="/created-workspaces">
+                                        <ViewItems type={"created-workspaces"} />
+                                    </Route>
+                                    <Route exact path="/created-datasets">
+                                        <ViewItems type={"created-datasets"} />
                                     </Route>
                                     <Route exact path="/bookmarked-workspaces">
-                                        <ViewWorkspaces type={"bookmark"} currentUser={currentUser} />
+                                        <ViewItems type={"bookmarked-workspaces"} currentUser={currentUser} />
                                     </Route>
-                                    <Route exact path="/discover-workspaces">
-                                        <ViewWorkspaces type={"discover"} currentUser={currentUser} setSearchPhrase={setSearchPhrase} />
+                                    <Route exact path="/bookmarked-datasets">
+                                        <ViewItems type={"bookmarked-datasets"} currentUser={currentUser} />
                                     </Route>
                                     <Route exact path="/all-workspaces">
-                                        <ViewWorkspaces type={"all"} currentUser={currentUser} setSearchPhrase={setSearchPhrase} />
+                                        <ViewItems type={"all-workspaces"} currentUser={currentUser} setSearchPhrase={setSearchPhrase} />
                                     </Route>
-                                    <Route path="/search-results/:id" render={(props) => <SearchWorkspaces currentUser={currentUser} searchPhrase={searchPhrase} setSearchPhrase={setSearchPhrase} key={props.location.key} />} />
+                                    <Route exact path="/all-datasets">
+                                        <ViewItems type={"all-datasets"} currentUser={currentUser} setSearchPhrase={setSearchPhrase} />
+                                    </Route>
+                                    <Route path="/search-results/:id" render={(props) => <Search currentUser={currentUser} searchPhrase={searchPhrase} setSearchPhrase={setSearchPhrase} key={props.location.key} />} />
                                     <Route exact path="/workspace/:id" render={(props) => <Workspace currentUser={currentUser} key={props.location.key} />} />
                                     <Route exact path="/new-workspace">
                                         <NewWorkspace currentUser={currentUser} />
@@ -81,11 +87,15 @@ export default function App() {
                                     <Route exact path="/account">
                                         <Account currentUser={currentUser} />
                                     </Route>
+                                    {/* <Route exact path="/404">
+                                        <NotFound />
+                                    </Route> */}
                                 </div>
                             </>
                         }
                     </>
                 }
+                {/* <Redirect to="/404" /> */}
             </Switch>
         </Router>
     );

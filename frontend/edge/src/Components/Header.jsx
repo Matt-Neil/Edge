@@ -2,23 +2,23 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AddIcon from '@mui/icons-material/Add';
-import HeaderOpenWorkspaces from '../Components/Header-Open-Workspaces'
+import HeaderOpenItem from '../Components/Header-Open-Item'
 
-const Header = ({currentUser, openWorkspaces}) => {
+const Header = ({currentUser, openItems}) => {
     return (
         <div className="header">
             <Link to="/home" className="header-link">Home</Link>
-            <Link to="/my-workspaces" className="header-link">Workspaces</Link>
-            <Link to="/bookmarked-workspaces" className="header-link">Bookmarked</Link>
+            <Link to="/created-workspaces" className="header-link">Workspaces</Link>
+            <Link to="/created-datasets" className="header-link">Datasets</Link>
             <div className="header-open">
-                {openWorkspaces.length !== 0 ?
+                {openItems.length !== 0 ?
                     <>
-                        {openWorkspaces.map((workspace, i) => {
-                            return <HeaderOpenWorkspaces workspace={workspace} key={i} />
+                        {openItems.map((item, i) => {
+                            return <HeaderOpenItem item={item} key={i} />
                         })}
                     </>
                 :
-                    <p>No Workspaces Open</p>
+                    <p>No Items Open</p>
                 }
             </div>
             <Link to="/new-workspaces" className="header-new-project">

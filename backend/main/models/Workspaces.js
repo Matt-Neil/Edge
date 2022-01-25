@@ -4,8 +4,16 @@ const ExperimentsSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
+    },
+    input: {
+        type: Number,
+        required: true
+    },
+    visibility: {
+        type: Boolean,
+        required: true
     }
-}, { _id: false })
+})
 
 const CommentsSchema = new mongoose.Schema({
     user: {
@@ -44,7 +52,7 @@ const WorkspacesSchema = new mongoose.Schema({
         type: [mongoose.Schema.Types.ObjectId],
         required: true
     },
-    bookmarked: {
+    bookmarks: {
         type: [mongoose.Schema.Types.ObjectId],
         required: true
     },
@@ -65,7 +73,7 @@ const WorkspacesSchema = new mongoose.Schema({
         required: true
     },
     data: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         required: true
     },
     updated: {
