@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import { Link } from 'react-router-dom'
-import workspacesAPI from '../API/workspaces'
+import globalAPI from '../API/global'
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 
@@ -31,7 +31,7 @@ const FeedWorkspaceCard = ({item, creator}) => {
 
     const updateUpvote = async () => {
         try {
-            await workspacesAPI.put(`/upvote/${item._id}?state=${upvoted}`);
+            await globalAPI.put(`/upvote/${item._id}?type=${item.type}&state=${upvoted}`);
 
             if (upvoted) {
                 setUpvotes(state => state-1)
@@ -45,7 +45,7 @@ const FeedWorkspaceCard = ({item, creator}) => {
 
     const updateBookmark = async () => {
         try {
-            await workspacesAPI.put(`/bookmark/${item._id}?state=${bookmarked}`);
+            await globalAPI.put(`/bookmark/${item._id}?type=${item.type}&state=${bookmarked}`);
             
             setBookmarked(state => !state)
         } catch (err) {}

@@ -37,7 +37,7 @@ const DatasetsSchema = new mongoose.Schema({
         type: [mongoose.Schema.Types.ObjectId],
         required: true
     },
-    bookmarked: {
+    bookmarks: {
         type: [mongoose.Schema.Types.ObjectId],
         required: true
     },

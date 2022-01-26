@@ -127,7 +127,7 @@
         width: 100%;
         display: flex;
         flex-direction: column;
-        margin: 15px 0 0 0;
+        margin: 15px 0;
         border-radius: 10px;
 
         .item-feed-card-picture {
@@ -220,6 +220,12 @@
         p {
             font-weight: 500;
             flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            line-clamp: 1; 
+            -webkit-box-orient: vertical;
             @include not-selectable()
         }
         .shortcut-items-new-workspace-icon {
@@ -237,7 +243,7 @@
             margin: 0 0 0 15px;
             font-size: 12px;
         }
-        .shortcut-items-item {
+        .shortcut-list-item {
             display: flex;
             align-items: center;
             height: 36px;
@@ -249,10 +255,17 @@
                 width: 36px;
                 border-radius: 5px;
                 margin: 0 15px 0 0;
+                object-fit: cover;
             }
             p {
                 font-size: 14px;
                 color: $dark-grey1;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                line-clamp: 1; 
+                -webkit-box-orient: vertical;
             }
         }
         .shortcut-items-all {
@@ -285,6 +298,7 @@
     .item-square-card-heading {
         display: flex;
         align-items: center;
+        margin: 0 15px 10px 15px;
 
         img {
             height: 18px;
@@ -293,11 +307,17 @@
         }
         .item-square-card-title {
             font-size: 18px;
-            margin: 15px 15px 10px 15px;
+            margin: 15px 0 10px 15px;
             color: $dark-grey1;
             text-decoration: none;
             font-family: 'Poppins', sans-serif;
             width: fit-content;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            line-clamp: 1; 
+            -webkit-box-orient: vertical;
         }
     }
     .item-square-card-title:hover {
@@ -340,7 +360,6 @@
         margin: 20px -10px 0 0;
     }
 }
-
 .item-square-card:hover {
     background-color: $light-grey2;
 }
@@ -382,10 +401,15 @@
                 font-size: 18px;
                 margin: 0 15px 10px 15px;
                 color: $dark-grey1;
-                font-size: 14px;
                 font-family: 'Poppins', sans-serif;
                 text-decoration: none;
                 width: fit-content;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                line-clamp: 1; 
+                -webkit-box-orient: vertical;
             }
         }
         .item-row-card-title:hover {

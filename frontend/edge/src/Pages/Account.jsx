@@ -37,9 +37,10 @@ const Account = () => {
             {loaded &&
                 <div className="width-body">
                     <div className="home-left-column">
-                        <Shortcut type="workspace" />
-                        <Shortcut type="dataset" />
-                        <Shortcut type="bookmarked" />
+                        <Shortcut type="workspaces" />
+                        <Shortcut type="datasets" />
+                        <Shortcut type="bookmarked-workspaces" />
+                        <Shortcut type="bookmarked-datasets" />
                     </div>
                     <div className="account-information home-middle-column">
                         <h1>Account Settings</h1>

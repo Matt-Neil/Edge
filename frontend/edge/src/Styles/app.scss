@@ -3,12 +3,12 @@
 @import "mixins";
 @import "components";
 @import "home";
-@import "newWorkspace";
-@import "selfWorkspace";
-@import "otherWorkspace";
+@import "newItem";
+@import "selfItem";
+@import "otherItem";
 @import "signin";
 @import "account";
-@import "viewWorkspaces";
+@import "viewItems";
 
 body {
     margin: 0;
@@ -186,12 +186,12 @@ input, textarea {
         color: $dark-grey1;
     }
 }
-.end-workspaces {
+.end-items {
     color: $blue2;
     margin: 25px 0 0 15px;
     @include not-selectable()
 }
-.load-workspaces {
+.load-items {
     color: $blue2;
     margin: 25px 0 0 15px;
     cursor: pointer;

@@ -2,7 +2,7 @@ import React, {useState, useEffect, useContext} from 'react'
 import { Link } from 'react-router-dom'
 import { OpenItemsContext } from '../Contexts/openItemsContext';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
-import workspacesAPI from '../API/workspaces'
+import globalAPI from '../API/global'
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -42,7 +42,7 @@ const WorkspaceRowCard = ({item, created, creator, currentUserID}) => {
 
     const updateUpvote = async () => {
         try {
-            await workspacesAPI.put(`/upvote/${item._id}?state=${upvoted}`);
+            await globalAPI.put(`/upvote/${item._id}?type=${item.type}&state=${upvoted}`);
 
             if (upvoted) {
                 setUpvotes(state => state-1)
@@ -56,7 +56,7 @@ const WorkspaceRowCard = ({item, created, creator, currentUserID}) => {
 
     const updateBookmark = async () => {
         try {
-            await workspacesAPI.put(`/bookmark/${item._id}?state=${bookmarked}`);
+            await globalAPI.put(`/bookmark/${item._id}?type=${item.type}&state=${bookmarked}`);
             
             setBookmarked(state => !state)
         } catch (err) {}
@@ -64,7 +64,7 @@ const WorkspaceRowCard = ({item, created, creator, currentUserID}) => {
 
     const updateVisibility = async () => {
         try {
-            await workspacesAPI.put(`/visibility/${item._id}?state=${visibility}`);
+            await globalAPI.put(`/visibility/${item._id}?type=${item.type}&state=${visibility}`);
 
             setVisibility(state => !state)
         } catch (err) {}

@@ -25,7 +25,7 @@ exports.getAll = async (req, res, next) => {
                     'creator': 1,
                     'title': 1,
                     'picture': 1,
-                    'bookmarks': { $in: [res.locals.currentUser._id, '$bookmarks'] },
+                    'bookmarked': { $in: [res.locals.currentUser._id, '$bookmarks'] },
                     'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
                     'upvotes': { $size: '$upvotes' },
                     'updated': 1,

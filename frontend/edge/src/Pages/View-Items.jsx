@@ -142,27 +142,32 @@ const ViewItems = ({type, currentUser, setSearchPhrase}) => {
         <>
             {loaded &&
                 <div className="width-body">  
-                    <div className="view-workspaces-body">
+                    <div className="view-items-body">
                         {type === "all" &&
-                            <div className="view-workspaces-search">
-                                <input className="view-workspaces-search-input"
+                            <div className="view-items-search">
+                                <input className="view-items-search-input"
                                         placeholder="Search"
                                         value={input}
                                         onChange={e => setInput(e.target.value)}
                                         onKeyPress={searchFunctionKey} />
-                                <SearchIcon className="view-workspaces-search-icon" onClick={e => searchFunctionButton()} />
+                                <SearchIcon className="view-items-search-icon" onClick={e => searchFunctionButton()} />
                             </div>
                         }
-                        <div className="view-workspaces-top">
+                        <div className="view-items-top">
                             {displayHeading()}
-                            {type === "created" && <Link to="/new-workspace" className="blue-button">New Workspace</Link>}
+                            {type === "created-workspaces" && <Link to="/new-item" className="blue-button">New Workspace</Link>}
+                            {type === "created-datasets" && <Link to="/new-dataset" className="blue-button">New Dataset</Link>}
                         </div>
-                        <div className="view-workspaces-middle">
-                            <p>{`${items.length} Workspaces`}</p>
-                            <img src="http://localhost:3000/List.png" className="view-workspaces-row-icon" onClick={() => {setRowFormat(true)}} />
-                            <img src="http://localhost:3000/Grid.png" className="view-workspaces-grid-icon" onClick={() => {setRowFormat(false)}} />
+                        <div className="view-items-middle">
+                            {(type === "created-workspaces" || type === "bookmarked-workspaces" || type === "all-workspaces") ?
+                                <p>{`${items.length} Workspaces`}</p>
+                            :
+                                <p>{`${items.length} Datasets`}</p>
+                            }
+                            <img src="http://localhost:3000/List.png" className="view-items-row-icon" onClick={() => {setRowFormat(true)}} />
+                            <img src="http://localhost:3000/Grid.png" className="view-items-grid-icon" onClick={() => {setRowFormat(false)}} />
                         </div>
-                        <div className="view-workspaces-list">
+                        <div className="view-items-list">
                             {items.length > 0 &&
                                 <>
                                     {items.map((item, i) => {
@@ -174,9 +179,15 @@ const ViewItems = ({type, currentUser, setSearchPhrase}) => {
                             }
                         </div>
                         {items.length >= 0 && finishedItems ?
-                            <p className="end-workspaces">No More Workspaces</p>
+                            <>
+                                {(type === "created-workspaces" || type === "bookmarked-workspaces" || type === "all-workspaces") ?
+                                    <p className="end-items">No more workspaces</p>
+                                :
+                                    <p className="end-items">No more datasets</p>
+                                }
+                            </>
                             :
-                            <p className="load-workspaces" onClick={() => {loadMore()}}>Load More</p>
+                            <p className="load-items" onClick={() => {loadMore()}}>Load more</p>
                         }
                     </div>
                 </div>

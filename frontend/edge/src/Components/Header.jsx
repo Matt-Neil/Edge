@@ -18,7 +18,7 @@ const Header = ({currentUser, openItems}) => {
                         })}
                     </>
                 :
-                    <p>No Items Open</p>
+                    <p>No items open</p>
                 }
             </div>
             <Link to="/new-workspaces" className="header-new-project">

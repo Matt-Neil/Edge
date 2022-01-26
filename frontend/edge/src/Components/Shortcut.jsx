@@ -18,7 +18,7 @@ const Shortcut = ({type}) => {
                     items = await usersAPI.get(`/created-workspaces-shortcut`);
                 } else if (type === "datasets") {
                     items = await usersAPI.get(`/created-datasets-shortcut`);
-                } else if (type === "bookmark-workspaces") {
+                } else if (type === "bookmarked-workspaces") {
                     items = await usersAPI.get(`/bookmarked-workspaces-shortcut`);
                 } else {
                     items = await usersAPI.get(`/bookmarked-datasets-shortcut`);
@@ -51,14 +51,14 @@ const Shortcut = ({type}) => {
                     </div>
                     <div className="shortcut-items-list">
                         {items.length === 0 ?
-                            <p className="shortcut-items-list-none">Nothing to See</p>
+                            <p className="shortcut-items-list-none">Empty</p>
                         :
                             <>
                                 {items.map((item, i) => {
                                     return (
                                         <Link to={type === "workspaces" ? `/workspace/${item._id}` : (type === "datasets") ? `/dataset/${item._id}` 
                                             : (type === "bookmarked-workspaces") ? `/workspace/${item._id}` : `/dataset/${item._id}`}
-                                                className="shortcut-items-item" 
+                                                className="shortcut-list-item" 
                                                 onClick={() => {addOpenItems(item._id, item.title, item.type)}}
                                                 key={i}>
                                             <img src={`http://localhost:4000/images/${item.picture}`} />
