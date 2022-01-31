@@ -74,6 +74,15 @@ exports.getWorkspace = async (req, res, next) => {
             }, {
                 $unwind: '$creatorName'
             }, { 
+                $lookup: { 
+                    from: 'datasets', 
+                    localField: 'data', 
+                    foreignField: '_id', 
+                    as: 'dataset' 
+                }
+            }, {
+                $unwind: '$dataset'
+            }, { 
                 $project: {
                     _id: 0,
                     '_id': 1,
@@ -89,6 +98,8 @@ exports.getWorkspace = async (req, res, next) => {
                     'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
                     'upvotes': { $size: '$upvotes' },
                     'updated': 1,
+                    'dataset.data': 1,
+                    'dataset.title': 1,
                     'creatorName.name': 1,
                     'type': "workspace"
                 }
@@ -126,33 +137,12 @@ exports.postWorkspace = async (req, res, next) => {
     try {
         const workspace = await Workspaces.create(req.body);
 
-        try {
-            const user = await Users.findById(res.locals.currentUser._id);
-    
-            if (!user) {
-                res.status(404).json({
-                    success: false,
-                    error: 'No User Found.'
-                })
-            } else {
-                const updatedWorkspaces = user.workspaces.concat(workspace._id)
-
-                user.workspaces = updatedWorkspaces
-
-                await user.save()
-
-                res.status(201).json({
-                    success: true,
-                    data: workspace._id
-                })
-            }
-        } catch (err) {
-            res.status(500).json({
-                success: false,
-                error: 'Server Error'
-            })
-        }
+        res.status(201).json({
+            success: true,
+            data: workspace._id
+        })
     } catch (err) {
+        console.log(err)
         res.status(500).json({
             success: false,
             error: 'Server Error'
@@ -167,15 +157,44 @@ exports.putWorkspace = async (req, res, next) => {
         if (!workspace) {
             res.status(404).json({
                 success: false,
-                error: "No Workspace Found."
+                error: "No Workspace Found"
             })
         } else {
+            workspace.title = req.body.title
+            workspace.description = req.body.description
+            workspace.picture = req.body.picture
             workspace.data = req.body.data
+            workspace.updated = req.body.updated
 
             await workspace.save();
 
             res.status(201).json({
                 success: true
+            })
+        }
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        })
+    }
+}
+
+exports.deleteWorkspace = async (req, res, next) => {
+    try {
+        const workspace = await Workspaces.findById(req.params.id)
+
+        if (!workspace) {
+            res.status(201).json({
+                success: false,
+                data: ""
+            })
+        } else {
+            await workspace.remove()
+            
+            res.status(201).json({
+                success: true,
+                data: ""
             })
         }
     } catch (err) {

@@ -34,7 +34,7 @@ def test_model():
 @app.route('/api/file/upload', methods = ['POST'])
 def upload_file():
     file = request.files['data']
-    filename = request.form['id'] + "-data.csv"
+    filename = request.form['id'] + ".csv"
     file.save('files/' + filename)
 
     return "OK"

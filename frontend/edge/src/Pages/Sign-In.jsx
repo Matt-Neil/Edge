@@ -6,7 +6,6 @@ const SignIn = () => {
     const [signin, setSignin] = useState(true);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [createUsername, setCreateUsername] = useState("");
     const [createEmail, setCreateEmail] = useState("");
     const [createPassword, setCreatePassword] = useState("");
     const [createName, setCreateName] = useState("")
@@ -25,7 +24,6 @@ const SignIn = () => {
             if (response.data.data && typeof window !== 'undefined') {
                 changeCurrentUser({
                     id: response.data.data._id,
-                    username: response.data.data.username,
                     name: response.data.data.name,
                     email: response.data.data.email,
                     password: response.data.data.password
@@ -41,11 +39,10 @@ const SignIn = () => {
     const signupUser = async (e) => {
         e.preventDefault();
 
-        if (createUsername !== "" || createEmail !== "" || createPassword !== "") {
+        if (createName !== "" || createEmail !== "" || createPassword !== "") {
             try {
                 const response = await authAPI.post("/signup", 
                 {
-                    username: createUsername,
                     name: createName,
                     email: createEmail,
                     password: createPassword
@@ -54,7 +51,6 @@ const SignIn = () => {
                 if (response.data.data && typeof window !== 'undefined') {
                     changeCurrentUser({
                         id: response.data.data._id,
-                        username: response.data.data.username,
                         name: response.data.data.name,
                         email: response.data.data.email,
                         password: response.data.data.password
@@ -88,8 +84,6 @@ const SignIn = () => {
                     <h1>Create an Account</h1>
                     <label>Name</label>
                     <input type="text" value={createName} onChange={e => {setCreateName(e.target.value)}} />
-                    <label>Username</label>
-                    <input type="text" value={createUsername} onChange={e => {setCreateUsername(e.target.value)}} />
                     <label>Email Address</label>
                     <input type="text" value={createEmail} onChange={e => {setCreateEmail(e.target.value)}} />
                     <label>Password</label>

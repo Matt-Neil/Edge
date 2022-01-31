@@ -4,7 +4,7 @@ import usersAPI from '../API/users'
 import { OpenItemsContext } from '../Contexts/openItemsContext';
 import AddIcon from '@mui/icons-material/Add';
 
-const Shortcut = ({type}) => {
+const Shortcut = ({type, currentUserID}) => {
     const {addOpenItems} = useContext(OpenItemsContext);
     const [items, setItems] = useState();
     const [loaded, setLoaded] = useState(false);
@@ -30,6 +30,12 @@ const Shortcut = ({type}) => {
         }
         fetchData();
     }, [])
+
+    const addHeader = (item) => {
+        if (item.creator === currentUserID) {
+            addOpenItems(item._id, item.title, item.type)
+        }
+    }
 
     return (
         <>
@@ -59,7 +65,7 @@ const Shortcut = ({type}) => {
                                         <Link to={type === "workspaces" ? `/workspace/${item._id}` : (type === "datasets") ? `/dataset/${item._id}` 
                                             : (type === "bookmarked-workspaces") ? `/workspace/${item._id}` : `/dataset/${item._id}`}
                                                 className="shortcut-list-item" 
-                                                onClick={() => {addOpenItems(item._id, item.title, item.type)}}
+                                                onClick={() => {addHeader(item)}}
                                                 key={i}>
                                             <img src={`http://localhost:4000/images/${item.picture}`} />
                                             <p>{item.title}</p>

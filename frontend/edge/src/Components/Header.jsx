@@ -4,7 +4,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import AddIcon from '@mui/icons-material/Add';
 import HeaderOpenItem from '../Components/Header-Open-Item'
 
-const Header = ({currentUser, openItems}) => {
+const Header = ({openItems}) => {
     return (
         <div className="header">
             <Link to="/home" className="header-link">Home</Link>
@@ -21,13 +21,10 @@ const Header = ({currentUser, openItems}) => {
                     <p>No items open</p>
                 }
             </div>
-            <Link to="/new-workspaces" className="header-new-project">
-                <AddIcon className="header-new-project-icon" />
-            </Link>
             <span />
             <Link to="/account" className="header-account">
                 <AccountCircleIcon className="header-account-icon" />
-                <p>{currentUser.name}</p>
+                <p>Account</p>
             </Link>
         </div>
     )

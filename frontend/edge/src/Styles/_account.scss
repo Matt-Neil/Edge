@@ -1,4 +1,7 @@
 .account-information {
+    position: absolute; 
+    left: 0; 
+    right: 0; 
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -6,6 +9,7 @@
     background-color: $light-grey2;
     border: 1px solid $mid-grey2;
     border-radius: 10px;
+    margin: 39px auto 0 auto;
 
     h1 {
         align-self: flex-start;
@@ -30,30 +34,31 @@
         color: $dark-grey1;
         cursor: not-allowed;
     }
-    .account-form {
-        align-self: flex-start;
-        display: flex;
-        flex-direction: column;
-        margin: 0 0 20px 0;
-
-        input {
-            height: 40px;
-            width: 400px;
-            padding: 0 10px;
-            margin: 10px 15px 25px 15px;
-            line-height: 40px;
-            border-radius: 10px;
-            background-color: $light-grey1;
-            border: 1px $mid-grey2 solid;
-            font-size: 12px;
-            color: $dark-grey1;
-        }
-        button:disabled {
-            cursor: not-allowed;
-        }
+    input {
+        height: 40px;
+        width: 400px;
+        padding: 0 10px;
+        margin: 10px 15px 25px 15px;
+        line-height: 40px;
+        border-radius: 10px;
+        background-color: $light-grey1;
+        border: 1px $mid-grey2 solid;
+        font-size: 12px;
+        color: $dark-grey1;
     }
-    button {
-        align-self: flex-start;
+    .account-save {
+        align-self: flex-end;
         margin: 0 15px 15px 15px;
+    }
+    .account-save:disabled {
+        cursor: not-allowed;
+    }
+    .account-signout {
+        align-self: flex-start;
+        margin: 0 15px 30px 15px;
+    }
+    .account-delete {
+        align-self: flex-start;
+        margin: 15px;
     }
 }

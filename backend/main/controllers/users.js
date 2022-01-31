@@ -2,6 +2,7 @@ const Users = require('../models/Users');
 const Workspaces = require('../models/Workspaces');
 const Datasets = require('../models/Datasets')
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 exports.getCreatedWorkspaces = async (req, res, next) => {
     try {
@@ -379,6 +380,73 @@ exports.getUser = async (req, res, next) => {
             })
         }
     } catch (err) {
+        res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        })
+    }
+}
+
+exports.putUser = async (req, res, next) => {
+    try {
+        const user = await Users.findById(res.locals.currentUser._id);
+
+        if (!user) {
+            res.status(404).json({
+                success: false,
+                error: 'No User Found.'
+            })
+        } else {
+            const hashedPassword = await bcrypt.hash(req.body.password.toString(), 10);
+
+            user.password = hashedPassword
+            
+            await user.save()
+            
+            res.status(201).json({
+                success: true,
+                data: ""
+            })
+        }
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        })
+    }
+}
+
+exports.deleteUser = async (req, res, next) => {
+    try {
+        const user = await Users.findById(res.locals.currentUser._id);
+
+        if (!user) {
+            res.status(404).json({
+                success: false,
+                error: 'No User Found.'
+            })
+        } else {
+            const workspaces = await Workspaces.find({creator: res.locals.currentUser._id})
+            const datasets = await Datasets.find({creator: res.locals.currentUser._id})
+
+            workspaces.map(async workspace => {
+                await workspace.remove()
+            })
+
+            datasets.map(async dataset => {
+                await dataset.remove()
+            })
+            
+            await user.remove();
+
+            res.status(201).json({
+                success: true,
+                data: ""
+            })
+        }
+    } catch (err) {
+        console.log(err)
         res.status(500).json({
             success: false,
             error: 'Server Error'

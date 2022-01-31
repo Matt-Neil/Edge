@@ -4,8 +4,7 @@
 @import "components";
 @import "home";
 @import "newItem";
-@import "selfItem";
-@import "otherItem";
+@import "item";
 @import "signin";
 @import "account";
 @import "viewItems";
@@ -35,7 +34,7 @@ input, textarea {
 }
 .width-body {
     display: flex;
-    margin: 80px 30px;
+    margin: 41px 30px 0 30px;
 }
 .sidebar-body {
     display: flex;
@@ -43,6 +42,8 @@ input, textarea {
     margin: 41px 0 0 0;
 }
 .inner-body {
+    position: relative;
+    left: 275px;
     display: flex;
     width: calc(100% - 335px);
     margin: 30px;
@@ -62,13 +63,26 @@ input, textarea {
     line-height: 36px;
     cursor: pointer;
 }
-
+.dark-grey-button {
+    width: fit-content;
+    height: 36px;
+    padding: 0 15px;
+    background-color: $dark-grey1;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    text-decoration: none;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+    line-height: 36px;
+    cursor: pointer;
+}
 .grey-button {
     width: fit-content;
     height: 36px;
     padding: 0 15px;
     background-color: $light-grey1;
-    border: none;
     border-radius: 10px;
     border: 1px $mid-grey2 solid;
     color: $dark-grey1;
@@ -79,13 +93,11 @@ input, textarea {
     line-height: 36px;
     cursor: pointer;
 }
-
 .white-button {
     width: fit-content;
     height: 36px;
     padding: 0 15px;
     background-color: white;
-    border: none;
     border-radius: 10px;
     border: 1px $mid-grey2 solid;
     color: $dark-grey1;
@@ -96,10 +108,9 @@ input, textarea {
     line-height: 36px;
     cursor: pointer;
 }
-
 .header {
     position: fixed;
-    width: 100vw;
+    width: 100%;
     top: 0;
     z-index: 5000;
     display: flex;
@@ -124,7 +135,7 @@ input, textarea {
         margin: 0 0 0 30px;
     }
     .header-link:nth-child(3) {
-        margin: 0 40px 0 25px;
+        margin: 0 25px;
     }
     .header-link:hover {
         color: $blue2;
@@ -153,20 +164,6 @@ input, textarea {
     }
     .header-open::-webkit-scrollbar-thumb {
         background-color: #dbdbdb;
-    }
-    .header-new-project {
-        display: flex;
-        align-items: center;
-        color: $dark-grey1;
-        text-decoration: none;
-        font-size: 14px;
-        font-family: 'Poppins', sans-serif;
-        cursor: pointer;
-        margin: 0 25px 0 10px;
-    }
-    .header-new-project-icon {
-        font-size: 20px;
-        color: $blue1;
     }
     span {
         flex: 1;
@@ -210,4 +207,7 @@ input, textarea {
     right: 0;
     top: 30%;
     text-align: center;
+}
+.item-exist {
+    margin: 30vh auto 0 auto;
 }

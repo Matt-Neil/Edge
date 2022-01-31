@@ -17,8 +17,7 @@ const ExperimentsSchema = new mongoose.Schema({
 
 const CommentsSchema = new mongoose.Schema({
     user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        type: String,
         required: true
     },
     comment: {
@@ -66,7 +65,7 @@ const WorkspacesSchema = new mongoose.Schema({
     },
     deployed: {
         type: mongoose.Schema.Types.ObjectId,
-        required: true
+        required: false
     },
     experiments: {
         type: [ExperimentsSchema],

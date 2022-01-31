@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 
-const ViewData = ({dataTable}) => {
+const ViewData = ({dataTable, start, end}) => {
     const [header, setHeader] = useState([])
     const [data, setData] = useState([])
 
@@ -13,10 +13,14 @@ const ViewData = ({dataTable}) => {
         const tempData = dataTable.slice(dataTable.indexOf('\n')+1).split('\n');
         setHeader(tempHeader)
 
-        tempData.map((row, i) => {
-            row = `${i},${row}`
+        if (tempData.length < end) {
+            end = tempData.length
+        }
+
+        for (let i=start; i<end; i++) {
+            let row = `${i+1},${tempData[i]}`
             setData(previous => [...previous, row.split(',')])
-        })
+        }
     }, [dataTable])
 
     const displayHeader = () => {
@@ -42,7 +46,7 @@ const ViewData = ({dataTable}) => {
     }
 
     return (
-        <table className="workspace-data-table">
+        <table className="data-table">
             <tbody>
                 <tr>
                     {displayHeader()}

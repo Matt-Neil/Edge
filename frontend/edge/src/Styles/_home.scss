@@ -35,6 +35,7 @@
     overflow-y: scroll;
     -ms-overflow-style: none;
     scrollbar-width: none;
+    padding: 39px 0 0 0;
 }
 .home-left-column::-webkit-scrollbar {
     display: none;
@@ -71,6 +72,7 @@
     position: absolute; 
     left: 0; 
     right: 0; 
+    padding: 39px 0 0 0;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -92,4 +94,5 @@
     max-width: 325px;
     width: 100%;
     min-width: 250px;
+    padding: 39px 0 0 0;
 }

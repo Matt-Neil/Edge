@@ -345,25 +345,31 @@ exports.putVisibility = async (req, res, next) => {
 
 exports.putComment = async (req, res, next) => {
     try {
-        const workspace = await Workspaces.findById(req.params.id);
+        let item
 
-        if (!workspace) {
+        if (req.query.type === "workspace") {
+            item = await Workspaces.findById(req.params.id);
+        } else {
+            item = await Datasets.findById(req.params.id);
+        }
+
+        if (!item) {
             res.status(404).json({
                 success: false,
                 error: "No Workspace Found."
             })
         } else {
             const addComment = {
-                user: res.locals.currentUser._id,
+                user: res.locals.currentUser.name,
                 comment: req.body.comment
             }
 
-            const comments = workspace.comments
+            const comments = item.comments
 
             comments.unshift(addComment)
-            workspace.comments = comments
+            item.comments = comments
 
-            await workspace.save();
+            await item.save();
 
             res.status(201).json({
                 success: true

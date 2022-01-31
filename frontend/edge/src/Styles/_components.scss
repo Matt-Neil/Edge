@@ -1,37 +1,36 @@
-.workspace-card {
-    width: 200px;
-    height: 60px;
-    margin: 0 15px 0 0;
-    background-color: $light-grey1;
-    border: 1px $mid-grey2 solid;
-    border-radius: 10px;
-    text-align: center;
-    text-decoration: none;
-    font-size: 14px;
-    color: $dark-grey1;
-    line-height: 60px;
-    font-family: 'Poppins', sans-serif;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-.workspace-data-table {
+.data-table {
     border-collapse: collapse;
     font-family: 'Poppins', sans-serif;
-    font-size: 12px;
     width: 100%;
 
     td, th {
-        width: 100px;
-        border: 1px $mid-grey2 solid;
+        min-width: 70px;
         text-align: left;
         overflow-x: auto;
     }
+    td:not(:last-child) {
+        border-right: 1px $mid-grey2 solid;
+        border-top: 1px $mid-grey2 solid;
+    }
+    th:not(:last-child) {
+        border-right: 1px $mid-grey2 solid;
+        border-bottom: 1px $mid-grey2 solid;
+    }
+    td:last-child {
+        border-left: 1px $mid-grey2 solid;
+        border-top: 1px $mid-grey2 solid;
+    }
+    th:last-child {
+        border-left: 1px $mid-grey2 solid;
+        border-bottom: 1px $mid-grey2 solid;
+    }
     th {
+        font-size: 12px;
         height: 20px;
         padding: 8px;
     }
     td {
+        font-size: 10px;
         height: 15px;
         padding: 5px;
     }
@@ -59,23 +58,19 @@
         width: 80px;
         margin: 0 20px 0 0;
 
-        .item-header-title-selected {
+        .item-header-title {
             padding: 0 0 0 8px;
             font-size: 12px;
-            color: $blue1;
             width: 80px;
             overflow: hidden;
             white-space: nowrap;
             cursor: pointer;
         }
-        .item-header-title {
-            padding: 0 0 0 8px;
-            font-size: 12px;
+        .item-header-title-selected {
+            color: $blue1;
+        }
+        .item-header-title-unselected {
             color: $dark-grey1;
-            width: 80px;
-            overflow: hidden;
-            white-space: nowrap;
-            cursor: pointer;
         }
     }
     .item-header-close {

@@ -72,18 +72,12 @@ const WorkspaceSquareCard = ({item, created, creator, currentUserID}) => {
 
     return (
         <div className="item-square-card" onClick={() => {addHeader()}}>
-            {item.type === "workspace" ? 
-                <Link to={`/workspace/${item._id}`}>
-                    <img src={`http://localhost:4000/images/${item.picture}`} className="item-square-card-picture" />
-                </Link>
-            :
-                <Link to={`/dataset/${item._id}`}>
-                    <img src={`http://localhost:4000/images/${item.picture}`} className="item-square-card-picture" />
-                </Link>
-            }
+            <Link to={item.type === "workspace" ? `/workspace/${item._id}` : `/dataset/${item._id}`}>
+                <img src={`http://localhost:4000/images/${item.picture}`} className="item-square-card-picture" />
+            </Link>
             <div className="item-square-card-heading">
                 {item.type === "workspace" ? <img src="http://localhost:3000/workspace.png" /> : <img src="http://localhost:3000/dataset.png" />}
-                <Link to={`/workspace/${item._id}`} className="item-square-card-title">{item.title}</Link>
+                <Link to={item.type === "workspace" ? `/workspace/${item._id}` : `/dataset/${item._id}`} className="item-square-card-title">{item.title}</Link>
             </div>
             <div>
                 {!created && <p className="item-square-card-meta">{creator}</p>}

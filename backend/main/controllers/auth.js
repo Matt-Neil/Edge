@@ -67,12 +67,10 @@ exports.postSignup = async (req, res, next) => {
     try {
         const hashedPassword = await bcrypt.hash(req.body.password.toString(), 10);
         const user = await Users.create({
-            username: req.body.username,
             email: req.body.email,
             name: req.body.name,
             password: hashedPassword,
-            projects: [],
-            bookmarked: []
+            skill: "Beginner"
         });
         const token = createToken(user._id);
 

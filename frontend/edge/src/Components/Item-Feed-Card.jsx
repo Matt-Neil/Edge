@@ -55,12 +55,12 @@ const FeedWorkspaceCard = ({item, creator}) => {
         <div className="item-feed-card-card">
             <img src="http://localhost:3000/Feed-Bar.png" className="item-feed-card-bar" />
             <div className="item-feed-card-body">
-                <Link to={`/workspace/${item._id}`}>
+                <Link to={item.type === "workspace" ? `/workspace/${item._id}` : `/dataset/${item._id}`}>
                     <img src={`http://localhost:4000/images/${item.picture}`} className="item-feed-card-picture" />
                 </Link>
                 <div className="item-feed-card-heading">
                     {item.type === "workspace" ? <img src="http://localhost:3000/workspace.png" /> : <img src="http://localhost:3000/dataset.png" />}
-                    <Link to={`/workspace/${item._id}`} className="item-feed-card-title">{item.title}</Link>
+                    <Link to={item.type === "workspace" ? `/workspace/${item._id}` : `/dataset/${item._id}`} className="item-feed-card-title">{item.title}</Link>
                 </div>
                 <div>
                     <p className="item-feed-card-meta">{creator}</p>

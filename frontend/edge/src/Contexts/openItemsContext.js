@@ -27,12 +27,16 @@ const OpenItemsContextProvider = (props) => {
         setOpenItems(openItems.filter(workspace => workspace.id !== id))
     }
 
+    const clearItems = () => {
+        localStorage.removeItem('openItems')
+    }
+
     useEffect(() => {
         localStorage.setItem('openItems', JSON.stringify(openItems));
     }, [openItems])
 
     return (
-        <OpenItemsContext.Provider value={{openItems, addOpenItems, removeOpenItems}}>
+        <OpenItemsContext.Provider value={{openItems, addOpenItems, removeOpenItems, clearItems}}>
             {props.children}
         </OpenItemsContext.Provider>
     )

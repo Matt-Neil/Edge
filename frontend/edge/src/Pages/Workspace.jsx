@@ -1,64 +1,102 @@
-import React, {useState, useEffect, useRef} from 'react'
-import {useHistory, Link, useParams} from "react-router-dom"
+import React, {useState, useEffect, useContext, useRef} from 'react'
+import {Link, useParams} from "react-router-dom"
 import workspacesAPI from '../API/workspaces'
+import globalAPI from '../API/global'
+import imageAPI from '../API/images'
+import datasetsAPI from '../API/datasets'
 import ViewData from '../Components/View-Data';
+import { OpenItemsContext } from '../Contexts/openItemsContext';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 const Workspace = ({currentUser}) => {
     const [loaded, setLoaded] = useState(false)
+    const [exist, setExist] = useState()
+    const [noData, setNoData] = useState()
+    const [dataset, setDataset] = useState()
     const [workspace, setWorkspace] = useState()
-    const [displayData, setDisplayData] = useState("data")
     const [dataTable, setDataTable] = useState()
     const [dataID, setDataID] = useState("")
-    const [uploadData, setUploadData] = useState()
-    const [replaceData, setReplaceData] = useState(false)
-    const [editData, setEditData] = useState(false)
+    const [updated, setUpdated] = useState()
+    const [changedData, setChangedData] = useState(false)
+    const [changedSettings, setChangedSettings] = useState(false)
     const [date, setDate] = useState("");
-    const [copyData, setCopyData] = useState(true)
+    const [start, setStart] = useState(0)
+    const [end, setEnd] = useState(30)
+    const [row, setRow] = useState()
+    const [maxRows, setMaxRows] = useState()
+    const [page, setPage] = useState(1)
     const [bookmarked, setBookmarked] = useState()
     const [upvoted, setUpvoted] = useState()
     const [upvotes, setUpvotes] = useState()
+    const [picture, setPicture] = useState()
     const [visibility, setVisibility] = useState()
     const [comments, setComments] = useState()
     const [comment, setComment] = useState("")
-    const [section, setSection] = useState("data")
+    const [section, setSection] = useState("experiments")
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
     const [image, setImage] = useState();
-    const copyInterval = useRef(0)
+    const [refreshTable, setRefreshTable] = useState()
+    const [displayPublic, setDisplayPublic] = useState(false)
+    const [displayExist, setDisplayExist] = useState(false)
+    const {addOpenItems} = useContext(OpenItemsContext);
     const workspaceID = useParams().id;
+    const publicInterval = useRef(0)
+    const existInterval = useRef(0)
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const workspace = await workspacesAPI.get(`/${workspaceID}`);
-                const comments = await workspacesAPI.get(`/comment/${workspaceID}`);
+                const comments = await globalAPI.get(`/comment/${workspaceID}?type=workspace`);
+
+                if (workspace.data.data.creator === currentUser.id) {
+                    addOpenItems(workspace.data.data._id, workspace.data.data.title, workspace.data.data.type)
+                }
 
                 setWorkspace(workspace.data.data);
+                setUpdated(workspace.data.data.updated);
                 setBookmarked(workspace.data.data.bookmarked)
                 setUpvoted(workspace.data.data.upvoted)
+                setPicture(workspace.data.data.picture)
                 setUpvotes(workspace.data.data.upvotes)
+                setDataset(workspace.data.data.dataset.data)
                 setVisibility(workspace.data.data.visibility)
                 setTitle(workspace.data.data.title)
                 setDescription(workspace.data.data.description)
                 setComments(comments.data.data)
 
-                fetch(`http://127.0.0.1:5000/files/${workspace.data.data.data}.csv`)
+                fetch(`http://127.0.0.1:5000/files/${workspace.data.data.dataset.data}.csv`)
                     .then(response => response.text())
                     .then(text => {
                         setDataTable(text)
+                        setMaxRows(text.slice(text.indexOf('\n')+1).split('\n').length)
+                        setExist(true)
+                        setNoData(false)
                         setLoaded(true)
-                    })
-            } catch (err) {}
+                    }).catch(function(err) {
+                        console.log(err)
+                        setExist(true)
+                        setNoData(true)
+                        setLoaded(true)
+                    });
+            } catch (err) {
+                console.log(err)
+                setExist(false)
+                setLoaded(true)
+            }
         }
         fetchData();
-    }, [])
+    }, [])    
 
     useEffect(() => {
-        if (loaded) {
-            const updatedDate = new Date(workspace.updated);
+        if (loaded && exist) {
+            const updatedDate = new Date(updated);
             const currentDate = new Date();
     
             if ((currentDate.getTime() - updatedDate.getTime()) / (1000 * 3600 * 24) >= 365) {
@@ -75,39 +113,45 @@ const Workspace = ({currentUser}) => {
                 setDate("Updated just now")
             }
         }
-    }, [loaded])
+    }, [loaded, updated])
 
-    useEffect(() => {
-        if (replaceData && uploadData !== undefined) {
-            setDataID("")
-
-            const file = uploadData;
-            const reader = new FileReader();
-
-            reader.onload = function(e) {
-                setDataTable(e.target.result);
-            }
-
-            reader.readAsText(file)
-        }
-    }, [uploadData])
-
-    const existingWorkspace = () => {
-        setUploadData(undefined)
-
-        fetch(`http://127.0.0.1:5000/files/${dataID}.csv`)
-            .then(response => response.text())
-            .then(text => {setDataTable(text)})
+    const displayPublicInterval = () => {
+        clearInterval(publicInterval.current)
+        setDisplayPublic(true);
+        publicInterval.current = setInterval(() => {
+            setDisplayPublic(false);
+        }, 1200)
+        return ()=> {clearInterval(publicInterval.current)};
     }
 
-    const copiedInterval = () => {
-        clearInterval(copyInterval.current)
-        navigator.clipboard.writeText(workspace.data);
-        setCopyData(false);
-        copyInterval.current = setInterval(() => {
-            setCopyData(true);
-        }, 800)
-        return ()=> {clearInterval(copyInterval.current)};
+    const displayExistInterval = () => {
+        clearInterval(existInterval.current)
+        setDisplayExist(true);
+        existInterval.current = setInterval(() => {
+            setDisplayExist(false);
+        }, 1200)
+        return ()=> {clearInterval(existInterval.current)};
+    }
+
+    const existingWorkspace = async () => {
+        try {
+            const checkPublic = await datasetsAPI.get(`/check-public?data=${dataID}`)
+    
+            if (checkPublic.data.success && checkPublic.data.data.visibility) {
+                fetch(`http://127.0.0.1:5000/files/${dataID}.csv`)
+                    .then(response => response.text())
+                    .then(text => {
+                        setDataTable(text)
+                        setMaxRows(text.slice(text.indexOf('\n')+1).split('\n').length)
+                        setDataset(dataID)
+                        setRefreshTable(new Date().getTime())
+                    })
+            } else if (checkPublic.data.success && !checkPublic.data.data.visibility) {
+                displayPublicInterval()
+            } else {
+                displayExistInterval()
+            }
+        } catch (err) {}
     }
 
     const updateUpvote = async () => {
@@ -144,7 +188,7 @@ const Workspace = ({currentUser}) => {
         e.preventDefault()
 
         try {
-            await workspacesAPI.put(`/comment/${workspaceID}`, {
+            await globalAPI.put(`/comment/${workspaceID}?type=workspace`, {
                 comment: comment
             });
 
@@ -154,6 +198,50 @@ const Workspace = ({currentUser}) => {
             }, ...comments])
             setComment("")
         } catch (err) {}
+    }
+
+    const fetchRow = () => {
+        if (!isNaN(row) && row !== "") {
+            setStart(row-1)
+            setEnd(row)
+            setRefreshTable(new Date().getTime())
+        } else {
+            if (start === (page-1)*30 && end === page*30) {
+                setRow("")
+            } else {
+                setStart((page-1)*30)
+                setEnd(page*30)
+                setRefreshTable(new Date().getTime())
+            }
+        }
+    }
+
+    const cancelRow = () => {
+        if (start === (page-1)*30 && end === page*30) {
+            setRow("")
+        } else {
+            setStart((page-1)*30)
+            setEnd(page*30)
+            setRefreshTable(new Date().getTime())
+        }
+    }
+
+    const previousPage = () => {
+        if (page > 1) {
+            setPage(state => state-1)
+        }
+        setStart((page-1)*30)
+        setEnd(page*30)
+        setRefreshTable(new Date().getTime())
+    }
+
+    const nextPage = () => {
+        if (page*30 < maxRows && maxRows > 30) {
+            setPage(state => state+1)
+            setStart((page)*30)
+            setEnd((page+1)*30)
+            setRefreshTable(new Date().getTime())
+        }
     }
 
     const commentDate = (date) => {
@@ -175,169 +263,204 @@ const Workspace = ({currentUser}) => {
         }
     }
 
-    const updateWorkspaceSettings = () => {
+    const updateSettings = async () => {
+        if (image) {
+            const formImage = new FormData();
+            formImage.append('image', image);
+            
+            try {
+                const tempPicture = picture
+                const imageResponse = await imageAPI.post("/upload", formImage);
 
+                await workspacesAPI.put(`/${workspaceID}`, {
+                    title: title,
+                    description: description,
+                    picture: imageResponse.data.data,
+                    data: dataset,
+                    updated: new Date().toISOString()
+                })
+
+                setImage(undefined)
+                setPicture(imageResponse.data.data)
+
+                if (tempPicture !== "default.png") {
+                    await imageAPI.put('/remove', {picture: tempPicture});
+                }
+            } catch (err) {}
+        } else {
+            try {
+                await workspacesAPI.put(`/${workspaceID}`, {
+                    title: title,
+                    description: description,
+                    picture: picture,
+                    data: dataset,
+                    updated: new Date().toISOString()
+                })
+            } catch (err) {}
+        }
+
+        setUpdated(new Date().toISOString())
+        setChangedSettings(false)
     }
 
-    const deleteWorkspace = () => {
-
+    const deleteWorkspace = async () => {
+        try {
+            await workspacesAPI.delete(`/${workspaceID}`)
+        } catch (err) {}
     }
 
     return (
         <>
-            {loaded &&
-                <>
-                    {workspace.self ?
-                        <div className="sidebar-body"> 
-                            <div className="self-workspace-sidebar">
-                                <h1>{workspace.title}</h1>
-                                <button className={section === "data" ? "blue-button" : "grey-button"} onClick={() => {setSection("data")}}>Data</button>
-                                <button className={section === "experiments" ? "blue-button" : "grey-button"} onClick={() => {setSection("experiments")}}>Experiments</button>
-                                <button className={section === "settings" ? "blue-button" : "grey-button"} onClick={() => {setSection("settings")}}>Settings</button>
-                                <button className={section === "comments" ? "blue-button" : "grey-button"} onClick={() => {setSection("comments")}}>Comments</button>
+            {loaded && exist ?
+                <div className="width-body">  
+                    <div className="item-body">
+                        <div className="item-top">
+                            <img className="item-picture" src={`http://localhost:4000/images/${picture}`} />
+                            {workspace.self && 
+                                <input className="item-image-input"
+                                        type="file" 
+                                        name="image" 
+                                        onChange={e => {
+                                            setImage(e.target.files[0])
+                                            {!changedSettings && setChangedSettings(true)}
+                                        }} />
+                            }
+                            <div className="item-heading">
+                                {workspace.self ? 
+                                    <input className="item-title-input"
+                                            placeholder="Title" 
+                                            value={title}
+                                            onChange={e => {
+                                                setTitle(e.target.value)
+                                                {!changedSettings && setChangedSettings(true)}
+                                            }} /> 
+                                : 
+                                    <>
+                                        <img src="http://localhost:3000/workspace.png" />
+                                        <h1>{workspace.title}</h1>
+                                    </>
+                                }
                             </div>
-                            <div className="inner-body">
-                                {section === "data" ?
-                                    <div className="self-workspace-data">
-                                        <div className="self-workspace-data-options">
-                                            {replaceData && 
-                                                <div>
-                                                    <input type="file" 
-                                                            name="data"
-                                                            key={Date.now()}
-                                                            onChange={e => {setUploadData(e.target.files[0])}} />
-                                                    <input className="self-workspace-replace-data-id"
+                            <div>
+                                {!workspace.self && <p className="item-meta">{workspace.creatorName.name}</p>}
+                                <p className="item-meta">{date}</p>
+                                <span />
+                                <Link to={`/dataset/${dataset}`} className="workspace-dataset-link">View Dataset</Link>
+                                {!workspace.self && <BookmarkIcon className={`item-icon ${bookmarked ? "blue" : "grey"}`} onClick={() => {updateBookmark()}} />}
+                                {workspace.self && 
+                                    <>
+                                        {visibility ? 
+                                            <VisibilityIcon className="item-visibility" onClick={() => {updateVisibility()}} />
+                                        :
+                                            <VisibilityOffIcon className="item-visibility" onClick={() => {updateVisibility()}} />
+                                        }
+                                    </>
+                                }
+                                <ThumbUpIcon className={`item-icon ${upvoted ? "blue" : "grey"}`} onClick={() => {updateUpvote()}} />
+                                <p className={`item-upvotes ${upvoted ? "blue" : "grey"}`}>{upvotes}</p>
+                            </div>
+                            {workspace.self ? 
+                                <>
+                                    <textarea className="item-description-input"
+                                                placeholder="Description" 
+                                                value={description}
+                                                onChange={e => {
+                                                    setDescription(e.target.value)
+                                                    {!changedSettings && setChangedSettings(true)}
+                                                }} /> 
+                                    <div className="item-middle">
+                                        <button className="dark-grey-button item-delete"
+                                                onClick={() => {deleteWorkspace()}}>Delete</button>
+                                        <button className="blue-button"
+                                                disabled={!changedSettings}
+                                                onClick={() => {updateSettings()}}>Save Changes</button>
+                                    </div>
+                                </>
+                            : 
+                                <p className="item-description">{workspace.description}</p>
+                            }
+                            <select className="item-select" onChange={e => {setSection(e.target.value)}}>
+                                <option value="experiments">Experiments</option>
+                                <option value="data">Data</option>
+                                <option value="comments">Comments</option>
+                            </select>
+                        </div>
+                        <div className="item-bottom">
+                            {section === "experiments" ? 
+                                <> 
+                                    
+                                </>
+                            : section === "data" ?
+                                <>
+                                    {noData ?
+                                        <p className="item-exist">Cannot find dataset</p>
+                                    :   
+                                        <>
+                                            {workspace.self && 
+                                                <div className="item-options">
+                                                    <p>Change Dataset</p>
+                                                    <input className="workspace-replace-input"
                                                             placeholder="Data ID"
                                                             onChange={e => {setDataID(e.target.value)}}
                                                             value={dataID} />
-                                                    <button className="blue-button self-workspace-replace-data-fetch"
+                                                    <button className="white-button item-replace-button"
+                                                            onClick={() => {
+                                                                setDataID(undefined)
+                                                                setChangedData(false)
+                                                            }}
+                                                            disabled={!changedData}>Clear</button>
+                                                    <button className="blue-button item-replace-button"
                                                             disabled={dataID === ""}
-                                                            onClick={() => {existingWorkspace()}}>Fetch</button>
+                                                            onClick={() => {existingWorkspace()}}>Import</button>
+                                                    {displayPublic && <p className="new-item-data-public">Dataset not public</p>}
+                                                    {displayExist && <p className="new-item-data-public">Dataset does not exist</p>}
                                                 </div>
                                             }
-                                            <button className={`self-workspace-data-replace ${replaceData ? "blue-button" : "grey-button"}`} onClick={() => {setReplaceData(state => !state)}}>Replace Data</button>
-                                            <button className={`self-workspace-data-edit ${editData ? "blue-button" : "grey-button"}`} onClick={() => {setEditData(state => !state)}}>Edit</button>
-                                            <a href={`http://127.0.0.1:5000/files/${workspace.data}.csv`} download>Download</a>
-                                        </div>
-                                        <div className="self-workspace-data-table">
-                                            <ViewData dataTable={dataTable} />
-                                        </div>
-                                    </div>
-                                : section === "experiments" ?
-                                    <div className="self-workspace-body">
-                                    </div>
-                                : section === "settings" ?
-                                    <div className="self-workspace-settings">
-                                        <form className="self-workspace-settings-form" method="PUT" onSubmit={updateWorkspaceSettings}>
-                                            <label>Title</label>
-                                            <input placeholder="Title" value={title} onChange={e => {setTitle(e.target.value)}} />
-                                            <label>Description</label>
-                                            <textarea placeholder="Description" value={description} onChange={e => {setDescription(e.target.value)}} />
-                                            <label>Picture</label>
-                                            <input type="file" 
-                                                    className="self-workspace-settings-picture"
-                                                    name="image" 
-                                                    onChange={e => {setImage(e.target.files[0])}} />
-                                            <div className="self-workspace-settings-visibility">
-                                                <label className="self-workspace-settings-visibility-label">Public?</label>
-                                                <input type="checkbox" 
-                                                        className="self-workspace-settings-visibility-input"
-                                                        onClick={() => {updateVisibility()}}
-                                                        checked={visibility} />
+                                            <div className="item-data-table-pagination">
+                                                <input placeholder="Row number" value={row} onChange={e => {setRow(e.target.value)}} />
+                                                <button onClick={() => {cancelRow()}} className="white-button item-data-cancel-fetch">Cancel</button>
+                                                <button onClick={() => {fetchRow()}} className="blue-button item-data-fetch">Fetch</button>
+                                                <span />
+                                                <ArrowBackIosNewIcon className="item-data-table-pagination-icon" onClick={() => {previousPage()}} />
+                                                <p>Page {page} / {Math.ceil(maxRows/30)}</p>
+                                                <ArrowForwardIosIcon className="item-data-table-pagination-icon" onClick={() => {nextPage()}} />
                                             </div>
-                                            <div className="self-workspace-settings-buttons">
-                                                <button className="blue-button" disabled={title === "" || description === ""}>Save Changes</button>
-                                                <button className="white-button" type="button" onClick={() => {deleteWorkspace()}}>Delete</button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                : 
-                                    <div className="self-workspace-comments">
-                                        {comments.length === 0 ?
-                                            <p className="self-workspace-comments-none">No Comments</p>
-                                        :
-                                            <>
-                                                {comments.map((comment, i) => {
-                                                    return (
-                                                        <div className="comment-card" key={i}>
-                                                            <div>
-                                                                <p className="comment-card-user">{comment.user.name}</p>
-                                                                <p className="comment-card-date">{commentDate(comment.createdAt)}</p>
-                                                            </div>
-                                                            <p className="comment-card-comment">{comment.comment}</p>
-                                                        </div>
-                                                    )
-                                                })}
-                                            </>
-                                        }
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    :
-                        <div className="width-body">  
-                            <div className="other-workspace-body">
-                                <div className="other-workspace-top">
-                                    <img src={`http://localhost:4000/images/${workspace.picture}`} />
-                                    <h1>{workspace.title}</h1>
-                                    <div>
-                                        <p className="other-workspace-meta">{workspace.creatorName.name}</p>
-                                        <p className="other-workspace-meta">{date}</p>
-                                        <BookmarkIcon className={`other-workspace-icon ${bookmarked ? "blue" : "grey"}`} onClick={() => {updateBookmark()}} />
-                                        <ThumbUpIcon className={`other-workspace-icon ${upvoted ? "blue" : "grey"}`} onClick={() => {updateUpvote()}} />
-                                        <p className={`other-workspace-upvotes ${upvoted ? "blue" : "grey"}`}>{upvotes}</p>
-                                    </div>
-                                    <p className="other-workspace-description">{workspace.description}</p>
-                                    <select className="other-workspace-select" onChange={e => {setDisplayData(e.target.value)}}>
-                                        <option value="data">Data</option>
-                                        <option value="model">Model</option>
-                                        <option value="comment">Comments</option>
-                                    </select>
-                                </div>
-                                <div className="other-workspace-bottom">
-                                    {displayData === "data" ? 
-                                        <> 
-                                            <div className="other-workspace-data">
-                                                <div className="other-workspace-copy">
-                                                    {copyData ? <p>Data ID</p> : <p>Copied</p>}
-                                                    <button disabled={!copyData} onClick={() => {copiedInterval()}}>
-                                                        <ContentCopyIcon className="other-workspace-copy-icon" />
-                                                    </button>
-                                                </div>
-                                                <a href={`http://127.0.0.1:5000/files/${workspace.data}.csv`} download>Download</a>
-                                            </div>
-                                            <ViewData dataTable={dataTable} />
-                                        </>
-                                    : displayData === "model" ?
-                                        <p>model</p>
-                                    :
-                                        <>
-                                            <form className="other-workspace-comment-form" method="PUT" onSubmit={addComment}>
-                                                <p className="other-workspace-comment">Leave a Comment</p>
-                                                <textarea className="other-workspace-comment-input" value={comment} onChange={e => {setComment(e.target.value)}} />
-                                                <button className="blue-button">Comment</button>
-                                            </form>
-                                            <div className="other-workspace-comments">
-                                                {comments.map((comment, i) => {
-                                                    return (
-                                                        <div className="comment-card" key={i}>
-                                                            <div>
-                                                                <p className="comment-card-user">{comment.user.name}</p>
-                                                                <p className="comment-card-date">{commentDate(comment.createdAt)}</p>
-                                                            </div>
-                                                            <p className="comment-card-comment">{comment.comment}</p>
-                                                        </div>
-                                                    )
-                                                })}
+                                            <div className="item-data-table">
+                                                <ViewData dataTable={dataTable} start={start} end={end} key={refreshTable} />
                                             </div>
                                         </>
                                     }
-                                </div>
-                            </div>
+                                </>
+                            : 
+                                <>
+                                    <form className="item-comment-form" method="PUT" onSubmit={addComment}>
+                                        <p className="item-comment">Leave a Comment</p>
+                                        <textarea className="item-comment-input" placeholder="Write here" value={comment} onChange={e => {setComment(e.target.value)}} />
+                                        <button className="blue-button">Comment</button>
+                                    </form>
+                                    <div className="item-comments">
+                                        {comments.map((comment, i) => {
+                                            return (
+                                                <div className="comment-card" key={i}>
+                                                    <div>
+                                                        <p className="comment-card-user">{comment.user}</p>
+                                                        <p className="comment-card-date">{commentDate(comment.createdAt)}</p>
+                                                    </div>
+                                                    <p className="comment-card-comment">{comment.comment}</p>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                </>
+                            }
                         </div>
-                    }
-                </>
-            }
+                    </div>
+                </div>
+            : loaded && !exist &&
+                <div className="width-body">  
+                    <p className="item-exist">Cannot find workspace</p>
+                </div>
+            }   
         </>
     )
 }

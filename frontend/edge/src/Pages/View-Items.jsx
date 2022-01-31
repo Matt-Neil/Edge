@@ -155,7 +155,7 @@ const ViewItems = ({type, currentUser, setSearchPhrase}) => {
                         }
                         <div className="view-items-top">
                             {displayHeading()}
-                            {type === "created-workspaces" && <Link to="/new-item" className="blue-button">New Workspace</Link>}
+                            {type === "created-workspaces" && <Link to="/new-workspace" className="blue-button">New Workspace</Link>}
                             {type === "created-datasets" && <Link to="/new-dataset" className="blue-button">New Dataset</Link>}
                         </div>
                         <div className="view-items-middle">

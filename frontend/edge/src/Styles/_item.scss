@@ -1,0 +1,314 @@
+.item-body {
+    display: flex;
+    flex-direction: column;
+    max-width: 990px;
+    min-width: 990px;
+    margin: 40px auto 0 auto;
+
+    .item-top {
+        display: flex;
+        flex-direction: column;
+        margin: 0 0 35px 0;
+        
+        .item-picture {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .item-image-input {
+            margin: 10px 0 25px 0;
+        }
+        .item-heading {
+
+            .item-title-input {
+                height: 40px;
+                width: 100%;
+                margin: 0 0 30px 0;
+                padding: 0 10px;
+                border: 1px solid $mid-grey2;
+                border-radius: 10px;
+                background-color: $light-grey1;
+            }
+            img {
+                height: 20px;
+                width: 20px;
+                margin: 0 15px 0 0;
+            }
+        }
+        div {
+            display: flex;
+            align-items: center;
+    
+            .workspace-dataset-link {
+                margin: 0 40px 0 0;
+                font-weight: 500;
+                font-size: 14px;
+                text-decoration: none;
+                color: $dark-grey1;
+                font-family: 'Poppins', sans-serif;
+                cursor: pointer;
+            }
+            .item-visibility {
+                color: $dark-grey1;
+                font-size: 26px;
+                margin: 0 5px 0 0;
+                cursor: pointer;
+            }
+            .item-meta {
+                margin: 0 20px 0 0;
+                color: $dark-grey2;
+                font-size: 12px;
+            }
+            span {
+                flex: 1;
+            }
+            .item-upvotes {
+                margin: 0 0 0 8px;
+                font-size: 14px;
+            }
+            .item-icon {
+                margin: 0 0 0 15px;
+                font-size: 22px;
+                cursor: pointer;
+            }
+        }
+        .item-description-input {
+            min-height: 150px;
+            width: calc(100% - 20px);
+            background-color: $light-grey1;
+            border: 1px $mid-grey2 solid;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 30px 0 15px 0;
+            resize: none;
+        }
+        .item-middle {
+            margin: 0 0 30px auto;
+            
+            .item-delete {
+                margin: 0 20px 0 0;
+            }
+        }
+        .item-save:disabled {
+            cursor: not-allowed;
+        }
+        .item-description {
+            font-size: 13px;
+            margin: 25px 0 40px 0;
+            letter-spacing: 0.05mm;
+            color: $dark-grey1;
+        }
+        .item-select {
+            width: fit-content;
+            padding: 5px 10px 5px 5px;
+            border-radius: 5px;
+            border: 1px solid $mid-grey2;
+            background-color: white;
+        }
+    }
+    .item-bottom {
+        .item-comment-form {
+            display: flex;
+            flex-direction: column;
+            margin: 10px 0 15px 0;
+
+            .item-comment-input {
+                max-height: 80px;
+                min-height: 80px;
+                width: calc(100% - 20px);
+                resize: none;
+                border: none;
+                background: none;
+                padding: 10px;
+                border: 1px solid $mid-grey2;
+                border-radius: 10px;
+                background-color: $light-grey1;
+            }
+            button {
+                margin: 10px 0 0 auto;
+            }
+        }
+        .item-comments {
+            margin: 50px 0 0 0;
+
+            .comment-card {
+                height: fit-content;
+                margin: 0 0 35px 0;
+
+                div {
+                    display: flex; 
+                    align-items: baseline;
+
+                    .comment-card-user {
+                        font-size: 14px;
+                        font-weight: 500;
+                    }
+                    .comment-card-date {
+                        margin: 0 0 0 20px;
+                        font-size: 12px;
+                    }
+                }
+                .comment-card-comment {
+                    margin: -5px 0 0 0;
+                    font-size: 14px;
+                }
+            }
+        }
+
+        .item-options {
+            display: flex;
+            align-items: center;
+            margin: 0 0 40px 0;
+
+            p {
+                margin: 0 20px 0 0;
+                font-weight: 500;
+                font-size: 14px;
+                color: $dark-grey1;
+            }
+            .workspace-replace-input {
+                margin: 0 15px 0 0;
+                height: 30px;
+                padding: 0 10px;
+                border: 1px solid $mid-grey2;
+                border-radius: 7px;
+                background-color: $light-grey1;
+            }
+            .item-replace-button {
+                margin: 0 15px 0 0;
+                height: 30px;
+                line-height: 30px;
+            }
+            .item-replace-button:disabled {
+                cursor: not-allowed;
+            }
+            .dataset-copy {
+                display: flex;
+                align-items: center;
+                height: 30px;
+                width: 110px;
+                border-radius: 7px;
+                border: 1px solid $mid-grey2;
+                background-color: white;
+                margin: 0 20px 0 auto;
+
+                p {
+                    margin: 0 auto 0 7px;
+                    font-size: 12px;
+                    color: $dark-grey1;
+                    @include not-selectable();
+                }
+                button {
+                    display: flex;
+                    align-items: center;
+                    height: 30px;
+                    width: 30px;
+                    background-color: $light-grey1;
+                    border-left: 1px solid $mid-grey2;
+                    border-top: none;
+                    border-right: none;
+                    border-bottom: none;
+                    border-top-right-radius: 6px;
+                    border-bottom-right-radius: 6px;
+                    cursor: pointer;
+
+                    .dataset-copy-icon {
+                        margin: 0 0 0 4px;
+                        font-size: 14px;
+                        color: $dark-grey1;
+                    }
+                }
+            }
+            a {
+                height: 30px;
+                width: fit-content;
+                padding: 0 15px;
+                background-color: $blue1;
+                border-radius: 7px;
+                text-decoration: none;
+                text-align: center;
+                line-height: 30px;
+                font-size: 12px;
+                font-family: 'Poppins', sans-serif;
+                color: white;
+            }
+        }
+        .item-data-table {
+            margin: 0 0 30px 0;
+            overflow-y: auto;
+            min-height: 100vh;
+            border: 1px solid $mid-grey2;
+        }
+        .item-data-table-pagination {
+            display: flex;
+            align-items: center;
+            margin: 0 0 15px 0;
+           
+            .item-data-table-pagination-icon {
+                font-size: 14px;
+                border: 1px solid $mid-grey2;
+                background-color: white;
+                padding: 5px;
+                border-radius: 15px;
+                cursor: pointer;
+            }
+            p {
+                font-size: 14px;
+                color: $dark-grey1; 
+                margin: 0 20px;
+            }
+            input {
+                margin: 0 15px 0 0;
+                height: 30px;
+                padding: 0 10px;
+                border: 1px solid $mid-grey2;
+                border-radius: 7px;
+                background-color: $light-grey1;
+            }
+            .item-data-fetch {
+                height: 30px;
+                line-height: 30px;
+                border-radius: 7px;
+            }
+            .item-data-cancel-fetch {
+                height: 30px;
+                line-height: 30px;
+                border-radius: 7px;
+                margin: 0 15px 0 0;
+            }
+            span {
+                flex: 1;
+            }
+        }
+
+        .item-workspaces {
+            display: flex;
+            align-items: center;
+
+            p {
+                flex: 1;
+            }
+            .item-workspaces-row-icon {
+                width: 18px;
+                height: 18px;
+                cursor: pointer;
+                margin: 0 10px 0 0;
+            }
+            .item-workspaces-grid-icon {
+                width: 18px;
+                height: 18px;
+                cursor: pointer;
+            }
+        }
+        .item-workspaces-list {
+            display: flex;
+            flex-wrap: wrap;
+            width: calc(100% + 30px);
+            margin: 15px 0 30px -15px;
+        }
+        .item-workspaces-end {
+            margin: 0 0 30px -15px;
+        }
+    }
+}

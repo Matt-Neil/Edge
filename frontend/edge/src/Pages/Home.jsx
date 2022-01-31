@@ -6,7 +6,7 @@ import Shortcut from '../Components/Shortcut';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
-const Home = ({setSearchPhrase}) => {
+const Home = ({setSearchPhrase, currentUser}) => {
     const [feed, setFeed] = useState()
     const [loaded, setLoaded] = useState(false)
     const [input, setInput] = useState("");
@@ -51,17 +51,17 @@ const Home = ({setSearchPhrase}) => {
                                     onKeyPress={searchFunctionKey} />
                             <SearchIcon className="home-search-icon" onClick={e => searchFunctionButton()} />
                         </div>
-                        <Shortcut type="workspaces" />
-                        <Shortcut type="datasets" />
-                        <Shortcut type="bookmarked-workspaces" />
-                        <Shortcut type="bookmarked-datasets" />
+                        <Shortcut type="workspaces" currentUserID={currentUser.id} />
+                        <Shortcut type="datasets" currentUserID={currentUser.id} />
+                        <Shortcut type="bookmarked-workspaces" currentUserID={currentUser.id} />
+                        <Shortcut type="bookmarked-datasets" currentUserID={currentUser.id} />
                     </div>
                     <div className="home-middle-column">
                         <div className="home-feed">
                             {feed.map((item, i) => {
                                 return <ItemFeedCard item={item} creator={item.creatorName.name} key={i} />
                             })}
-                            <p className="blue">End of Feed</p>
+                            <p className="blue">End of feed</p>
                         </div>
                     </div>
                     <div className="home-right-column">

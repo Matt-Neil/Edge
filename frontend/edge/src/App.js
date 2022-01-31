@@ -8,7 +8,9 @@ import ViewItems from "./Pages/View-Items"
 import Home from "./Pages/Home"
 import Account from "./Pages/Account"
 import NewWorkspace from "./Pages/New-Workspace"
+import NewDataset from "./Pages/New-Dataset"
 import Workspace from "./Pages/Workspace"
+import Dataset from "./Pages/Dataset"
 import Search from "./Pages/Search"
 import SignIn from "./Pages/Sign-In"
 import NewExperiment from "./Pages/New-Experiment"
@@ -57,9 +59,9 @@ export default function App() {
                         :
                             <>
                                 <div className="whole-body">
-                                    <Header currentUser={currentUser} openItems={openItems} />
+                                    <Header openItems={openItems} />
                                     <Route exact path="/home">
-                                        <Home setSearchPhrase={setSearchPhrase} />
+                                        <Home setSearchPhrase={setSearchPhrase} currentUser={currentUser} />
                                     </Route>
                                     <Route exact path="/created-workspaces">
                                         <ViewItems type={"created-workspaces"} />
@@ -81,11 +83,15 @@ export default function App() {
                                     </Route>
                                     <Route path="/search-results/:id" render={(props) => <Search currentUser={currentUser} searchPhrase={searchPhrase} setSearchPhrase={setSearchPhrase} key={props.location.key} />} />
                                     <Route exact path="/workspace/:id" render={(props) => <Workspace currentUser={currentUser} key={props.location.key} />} />
+                                    <Route exact path="/dataset/:id" render={(props) => <Dataset currentUser={currentUser} key={props.location.key} />} />
                                     <Route exact path="/new-workspace">
                                         <NewWorkspace currentUser={currentUser} />
                                     </Route>
+                                    <Route exact path="/new-dataset">
+                                        <NewDataset currentUser={currentUser} />
+                                    </Route>
                                     <Route exact path="/account">
-                                        <Account currentUser={currentUser} />
+                                        <Account />
                                     </Route>
                                     {/* <Route exact path="/404">
                                         <NotFound />
