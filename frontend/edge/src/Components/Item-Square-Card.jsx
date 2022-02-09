@@ -42,7 +42,7 @@ const WorkspaceSquareCard = ({item, created, creator, currentUserID}) => {
 
     const updateUpvote = async () => {
         try {
-            await globalAPI.put(`/upvote/${item._id}?type=${item.type}&state=${upvoted}`);
+            await globalAPI.put(`/upvote/${item._id}?state=${upvoted}`);
 
             if (upvoted) {
                 setUpvotes(state => state-1)
@@ -56,7 +56,7 @@ const WorkspaceSquareCard = ({item, created, creator, currentUserID}) => {
 
     const updateBookmark = async () => {
         try {
-            await globalAPI.put(`/bookmark/${item._id}?type=${item.type}&state=${bookmarked}`);
+            await globalAPI.put(`/bookmark/${item._id}?state=${bookmarked}`);
             
             setBookmarked(state => !state)
         } catch (err) {}
@@ -64,7 +64,7 @@ const WorkspaceSquareCard = ({item, created, creator, currentUserID}) => {
 
     const updateVisibility = async () => {
         try {
-            await globalAPI.put(`/visibility/${item._id}?type=${item.type}&state=${visibility}`);
+            await globalAPI.put(`/visibility/${item._id}?state=${visibility}`);
 
             setVisibility(state => !state)
         } catch (err) {}

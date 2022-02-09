@@ -3,8 +3,7 @@ import {useHistory, Link} from "react-router-dom"
 import ItemRowCard from '../Components/Item-Row-Card'
 import ItemSquareCard from '../Components/Item-Square-Card'
 import usersAPI from '../API/users'
-import workspacesAPI from '../API/workspaces'
-import datasetsAPI from '../API/datasets'
+import itemsAPI from '../API/items'
 import SearchIcon from '@mui/icons-material/Search';
 
 const ViewItems = ({type, currentUser, setSearchPhrase}) => {
@@ -21,23 +20,20 @@ const ViewItems = ({type, currentUser, setSearchPhrase}) => {
                 let items;
 
                 switch (type) {
-                    case "created-workspaces":
-                        items = await usersAPI.get(`/created-workspaces?date=${new Date().toISOString()}`);
-                        break;
                     case "created-datasets":
-                        items = await usersAPI.get(`/created-datasets?date=${new Date().toISOString()}`);
+                        items = await usersAPI.get(`/created?type=dataset&date=${new Date().toISOString()}`);
                         break;
-                    case "bookmarked-workspaces":
-                        items = await usersAPI.get(`/bookmarked-workspaces?date=${new Date().toISOString()}`);
+                    case "created-workspaces":
+                        items = await usersAPI.get(`/created?type=workspace&date=${new Date().toISOString()}`);
                         break;
-                    case "bookmarked-datasets":
-                        items = await usersAPI.get(`/bookmarked-datasets?date=${new Date().toISOString()}`);
+                    case "bookmarked":
+                        items = await usersAPI.get(`/bookmarked?date=${new Date().toISOString()}`);
                         break;
                     case "all-workspaces":
-                        items = await workspacesAPI.get(`/all?date=${new Date().toISOString()}`);
+                        items = await itemsAPI.get(`/all?type=workspace&date=${new Date().toISOString()}`);
                         break;
                     case "all-datasets":
-                        items = await datasetsAPI.get(`/all?date=${new Date().toISOString()}`);
+                        items = await itemsAPI.get(`/all?type=dataset&date=${new Date().toISOString()}`);
                         break;
                 }
 
@@ -72,24 +68,21 @@ const ViewItems = ({type, currentUser, setSearchPhrase}) => {
                 let fetchedItems;
 
                 switch (type) {
-                    case "created-workspaces":
-                        fetchedItems = await usersAPI.get(`/created-workspaces?date=${date}`);
-                        break;
                     case "created-datasets":
-                        fetchedItems = await usersAPI.get(`/created-datasets?date=${date}`);
+                        items = await usersAPI.get(`/created?type=dataset&date=${date}`);
                         break;
-                    case "bookmarked-workspaces":
-                        fetchedItems = await usersAPI.get(`/bookmarked-workspaces?date=${date}`);
+                    case "created-workspaces":
+                        items = await usersAPI.get(`/created?type=workspace&date=${date}`);
                         break;
-                    case "bookmarked-datasets":
-                        fetchedItems = await usersAPI.get(`/bookmarked-datasets?date=${date}`);
+                    case "bookmarked":
+                        items = await usersAPI.get(`/bookmarked?date=${date}`);
                         break;
                     case "all-workspaces":
-                        fetchedItems = await workspacesAPI.get(`/all?date=${date}`);
+                        items = await itemsAPI.get(`/all?type=workspace&date=${date}`);
                         break;
                     case "all-datasets":
-                        fetchedItems = await datasetsAPI.get(`/all?date=${date}`);
-                        break;    
+                        items = await itemsAPI.get(`/all?type=dataset&date=${date}`);
+                        break;   
                 }
     
                 if (fetchedItems.data.data.length < 21) {
@@ -121,11 +114,8 @@ const ViewItems = ({type, currentUser, setSearchPhrase}) => {
             case "created-datasets":
                 heading = "Created Datasets"
                 break;
-            case "bookmarked-workspaces":
-                heading = "Bookmarked Workspaces"
-                break;
-            case "bookmarked-datasets":
-                heading = "Bookmarked Datasets"
+            case "bookmarked":
+                heading = "Bookmarked"
                 break;
             case "all-workspaces":
                 heading = "All Workspaces"
@@ -155,14 +145,16 @@ const ViewItems = ({type, currentUser, setSearchPhrase}) => {
                         }
                         <div className="view-items-top">
                             {displayHeading()}
-                            {type === "created-workspaces" && <Link to="/new-workspace" className="blue-button">New Workspace</Link>}
-                            {type === "created-datasets" && <Link to="/new-dataset" className="blue-button">New Dataset</Link>}
+                            {type === "created-workspaces" && <Link to="/create-workspace" className="blue-button">Create Workspace</Link>}
+                            {type === "created-datasets" && <Link to="/create-dataset" className="blue-button">Create Dataset</Link>}
                         </div>
                         <div className="view-items-middle">
-                            {(type === "created-workspaces" || type === "bookmarked-workspaces" || type === "all-workspaces") ?
+                            {(type === "created-workspaces" || type === "all-workspaces") ?
                                 <p>{`${items.length} Workspaces`}</p>
-                            :
+                            : (type === "created-datasets" || type === "all-dataset") ?
                                 <p>{`${items.length} Datasets`}</p>
+                            :
+                                <p>{`${items.length} Bookmarks`}</p>
                             }
                             <img src="http://localhost:3000/List.png" className="view-items-row-icon" onClick={() => {setRowFormat(true)}} />
                             <img src="http://localhost:3000/Grid.png" className="view-items-grid-icon" onClick={() => {setRowFormat(false)}} />
@@ -179,13 +171,7 @@ const ViewItems = ({type, currentUser, setSearchPhrase}) => {
                             }
                         </div>
                         {items.length >= 0 && finishedItems ?
-                            <>
-                                {(type === "created-workspaces" || type === "bookmarked-workspaces" || type === "all-workspaces") ?
-                                    <p className="end-items">No more workspaces</p>
-                                :
-                                    <p className="end-items">No more datasets</p>
-                                }
-                            </>
+                            <p className="end-items">No more bookmarks</p>
                             :
                             <p className="load-items" onClick={() => {loadMore()}}>Load more</p>
                         }

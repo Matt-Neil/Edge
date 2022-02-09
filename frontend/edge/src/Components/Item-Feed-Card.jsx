@@ -31,7 +31,7 @@ const FeedWorkspaceCard = ({item, creator}) => {
 
     const updateUpvote = async () => {
         try {
-            await globalAPI.put(`/upvote/${item._id}?type=${item.type}&state=${upvoted}`);
+            await globalAPI.put(`/upvote/${item._id}?state=${upvoted}`);
 
             if (upvoted) {
                 setUpvotes(state => state-1)
@@ -45,7 +45,7 @@ const FeedWorkspaceCard = ({item, creator}) => {
 
     const updateBookmark = async () => {
         try {
-            await globalAPI.put(`/bookmark/${item._id}?type=${item.type}&state=${bookmarked}`);
+            await globalAPI.put(`/bookmark/${item._id}?state=${bookmarked}`);
             
             setBookmarked(state => !state)
         } catch (err) {}

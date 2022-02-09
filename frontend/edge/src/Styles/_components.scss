@@ -223,7 +223,7 @@
             -webkit-box-orient: vertical;
             @include not-selectable()
         }
-        .shortcut-items-new-workspace-icon {
+        .shortcut-items-create-item-icon {
             font-size: 20px;
             color: $blue1;
         }
@@ -442,7 +442,87 @@
         }
     }
 }
-
 .item-row-card:hover {
+    background-color: $light-grey2;
+}
+
+.model-node {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    @include not-selectable();
+
+    div {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: fit-content;
+        height: 32px;
+        padding: 0 15px;
+        border-radius: 10px;
+        font-size: 13px;
+        cursor: pointer;
+    }
+    .model-node-selected {
+        background-color: $blue1;
+        border: 1px solid $blue1;
+        color: white;
+    }
+    .model-node-unselected {
+        background-color: $light-grey2;
+        border: 1px solid $mid-grey2;
+        color: $dark-grey1;
+    }
+    .model-node-value {
+        font-size: 11px;
+        margin: 2px 0;
+    }
+    .model-node-connector {
+        height: 35px;
+        object-fit: contain;
+        margin: 0 0 2px 0;
+    }
+}
+
+.experiment-card {
+    width: calc(100% - 30px);
+    height: 70px;
+    display: flex;
+    text-decoration: none;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 10px;
+    
+    .experiment-card-title {
+        font-size: 18px;
+        margin: 0 25px 0 10px;
+        color: $dark-grey1;
+        font-family: 'Poppins', sans-serif;
+        text-decoration: none;
+        width: fit-content;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        line-clamp: 1; 
+        -webkit-box-orient: vertical;
+    }
+    .experiment-card-title:hover {
+        color: $blue1;
+    }
+    .experiment-card-date {
+        color: $dark-grey2;
+        font-size: 12px;
+        flex: 1;
+    }
+    .experiment-card-icon {
+        color: $dark-grey1;
+        font-size: 20px;
+        margin: 0 10px;
+        cursor: pointer;
+    }
+}
+.experiment-card:hover {
     background-color: $light-grey2;
 }

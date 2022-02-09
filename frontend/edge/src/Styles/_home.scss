@@ -28,7 +28,7 @@
     position: fixed;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 81px);
+    height: calc(100vh - 91px);
     max-width: 325px;
     width: 100%;
     min-width: 250px;
@@ -72,7 +72,7 @@
     position: absolute; 
     left: 0; 
     right: 0; 
-    padding: 39px 0 0 0;
+    padding: 39px 0 10px 0;
     margin: 0 auto;
     display: flex;
     flex-direction: column;

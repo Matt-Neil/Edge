@@ -1,16 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { getCreatedWorkspaces, getCreatedDatasets, getBookmarkedWorkspaces, getBookmarkedDatasets, getBookmarkedWorkspacesShort, 
-    getBookmarkedDatasetsShort, getCreatedWorkspacesShort, getCreatedDatasetsShort, getUser, putUser, deleteUser } = require('../controllers/users');
+const { getCreated, getBookmarked, getBookmarkedShortcut, getCreatedShortcut, getUser, putUser, deleteUser } = require('../controllers/users');
 
-router.route('/bookmarked-workspaces').get(getBookmarkedWorkspaces);
-router.route('/bookmarked-datasets').get(getBookmarkedDatasets);
-router.route('/created-workspaces').get(getCreatedWorkspaces);
-router.route('/created-datasets').get(getCreatedDatasets);
-router.route('/bookmarked-workspaces-shortcut').get(getBookmarkedWorkspacesShort);
-router.route('/bookmarked-datasets-shortcut').get(getBookmarkedDatasetsShort);
-router.route('/created-workspaces-shortcut').get(getCreatedWorkspacesShort);
-router.route('/created-datasets-shortcut').get(getCreatedDatasetsShort);
+router.route('/bookmarked').get(getBookmarked);
+router.route('/created').get(getCreated);
+router.route('/bookmarked-shortcut').get(getBookmarkedShortcut);
+router.route('/created-shortcut').get(getCreatedShortcut);
 router.route('/').get(getUser).put(putUser).delete(deleteUser);
 
 module.exports = router

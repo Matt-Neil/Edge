@@ -7,13 +7,13 @@ import { OpenItemsContext } from './Contexts/openItemsContext';
 import ViewItems from "./Pages/View-Items"
 import Home from "./Pages/Home"
 import Account from "./Pages/Account"
-import NewWorkspace from "./Pages/New-Workspace"
-import NewDataset from "./Pages/New-Dataset"
+import CreateWorkspace from "./Pages/Create-Workspace"
+import CreateDataset from "./Pages/Create-Dataset"
 import Workspace from "./Pages/Workspace"
 import Dataset from "./Pages/Dataset"
 import Search from "./Pages/Search"
 import SignIn from "./Pages/Sign-In"
-import NewExperiment from "./Pages/New-Experiment"
+import CreateExperiment from "./Pages/Create-Experiment"
 import Experiment from "./Pages/Experiment"
 import NotFound from "./Pages/Not-Found"
 import Header from "./Components/Header"
@@ -69,11 +69,8 @@ export default function App() {
                                     <Route exact path="/created-datasets">
                                         <ViewItems type={"created-datasets"} />
                                     </Route>
-                                    <Route exact path="/bookmarked-workspaces">
-                                        <ViewItems type={"bookmarked-workspaces"} currentUser={currentUser} />
-                                    </Route>
-                                    <Route exact path="/bookmarked-datasets">
-                                        <ViewItems type={"bookmarked-datasets"} currentUser={currentUser} />
+                                    <Route exact path="/bookmarked">
+                                        <ViewItems type={"bookmarked"} currentUser={currentUser} />
                                     </Route>
                                     <Route exact path="/all-workspaces">
                                         <ViewItems type={"all-workspaces"} currentUser={currentUser} setSearchPhrase={setSearchPhrase} />
@@ -84,11 +81,14 @@ export default function App() {
                                     <Route path="/search-results/:id" render={(props) => <Search currentUser={currentUser} searchPhrase={searchPhrase} setSearchPhrase={setSearchPhrase} key={props.location.key} />} />
                                     <Route exact path="/workspace/:id" render={(props) => <Workspace currentUser={currentUser} key={props.location.key} />} />
                                     <Route exact path="/dataset/:id" render={(props) => <Dataset currentUser={currentUser} key={props.location.key} />} />
-                                    <Route exact path="/new-workspace">
-                                        <NewWorkspace currentUser={currentUser} />
+                                    <Route exact path="/create-workspace">
+                                        <CreateWorkspace currentUser={currentUser} />
                                     </Route>
-                                    <Route exact path="/new-dataset">
-                                        <NewDataset currentUser={currentUser} />
+                                    <Route exact path="/create-dataset">
+                                        <CreateDataset currentUser={currentUser} />
+                                    </Route>
+                                    <Route exact path="/:id/create-experiment">
+                                        <CreateExperiment currentUser={currentUser} />
                                     </Route>
                                     <Route exact path="/account">
                                         <Account />

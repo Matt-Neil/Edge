@@ -49,6 +49,14 @@
                 font-family: 'Poppins', sans-serif;
                 cursor: pointer;
             }
+            .dataset-normalised-label {
+                margin: 0 10px 0 0;
+                font-size: 14px;
+                color: $dark-grey1;
+            }
+            .dataset-normalised-input {
+                margin: 0 20px 0 5px;
+            }
             .item-visibility {
                 color: $dark-grey1;
                 font-size: 26px;
@@ -108,10 +116,35 @@
         }
     }
     .item-bottom {
+        .end-items {
+            margin: 0;
+        }
+        .item-experiments {
+            display: flex;
+            flex-direction: column;
+            margin: 0 0 25px 0;
+
+            .item-experiments-middle {
+                display: flex;
+                align-items: center;
+                margin: 0 0 25px 0;
+        
+                p {
+                    flex: 1;
+                }
+                .item-experiments-create {
+                    margin: 0 0 0 auto;
+                }
+            }
+            .item-experiments-list {
+                display: flex;
+                flex-direction: column;
+            }
+        }
         .item-comment-form {
             display: flex;
             flex-direction: column;
-            margin: 10px 0 15px 0;
+            margin: 10px 0 25px 0;
 
             .item-comment-input {
                 max-height: 80px;
@@ -130,7 +163,7 @@
             }
         }
         .item-comments {
-            margin: 50px 0 0 0;
+            margin: 50px 0 25px 0;
 
             .comment-card {
                 height: fit-content;
@@ -153,6 +186,9 @@
                     margin: -5px 0 0 0;
                     font-size: 14px;
                 }
+            }
+            .end-items {
+                margin: 0;
             }
         }
 

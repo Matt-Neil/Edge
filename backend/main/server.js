@@ -1,10 +1,9 @@
 require("dotenv").config();
 const express = require("express");
 const users = require('./routes/users');
-const workspaces = require('./routes/workspaces');
+const items = require('./routes/items');
 const auth = require('./routes/auth');
 const images = require('./routes/images');
-const datasets = require('./routes/datasets')
 const global = require('./routes/global')
 const { checkUser } = require('./middleware/auth');
 const port = process.env.PORT || 8000;
@@ -26,8 +25,7 @@ app.post('*', checkUser);
 app.put('*', checkUser);
 app.delete('*', checkUser);
 app.use('/api/users', users);
-app.use('/api/workspaces', workspaces);
-app.use('/api/datasets', datasets);
+app.use('/api/items', items);
 app.use('/api/auth', auth);
 app.use('/api/images', images);
 app.use('/api/global', global)

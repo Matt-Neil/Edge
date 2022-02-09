@@ -3,11 +3,12 @@
 @import "mixins";
 @import "components";
 @import "home";
-@import "newItem";
+@import "createItem";
 @import "item";
 @import "signin";
 @import "account";
 @import "viewItems";
+@import "experiment";
 
 body {
     margin: 0;
@@ -43,9 +44,9 @@ input, textarea {
 }
 .inner-body {
     position: relative;
-    left: 275px;
+    left: 290px;
     display: flex;
-    width: calc(100% - 335px);
+    width: calc(100% - 350px);
     margin: 30px;
 }
 .blue-button {

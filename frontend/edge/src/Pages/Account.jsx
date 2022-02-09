@@ -57,8 +57,7 @@ const Account = () => {
                     <div className="home-left-column">
                         <Shortcut type="workspaces" />
                         <Shortcut type="datasets" />
-                        <Shortcut type="bookmarked-workspaces" />
-                        <Shortcut type="bookmarked-datasets" />
+                        <Shortcut type="bookmarked" />
                     </div>
                     <div className="account-information">
                         <h1>Account Settings</h1>

@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useRef, useContext} from 'react'
 import {useParams} from "react-router-dom"
-import datasetsAPI from '../API/datasets'
+import itemsAPI from '../API/items'
 import globalAPI from '../API/global'
 import imageAPI from '../API/images'
 import fileAPI from '../API/files'
@@ -41,6 +41,7 @@ const Workspace = ({currentUser}) => {
     const [upvoted, setUpvoted] = useState()
     const [upvotes, setUpvotes] = useState()
     const [visibility, setVisibility] = useState()
+    const [normalised, setNormalised] = useState()
     const [comments, setComments] = useState()
     const [comment, setComment] = useState("")
     const [data, setData] = useState()
@@ -55,9 +56,9 @@ const Workspace = ({currentUser}) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const dataset = await datasetsAPI.get(`/${datasetID}`);
-                const comments = await globalAPI.get(`/comment/${datasetID}?type=dataset`);
-                const workspaces = await datasetsAPI.get(`/workspaces?id=${datasetID}&date=${new Date().toISOString()}`);
+                const dataset = await itemsAPI.get(`/${datasetID}?type=dataset`);
+                const comments = await globalAPI.get(`/comment/${datasetID}`);
+                const workspaces = await itemsAPI.get(`/associated-workspaces?id=${datasetID}&date=${new Date().toISOString()}`);
 
                 if (workspaces.data.data.length < 21) {
                     setFinishedWorkspaces(true)
@@ -71,16 +72,17 @@ const Workspace = ({currentUser}) => {
                 setUpdated(dataset.data.data.updated);
                 setBookmarked(dataset.data.data.bookmarked)
                 setUpvoted(dataset.data.data.upvoted)
-                setData(dataset.data.data.data)
+                setData(dataset.data.data.datafile)
                 setUpvotes(dataset.data.data.upvotes)
                 setVisibility(dataset.data.data.visibility)
+                setNormalised(dataset.data.data.normalised)
                 setTitle(dataset.data.data.title)
                 setPicture(dataset.data.data.picture)
                 setDescription(dataset.data.data.description)
                 setWorkspaces(workspaces.data.data)
                 setComments(comments.data.data)
 
-                fetch(`http://127.0.0.1:5000/files/${dataset.data.data.data}.csv`)
+                fetch(`http://127.0.0.1:5000/files/${dataset.data.data.datafile}.csv`)
                     .then(response => response.text())
                     .then(text => {
                         setDataTable(text)
@@ -120,7 +122,7 @@ const Workspace = ({currentUser}) => {
     const fetchDataWorkspaces = async (date) => {
         if (!finishedWorkspaces) {
             try {
-                const fetchedWorkspaces = await datasetsAPI.get(`/workspaces?date=${date}`);;
+                const fetchedWorkspaces = await itemsAPI.get(`/associated-workspaces?id=${datasetID}&date=${date}`);;
     
                 if (fetchedWorkspaces.data.data.length < 21) {
                     setFinishedWorkspaces(true)
@@ -149,7 +151,7 @@ const Workspace = ({currentUser}) => {
 
     const updateUpvote = async () => {
         try {
-            await globalAPI.put(`/upvote/${dataset._id}?type=${dataset.type}&state=${upvoted}`);
+            await globalAPI.put(`/upvote/${dataset._id}?state=${upvoted}`);
 
             if (upvoted) {
                 setUpvotes(state => state-1)
@@ -163,7 +165,7 @@ const Workspace = ({currentUser}) => {
 
     const updateBookmark = async () => {
         try {
-            await globalAPI.put(`/bookmark/${dataset._id}?type=${dataset.type}&state=${bookmarked}`);
+            await globalAPI.put(`/bookmark/${dataset._id}?state=${bookmarked}`);
             
             setBookmarked(state => !state)
         } catch (err) {}
@@ -171,7 +173,7 @@ const Workspace = ({currentUser}) => {
 
     const updateVisibility = async () => {
         try {
-            await globalAPI.put(`/visibility/${dataset._id}?type=${dataset.type}&state=${visibility}`);
+            await globalAPI.put(`/visibility/${dataset._id}?state=${visibility}`);
 
             setVisibility(state => !state)
         } catch (err) {}
@@ -181,7 +183,7 @@ const Workspace = ({currentUser}) => {
         e.preventDefault()
 
         try {
-            await globalAPI.put(`/comment/${datasetID}?type=dataset`, {
+            await globalAPI.put(`/comment/${datasetID}`, {
                 comment: comment
             });
 
@@ -265,11 +267,11 @@ const Workspace = ({currentUser}) => {
                 const tempPicture = picture
                 const imageResponse = await imageAPI.post("/upload", formImage);
 
-                await datasetsAPI.put(`/${datasetID}`, {
+                await itemsAPI.put(`/${datasetID}?type=dataset`, {
                     title: title,
                     description: description,
                     picture: imageResponse.data.data,
-                    data: data,
+                    datafile: data,
                     updated: new Date().toISOString()
                 })
 
@@ -282,11 +284,11 @@ const Workspace = ({currentUser}) => {
             } catch (err) {}
         } else {
             try {
-                await datasetsAPI.put(`/${datasetID}`, {
+                await itemsAPI.put(`/${datasetID}?type=dataset`, {
                     title: title,
                     description: description,
                     picture: picture,
-                    data: data,
+                    datafile: data,
                     updated: new Date().toISOString()
                 })
             } catch (err) {}
@@ -316,11 +318,11 @@ const Workspace = ({currentUser}) => {
             formData.append('id', id)
 
             try {
-                await datasetsAPI.put(`/${datasetID}`, {
+                await itemsAPI.put(`/${datasetID}?type=dataset`, {
                     title: title,
                     description: description,
                     picture: picture,
-                    data: id,
+                    datafile: id,
                     updated: new Date().toISOString()
                 })
 
@@ -334,9 +336,9 @@ const Workspace = ({currentUser}) => {
         }
     }
 
-    const deleteDataset = async (e) => {
+    const deleteDataset = async () => {
         try {
-            await datasetsAPI.delete(`/${datasetID}`)
+            await itemsAPI.delete(`/${datasetID}`)
         } catch (err) {}
     }
 
@@ -377,6 +379,15 @@ const Workspace = ({currentUser}) => {
                                 <p className="item-meta">{date}</p>
                                 <span />
                                 {!dataset.self && <BookmarkIcon className={`item-icon ${bookmarked ? "blue" : "grey"}`} onClick={() => {updateBookmark()}} />}
+                                {dataset.self && 
+                                    <>
+                                        <label className="dataset-normalised-label">Normalised?</label>
+                                        <input className="dataset-normalised-input"
+                                                type="checkbox" 
+                                                onChange={() => {setNormalised(previous => !previous)}}
+                                                checked={normalised} />
+                                    </>
+                                }
                                 {dataset.self && 
                                     <>
                                         {visibility ? 
@@ -445,7 +456,7 @@ const Workspace = ({currentUser}) => {
                                                 <ContentCopyIcon className="dataset-copy-icon" />
                                             </button>
                                         </div>
-                                        <a href={`http://127.0.0.1:5000/files/${dataset.data}.csv`} download>Download</a>
+                                        <a href={`http://127.0.0.1:5000/files/${dataset.datafile}.csv`} download>Download</a>
                                     </div>
                                     <div className="item-data-table-pagination">
                                         <input placeholder="Row number" value={row} onChange={e => {setRow(e.target.value)}} />
@@ -492,17 +503,23 @@ const Workspace = ({currentUser}) => {
                                         <button className="blue-button">Comment</button>
                                     </form>
                                     <div className="item-comments">
-                                        {comments.map((comment, i) => {
-                                            return (
-                                                <div className="comment-card" key={i}>
-                                                    <div>
-                                                        <p className="comment-card-user">{comment.user}</p>
-                                                        <p className="comment-card-date">{commentDate(comment.createdAt)}</p>
-                                                    </div>
-                                                    <p className="comment-card-comment">{comment.comment}</p>
-                                                </div>
-                                            )
-                                        })}
+                                        {comments.length === 0 ?
+                                            <p className="end-items">No comments</p>
+                                            :
+                                            <>
+                                                {comments.map((comment, i) => {
+                                                    return (
+                                                        <div className="comment-card" key={i}>
+                                                            <div>
+                                                                <p className="comment-card-user">{comment.user}</p>
+                                                                <p className="comment-card-date">{commentDate(comment.createdAt)}</p>
+                                                            </div>
+                                                            <p className="comment-card-comment">{comment.comment}</p>
+                                                        </div>
+                                                    )
+                                                })}
+                                            </>
+                                        }
                                     </div>
                                 </>
                             }

@@ -1,15 +1,15 @@
 const Users = require('../models/Users');
-const Workspaces = require('../models/Workspaces');
-const Datasets = require('../models/Datasets')
+const Items = require('../models/Items');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-exports.getCreatedWorkspaces = async (req, res, next) => {
+exports.getCreated = async (req, res, next) => {
     try {
-        const workspaces = await Workspaces.aggregate([
+        const items = await Items.aggregate([
             { 
                 $match: {
-                    creator: mongoose.Types.ObjectId(res.locals.currentUser._id)
+                    creator: mongoose.Types.ObjectId(res.locals.currentUser._id),
+                    type: req.query.type
                 }
             }, {
                 $project: {
@@ -23,7 +23,7 @@ exports.getCreatedWorkspaces = async (req, res, next) => {
                     'visibility': 1,
                     'updated': 1,
                     'page': { $lt: ['$updated', new Date(req.query.date)] },
-                    'type': "workspace"
+                    'type': 1
                 }
             }, {
                 $match: {
@@ -38,7 +38,7 @@ exports.getCreatedWorkspaces = async (req, res, next) => {
     
         res.status(201).json({
             success: true,
-            data: workspaces
+            data: items
         })
     } catch (err) {
         res.status(500).json({
@@ -48,12 +48,13 @@ exports.getCreatedWorkspaces = async (req, res, next) => {
     }
 }
 
-exports.getCreatedWorkspacesShort = async (req, res, next) => {
+exports.getCreatedShortcut = async (req, res, next) => {
     try {
-        const workspaces = await Workspaces.aggregate([
+        const items = await Items.aggregate([
             { 
                 $match: {
-                    creator: mongoose.Types.ObjectId(res.locals.currentUser._id)
+                    creator: mongoose.Types.ObjectId(res.locals.currentUser._id),
+                    type: req.query.type
                 }
             }, {
                 $project: {
@@ -62,7 +63,7 @@ exports.getCreatedWorkspacesShort = async (req, res, next) => {
                     'title': 1,
                     'picture': 1,
                     'updated': 1,
-                    'type': "workspace"
+                    'type': 1
                 }
             }, { 
                 $sort: { 
@@ -73,7 +74,7 @@ exports.getCreatedWorkspacesShort = async (req, res, next) => {
     
         res.status(201).json({
             success: true,
-            data: workspaces
+            data: items
         })
     } catch (err) {
         res.status(500).json({
@@ -83,88 +84,9 @@ exports.getCreatedWorkspacesShort = async (req, res, next) => {
     }
 }
 
-exports.getCreatedDatasets = async (req, res, next) => {
+exports.getBookmarked = async (req, res, next) => {
     try {
-        const datasets = await Datasets.aggregate([
-            { 
-                $match: {
-                    creator: mongoose.Types.ObjectId(res.locals.currentUser._id)
-                }
-            }, {
-                $project: {
-                    _id: 0,
-                    '_id': 1,
-                    'creator': 1,
-                    'title': 1,
-                    'picture': 1,
-                    'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
-                    'upvotes': { $size: '$upvotes' },
-                    'visibility': 1,
-                    'updated': 1,
-                    'page': { $lt: ['$updated', new Date(req.query.date)] },
-                    'type': "dataset"
-                }
-            }, {
-                $match: {
-                    'page': true
-                }
-            }, { 
-                $sort: { 
-                    'updated': -1
-                } 
-            }
-        ]).limit(21);
-    
-        res.status(201).json({
-            success: true,
-            data: datasets
-        })
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            error: 'Server Error'
-        })
-    }
-}
-
-exports.getCreatedDatasetsShort = async (req, res, next) => {
-    try {
-        const datasets = await Datasets.aggregate([
-            { 
-                $match: {
-                    creator: mongoose.Types.ObjectId(res.locals.currentUser._id)
-                }
-            }, {
-                $project: {
-                    _id: 0,
-                    '_id': 1,
-                    'title': 1,
-                    'picture': 1,
-                    'updated': 1,
-                    'type': "dataset"
-                }
-            }, { 
-                $sort: { 
-                    'updated': -1
-                } 
-            }
-        ]).limit(3);
-    
-        res.status(201).json({
-            success: true,
-            data: datasets
-        })
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            error: 'Server Error'
-        })
-    }
-}
-
-exports.getBookmarkedWorkspaces = async (req, res, next) => {
-    try {
-        const workspaces = await Workspaces.aggregate([
+        const items = await Items.aggregate([
             { 
                 $match: {
                     visibility: true
@@ -191,7 +113,7 @@ exports.getBookmarkedWorkspaces = async (req, res, next) => {
                     'updated': 1,
                     'page': { $lt: ['$createdAt', new Date(req.query.date)] },
                     'creatorName.name': 1,
-                    'type': "workspace"
+                    'type': 1
                 }
             }, {
                 $match: {
@@ -213,7 +135,7 @@ exports.getBookmarkedWorkspaces = async (req, res, next) => {
     
         res.status(201).json({
             success: true,
-            data: workspaces
+            data: items
         })
     } catch (err) {
         res.status(500).json({
@@ -223,9 +145,9 @@ exports.getBookmarkedWorkspaces = async (req, res, next) => {
     }
 }
 
-exports.getBookmarkedWorkspacesShort = async (req, res, next) => {
+exports.getBookmarkedShortcut = async (req, res, next) => {
     try {
-        const workspaces = await Workspaces.aggregate([
+        const items = await Items.aggregate([
             { 
                 $match: {
                     visibility: true
@@ -238,7 +160,7 @@ exports.getBookmarkedWorkspacesShort = async (req, res, next) => {
                     'picture': 1,
                     'bookmarks': { $in: [res.locals.currentUser._id, '$bookmarks'] },
                     'updated': 1,
-                    'type': "workspace"
+                    'type': 1
                 }
             }, {
                 $match: {
@@ -253,108 +175,7 @@ exports.getBookmarkedWorkspacesShort = async (req, res, next) => {
     
         res.status(201).json({
             success: true,
-            data: workspaces
-        })
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            error: 'Server Error'
-        })
-    }
-}
-
-exports.getBookmarkedDatasets = async (req, res, next) => {
-    try {
-        const datasets = await Datasets.aggregate([
-            { 
-                $match: {
-                    visibility: true
-                }
-            }, { 
-                $lookup: { 
-                    from: 'users', 
-                    localField: 'creator', 
-                    foreignField: '_id', 
-                    as: 'creatorName'
-                }
-            }, {
-                $unwind: '$creatorName'
-            }, { 
-                $project: {
-                    _id: 0,
-                    '_id': 1,
-                    'creator': 1,
-                    'title': 1,
-                    'picture': 1,
-                    'bookmarks': { $in: [res.locals.currentUser._id, '$bookmarks'] },
-                    'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
-                    'upvotes': { $size: '$upvotes' },
-                    'updated': 1,
-                    'page': { $lt: ['$createdAt', new Date(req.query.date)] },
-                    'creatorName.name': 1,
-                    'type': "dataset"
-                }
-            }, {
-                $match: {
-                    $and: [
-                        {
-                            page: true
-                        },
-                        {
-                            bookmarks: true
-                        }
-                    ]
-                }
-            }, { 
-                $sort: { 
-                    'updated': -1
-                } 
-            }
-        ]).limit(21);
-    
-        res.status(201).json({
-            success: true,
-            data: datasets
-        })
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            error: 'Server Error'
-        })
-    }
-}
-
-exports.getBookmarkedDatasetsShort = async (req, res, next) => {
-    try {
-        const datasets = await Datasets.aggregate([
-            { 
-                $match: {
-                    visibility: true
-                }
-            }, { 
-                $project: {
-                    _id: 0,
-                    '_id': 1,
-                    'title': 1,
-                    'picture': 1,
-                    'bookmarks': { $in: [res.locals.currentUser._id, '$bookmarks'] },
-                    'updated': 1,
-                    'type': "dataset"
-                }
-            }, {
-                $match: {
-                    bookmarks: true
-                }
-            }, { 
-                $sort: { 
-                    'updated': -1
-                } 
-            }
-        ]).limit(3);
-    
-        res.status(201).json({
-            success: true,
-            data: datasets
+            data: items
         })
     } catch (err) {
         res.status(500).json({
@@ -427,15 +248,10 @@ exports.deleteUser = async (req, res, next) => {
                 error: 'No User Found.'
             })
         } else {
-            const workspaces = await Workspaces.find({creator: res.locals.currentUser._id})
-            const datasets = await Datasets.find({creator: res.locals.currentUser._id})
+            const items = await Items.find({creator: res.locals.currentUser._id})
 
-            workspaces.map(async workspace => {
-                await workspace.remove()
-            })
-
-            datasets.map(async dataset => {
-                await dataset.remove()
+            items.map(async item => {
+                await item.remove()
             })
             
             await user.remove();
@@ -446,7 +262,6 @@ exports.deleteUser = async (req, res, next) => {
             })
         }
     } catch (err) {
-        console.log(err)
         res.status(500).json({
             success: false,
             error: 'Server Error'

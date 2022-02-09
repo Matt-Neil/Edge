@@ -1,19 +1,16 @@
 import React, {useState, useEffect} from 'react'
-import {useHistory, Link, useParams} from "react-router-dom"
+import {useHistory, useParams} from "react-router-dom"
 import ItemRowCard from '../Components/Item-Row-Card'
 import ItemSquareCard from '../Components/Item-Square-Card'
 import globalAPI from '../API/global'
 import SearchIcon from '@mui/icons-material/Search';
 
 const AccountWorkspaces = ({searchPhrase, setSearchPhrase, currentUser}) => {
-    const [filter, setFilter] = useState("workspaces")
-    const [workspaces, setWorkspaces] = useState();
-    const [datasets, setDatasets] = useState();
+    const [items, setItems] = useState();
     const [loaded, setLoaded] = useState(false);
     const [rowFormat, setRowFormat] = useState(false)
     const [input, setInput] = useState("");
-    const [finishedWorkspaces, setFinishedWorkspaces] = useState(false);
-    const [finishedDatasets, setFinishedDatasets] = useState(false);
+    const [finishedItems, setFinishedItems] = useState(false);
     const urlPhrase = useParams().id;
     const history = useHistory();
 
@@ -21,37 +18,25 @@ const AccountWorkspaces = ({searchPhrase, setSearchPhrase, currentUser}) => {
         const fetchData = async () => {
             if (searchPhrase === null) {
                 if (urlPhrase) {
-                    const workspaces = await globalAPI.get(`/search?phrase=${urlPhrase}&type=workspace`);
-                    const datasets = await globalAPI.get(`/search?phrase=${urlPhrase}&type=dataset`);
+                    const items = await globalAPI.get(`/search?phrase=${urlPhrase}`);
 
-                    if (workspaces.data.data.length < 21) {
-                        setFinishedWorkspaces(true)
+                    if (items.data.data.length < 21) {
+                        setFinishedItems(true)
                     }
 
-                    if (datasets.data.data.length < 21) {
-                        setFinishedDatasets(true)
-                    }
-
-                    setWorkspaces(workspaces.data.data);
-                    setDatasets(datasets.data.data);
+                    setItems(items.data.data);
                     setLoaded(true);
                 } else {
                     history.push("/home");
                 }
             } else {
-                const workspaces = await globalAPI.get(`/search?phrase=${searchPhrase}&type=workspace`);
-                const datasets = await globalAPI.get(`/search?phrase=${searchPhrase}&type=dataset`);
+                const items = await globalAPI.get(`/search?phrase=${searchPhrase}`);
 
-                if (workspaces.data.data.length < 21) {
-                    setFinishedWorkspaces(true)
+                if (items.data.data.length < 21) {
+                    setFinishedItems(true)
                 }
 
-                if (datasets.data.data.length < 21) {
-                    setFinishedDatasets(true)
-                }
-
-                setWorkspaces(workspaces.data.data);
-                setDatasets(datasets.data.data);
+                setItems(items.data.data);
                 setLoaded(true);
             }
         }
@@ -72,41 +57,23 @@ const AccountWorkspaces = ({searchPhrase, setSearchPhrase, currentUser}) => {
         }
     }
 
-    const fetchDataWorkspaces = async (id) => {
-        if (!finishedWorkspaces) {
+    const fetchDataItems = async (id) => {
+        if (!finishedItems) {
             try {
-                const fetchedWorkspaces = await globalAPI.get(`/search?phrase=${urlPhrase}&type=workspace&id=${id}`);
+                const fetchedItems = await globalAPI.get(`/search?phrase=${urlPhrase}&id=${id}`);
     
-                if (fetchedWorkspaces.data.data.length < 21) {
-                    setFinishedWorkspaces(true)
+                if (fetchedItems.data.data.length < 21) {
+                    setFinishedItems(true)
                 }
 
-                setWorkspaces(workspaces => [...workspaces, ...fetchedWorkspaces.data.data]);
-            } catch (err) {}
-        }
-    }
-
-    const fetchDataDatasets = async (id) => {
-        if (!finishedDatasets) {
-            try {
-                const fetchedDatasets = await globalAPI.get(`/search?phrase=${urlPhrase}&type=dataset&id=${id}`);
-    
-                if (fetchedDatasets.data.data.length < 21) {
-                    setFinishedDatasets(true)
-                }
-
-                setDatasets(datasets => [...datasets, ...fetchedDatasets.data.data]);
+                setItems(items => [...items, ...fetchedItems.data.data]);
             } catch (err) {}
         }
     }
 
     const loadMore = () => {
-        if (workspaces.length !== 0 && filter === "workspaces") {
-            {fetchDataWorkspaces(workspaces[workspaces.length-1]._id)}
-        }
-
-        if (datasets.length !== 0 && filter === "datasets") {
-            {fetchDataDatasets(datasets[datasets.length-1]._id)}
+        if (items.length !== 0) {
+            {fetchDataItems(items[items.length-1]._id)}
         }
     };
 
@@ -121,56 +88,32 @@ const AccountWorkspaces = ({searchPhrase, setSearchPhrase, currentUser}) => {
                                     value={input}
                                     onChange={e => setInput(e.target.value)}
                                     onKeyPress={searchFunctionKey} />
-                            <SearchIcon className="view-items-search-icon" onClick={e => searchFunctionButton()} />
+                            <SearchIcon className="view-items-search-icon" onClick={() => searchFunctionButton()} />
                         </div>
                         <div className="view-items-top">
                             <h1>Search Results</h1>
-                            <select className="view-items-search-select" onChange={e => {setFilter(e.target.value)}}>
-                                <option value="workspaces">Workspaces</option>
-                                <option value="datasets">Datasets</option>
-                            </select>
                         </div>
                         <div className="view-items-middle">
-                            {filter === "workspaces" ?
-                                <p>{`${workspaces.length} Workspaces`}</p>
-                            :
-                                <p>{`${datasets.length} Datasets`}</p>
-                            }
+                            <p>{`${items.length} Results`}</p>
                             <img src="http://localhost:3000/List.png" className="view-items-row-icon" onClick={() => {setRowFormat(true)}} />
                             <img src="http://localhost:3000/Grid.png" className="view-items-grid-icon" onClick={() => {setRowFormat(false)}} />
                         </div>
                         <div className="view-items-list">
-                            {workspaces.length > 0 && filter === "workspaces" &&
+                            {items.length > 0 &&
                                 <>
-                                    {workspaces.map((workspace, i) => {
-                                        return rowFormat ? <ItemRowCard item={workspace} creator={workspace.creatorName.name} currentUserID={currentUser.id} created={false} key={i} /> : <ItemSquareCard item={workspace} creator={workspace.creatorName.name} currentUserID={currentUser.id} created={false} key={i} />
-                                    })}
-                                </>
-                            }
-                            {datasets.length > 0 && filter === "datasets" &&
-                                <>
-                                    {datasets.map((dataset, i) => {
-                                        return rowFormat ? <ItemRowCard item={dataset} creator={dataset.creatorName.name} currentUserID={currentUser.id} created={false} key={i} /> : <ItemSquareCard item={dataset} creator={dataset.creatorName.name} currentUserID={currentUser.id} created={false} key={i} />
+                                    {items.map((item, i) => {
+                                        return rowFormat ? 
+                                            <ItemRowCard item={item} creator={item.creatorName.name} currentUserID={currentUser.id} created={false} key={i} /> 
+                                            : 
+                                            <ItemSquareCard item={item} creator={item.creatorName.name} currentUserID={currentUser.id} created={false} key={i} />
                                     })}
                                 </>
                             }
                         </div>
-                        {filter === "workspaces" ?
-                            <>
-                                {workspaces.length >= 0 && finishedWorkspaces ?
-                                    <p className="end-items">No more workspaces</p>
-                                    :
-                                    <p className="load-items" onClick={() => {loadMore()}}>Load more</p>
-                                }
-                            </>
-                        :
-                            <>
-                                {datasets.length >= 0 && finishedDatasets ?
-                                    <p className="end-items">No more datasets</p>
-                                    :
-                                    <p className="load-items" onClick={() => {loadMore()}}>Load more</p>
-                                }
-                            </>
+                        {items.length >= 0 && finishedItems ?
+                            <p className="end-items">No more results</p>
+                            :
+                            <p className="load-items" onClick={() => {loadMore()}}>Load more</p>
                         }
                     </div>
                 </div>

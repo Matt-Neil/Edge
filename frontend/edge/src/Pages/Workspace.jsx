@@ -1,9 +1,8 @@
 import React, {useState, useEffect, useContext, useRef} from 'react'
 import {Link, useParams} from "react-router-dom"
-import workspacesAPI from '../API/workspaces'
 import globalAPI from '../API/global'
 import imageAPI from '../API/images'
-import datasetsAPI from '../API/datasets'
+import itemsAPI from '../API/items'
 import ViewData from '../Components/View-Data';
 import { OpenItemsContext } from '../Contexts/openItemsContext';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
@@ -12,6 +11,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import ExperimentCard from '../Components/Experiment-Card'
 
 const Workspace = ({currentUser}) => {
     const [loaded, setLoaded] = useState(false)
@@ -37,6 +37,7 @@ const Workspace = ({currentUser}) => {
     const [visibility, setVisibility] = useState()
     const [comments, setComments] = useState()
     const [comment, setComment] = useState("")
+    const [experiments, setExperiments] = useState()
     const [section, setSection] = useState("experiments")
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
@@ -52,8 +53,8 @@ const Workspace = ({currentUser}) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const workspace = await workspacesAPI.get(`/${workspaceID}`);
-                const comments = await globalAPI.get(`/comment/${workspaceID}?type=workspace`);
+                const workspace = await itemsAPI.get(`/${workspaceID}?type=workspace`);
+                const comments = await globalAPI.get(`/comment/${workspaceID}`);
 
                 if (workspace.data.data.creator === currentUser.id) {
                     addOpenItems(workspace.data.data._id, workspace.data.data.title, workspace.data.data.type)
@@ -65,13 +66,14 @@ const Workspace = ({currentUser}) => {
                 setUpvoted(workspace.data.data.upvoted)
                 setPicture(workspace.data.data.picture)
                 setUpvotes(workspace.data.data.upvotes)
-                setDataset(workspace.data.data.dataset.data)
+                setDataset(workspace.data.data.dataset._id)
                 setVisibility(workspace.data.data.visibility)
                 setTitle(workspace.data.data.title)
                 setDescription(workspace.data.data.description)
                 setComments(comments.data.data)
+                setExperiments(workspace.data.data.experiments)
 
-                fetch(`http://127.0.0.1:5000/files/${workspace.data.data.dataset.data}.csv`)
+                fetch(`http://127.0.0.1:5000/files/${workspace.data.data.dataset.datafile}.csv`)
                     .then(response => response.text())
                     .then(text => {
                         setDataTable(text)
@@ -79,14 +81,12 @@ const Workspace = ({currentUser}) => {
                         setExist(true)
                         setNoData(false)
                         setLoaded(true)
-                    }).catch(function(err) {
-                        console.log(err)
+                    }).catch(() => {
                         setExist(true)
                         setNoData(true)
                         setLoaded(true)
                     });
             } catch (err) {
-                console.log(err)
                 setExist(false)
                 setLoaded(true)
             }
@@ -135,7 +135,7 @@ const Workspace = ({currentUser}) => {
 
     const existingWorkspace = async () => {
         try {
-            const checkPublic = await datasetsAPI.get(`/check-public?data=${dataID}`)
+            const checkPublic = await itemsAPI.get(`/check-public-dataset?datafile=${dataID}`)
     
             if (checkPublic.data.success && checkPublic.data.data.visibility) {
                 fetch(`http://127.0.0.1:5000/files/${dataID}.csv`)
@@ -143,7 +143,7 @@ const Workspace = ({currentUser}) => {
                     .then(text => {
                         setDataTable(text)
                         setMaxRows(text.slice(text.indexOf('\n')+1).split('\n').length)
-                        setDataset(dataID)
+                        setDataset(checkPublic._id)
                         setRefreshTable(new Date().getTime())
                     })
             } else if (checkPublic.data.success && !checkPublic.data.data.visibility) {
@@ -156,7 +156,7 @@ const Workspace = ({currentUser}) => {
 
     const updateUpvote = async () => {
         try {
-            await workspacesAPI.put(`/upvote/${workspaceID}?state=${upvoted}`);
+            await globalAPI.put(`/upvote/${workspaceID}?state=${upvoted}`);
 
             if (upvoted) {
                 setUpvotes(state => state-1)
@@ -170,7 +170,7 @@ const Workspace = ({currentUser}) => {
 
     const updateBookmark = async () => {
         try {
-            await workspacesAPI.put(`/bookmark/${workspaceID}?state=${bookmarked}`);
+            await globalAPI.put(`/bookmark/${workspaceID}?state=${bookmarked}`);
             
             setBookmarked(state => !state)
         } catch (err) {}
@@ -178,7 +178,7 @@ const Workspace = ({currentUser}) => {
 
     const updateVisibility = async () => {
         try {
-            await workspacesAPI.put(`/visibility/${workspace._id}`);
+            await globalAPI.put(`/visibility/${workspace._id}`);
 
             setVisibility(state => !state)
         } catch (err) {}
@@ -272,11 +272,11 @@ const Workspace = ({currentUser}) => {
                 const tempPicture = picture
                 const imageResponse = await imageAPI.post("/upload", formImage);
 
-                await workspacesAPI.put(`/${workspaceID}`, {
+                await itemsAPI.put(`/${workspaceID}?type=workspace`, {
                     title: title,
                     description: description,
                     picture: imageResponse.data.data,
-                    data: dataset,
+                    dataset: dataset,
                     updated: new Date().toISOString()
                 })
 
@@ -289,11 +289,11 @@ const Workspace = ({currentUser}) => {
             } catch (err) {}
         } else {
             try {
-                await workspacesAPI.put(`/${workspaceID}`, {
+                await itemsAPI.put(`/${workspaceID}?type=workspace`, {
                     title: title,
                     description: description,
                     picture: picture,
-                    data: dataset,
+                    dataset: dataset,
                     updated: new Date().toISOString()
                 })
             } catch (err) {}
@@ -305,7 +305,7 @@ const Workspace = ({currentUser}) => {
 
     const deleteWorkspace = async () => {
         try {
-            await workspacesAPI.delete(`/${workspaceID}`)
+            await itemsAPI.delete(`/${workspaceID}`)
         } catch (err) {}
     }
 
@@ -387,13 +387,27 @@ const Workspace = ({currentUser}) => {
                         </div>
                         <div className="item-bottom">
                             {section === "experiments" ? 
-                                <> 
-                                    
-                                </>
+                                <div className="item-experiments">
+                                    <div className="item-experiments-middle">
+                                        <p>{`${experiments.length} Experiments`}</p>
+                                        <Link className="blue-button item-experiments-create" to={`/${workspaceID}/create-experiment`}>Create Experiment</Link>
+                                    </div> 
+                                    {experiments.length === 0 ?
+                                        <p className="end-items">No experiments</p>
+                                    :
+                                        <div className="item-experiments-list"> 
+                                            {experiments.map((experiment, i) => {
+                                                if (currentUser.id === workspace.creator) return <ExperimentCard experiment={experiment} created={true} key={i} />
+
+                                                return <ExperimentCard experiment={experiment} created={false} key={i} />
+                                            })}
+                                        </div>
+                                    }
+                                </div>
                             : section === "data" ?
                                 <>
                                     {noData ?
-                                        <p className="item-exist">Cannot find dataset</p>
+                                        <p className="end-items">Cannot find dataset</p>
                                     :   
                                         <>
                                             {workspace.self && 
@@ -412,8 +426,8 @@ const Workspace = ({currentUser}) => {
                                                     <button className="blue-button item-replace-button"
                                                             disabled={dataID === ""}
                                                             onClick={() => {existingWorkspace()}}>Import</button>
-                                                    {displayPublic && <p className="new-item-data-public">Dataset not public</p>}
-                                                    {displayExist && <p className="new-item-data-public">Dataset does not exist</p>}
+                                                    {displayPublic && <p className="create-item-data-public">Dataset not public</p>}
+                                                    {displayExist && <p className="create-item-data-public">Dataset does not exist</p>}
                                                 </div>
                                             }
                                             <div className="item-data-table-pagination">
@@ -439,17 +453,23 @@ const Workspace = ({currentUser}) => {
                                         <button className="blue-button">Comment</button>
                                     </form>
                                     <div className="item-comments">
-                                        {comments.map((comment, i) => {
-                                            return (
-                                                <div className="comment-card" key={i}>
-                                                    <div>
-                                                        <p className="comment-card-user">{comment.user}</p>
-                                                        <p className="comment-card-date">{commentDate(comment.createdAt)}</p>
-                                                    </div>
-                                                    <p className="comment-card-comment">{comment.comment}</p>
-                                                </div>
-                                            )
-                                        })}
+                                        {comments.length === 0 ?
+                                            <p className="end-items">No comments</p>
+                                            :
+                                            <>
+                                                {comments.map((comment, i) => {
+                                                    return (
+                                                        <div className="comment-card" key={i}>
+                                                            <div>
+                                                                <p className="comment-card-user">{comment.user}</p>
+                                                                <p className="comment-card-date">{commentDate(comment.createdAt)}</p>
+                                                            </div>
+                                                            <p className="comment-card-comment">{comment.comment}</p>
+                                                        </div>
+                                                    )
+                                                })}
+                                            </>
+                                        }
                                     </div>
                                 </>
                             }

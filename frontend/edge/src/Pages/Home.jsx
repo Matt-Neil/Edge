@@ -53,8 +53,7 @@ const Home = ({setSearchPhrase, currentUser}) => {
                         </div>
                         <Shortcut type="workspaces" currentUserID={currentUser.id} />
                         <Shortcut type="datasets" currentUserID={currentUser.id} />
-                        <Shortcut type="bookmarked-workspaces" currentUserID={currentUser.id} />
-                        <Shortcut type="bookmarked-datasets" currentUserID={currentUser.id} />
+                        <Shortcut type="bookmarked" currentUserID={currentUser.id} />
                     </div>
                     <div className="home-middle-column">
                         <div className="home-feed">
