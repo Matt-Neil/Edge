@@ -26,9 +26,9 @@
                 width: 100%;
                 margin: 0 0 30px 0;
                 padding: 0 10px;
-                border: 1px solid $mid-grey2;
+                border: 1px solid #f7efcd;
                 border-radius: 10px;
-                background-color: $light-grey1;
+                background-color: #fcf6dc;
             }
             img {
                 height: 20px;
@@ -55,7 +55,7 @@
                 color: $dark-grey1;
             }
             .dataset-normalised-input {
-                margin: 0 20px 0 5px;
+                margin: 0 25px 0 0;
             }
             .item-visibility {
                 color: $dark-grey1;
@@ -84,11 +84,12 @@
         .item-description-input {
             min-height: 150px;
             width: calc(100% - 20px);
-            background-color: $light-grey1;
-            border: 1px $mid-grey2 solid;
+            border: 1px solid #f7efcd;
             border-radius: 10px;
+            background-color: #fcf6dc;
             padding: 10px;
             margin: 30px 0 15px 0;
+            font-size: 14px;
             resize: none;
         }
         .item-middle {
@@ -139,6 +140,7 @@
             .item-experiments-list {
                 display: flex;
                 flex-direction: column;
+                margin: 0 0 30px 0;
             }
         }
         .item-comment-form {
@@ -151,12 +153,11 @@
                 min-height: 80px;
                 width: calc(100% - 20px);
                 resize: none;
-                border: none;
                 background: none;
                 padding: 10px;
-                border: 1px solid $mid-grey2;
+                border: 1px solid #f7efcd;
                 border-radius: 10px;
-                background-color: $light-grey1;
+                background-color: #fcf6dc;
             }
             button {
                 margin: 10px 0 0 auto;
@@ -207,9 +208,9 @@
                 margin: 0 15px 0 0;
                 height: 30px;
                 padding: 0 10px;
-                border: 1px solid $mid-grey2;
-                border-radius: 7px;
-                background-color: $light-grey1;
+                border: 1px solid #f7efcd;
+                border-radius: 10px;
+                background-color: #fcf6dc;
             }
             .item-replace-button {
                 margin: 0 15px 0 0;
@@ -298,16 +299,16 @@
                 margin: 0 15px 0 0;
                 height: 30px;
                 padding: 0 10px;
-                border: 1px solid $mid-grey2;
-                border-radius: 7px;
-                background-color: $light-grey1;
+                border: 1px solid #f7efcd;
+                border-radius: 10px;
+                background-color: #fcf6dc;
             }
-            .item-data-fetch {
+            .item-data-find {
                 height: 30px;
                 line-height: 30px;
                 border-radius: 7px;
             }
-            .item-data-cancel-fetch {
+            .item-data-cancel-find {
                 height: 30px;
                 line-height: 30px;
                 border-radius: 7px;
@@ -344,7 +345,7 @@
             margin: 15px 0 30px -15px;
         }
         .item-workspaces-end {
-            margin: 0 0 30px -15px;
+            margin: 0 0 30px 0;
         }
     }
 }

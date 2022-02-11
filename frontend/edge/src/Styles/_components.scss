@@ -457,7 +457,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        width: fit-content;
+        width: 40px;
         height: 32px;
         padding: 0 15px;
         border-radius: 10px;
@@ -484,6 +484,9 @@
         margin: 0 0 2px 0;
     }
 }
+.model-node-input {
+    margin: 0 20px 0 0;
+}
 
 .experiment-card {
     width: calc(100% - 30px);
@@ -507,6 +510,7 @@
         -webkit-line-clamp: 1;
         line-clamp: 1; 
         -webkit-box-orient: vertical;
+        cursor: pointer;
     }
     .experiment-card-title:hover {
         color: $blue1;

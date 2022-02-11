@@ -26,9 +26,7 @@ h1 {
     color: $dark-grey1;
 }
 input, textarea {
-    font-size: 14px;
     font-family: 'Poppins', sans-serif;
-    color: $dark-grey1;
 }
 .whole-body {
     width: 100%;
@@ -211,4 +209,22 @@ input, textarea {
 }
 .item-exist {
     margin: 30vh auto 0 auto;
+}
+::placeholder {
+    font-family: 'Poppins', sans-serif;
+    color: black;
+    letter-spacing: 0.05mm;
+    font-size: 13px;
+}
+:-ms-input-placeholder {
+    font-family: 'Poppins', sans-serif;
+    color: black;
+    letter-spacing: 0.05mm;
+    font-size: 14px;
+}
+::-ms-input-placeholder {
+    font-family: 'Poppins', sans-serif;
+    color: black;
+    letter-spacing: 0.05mm;
+    font-size: 14px;
 }

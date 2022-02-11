@@ -346,13 +346,57 @@ exports.deleteItem = async (req, res, next) => {
     }
 }
 
-exports.getCreatedExperiments = async (req, res, next) => {
+exports.getAllExperiments = async (req, res, next) => {
     try {
         const workspace = await Items.findById(req.params.id, "experiments")
 
         res.status(201).json({
             success: true,
             data: workspace
+        })
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        })
+    }
+}
+
+exports.getCreatedExperiments = async (req, res, next) => {
+    try {
+        const experiments = await Items.aggregate([
+            { 
+                $match: {
+                    _id: mongoose.Types.ObjectId(req.params.id),
+                    type: "workspace"
+                }
+            }, {
+                $unwind: '$experiments'
+            }, { 
+                $project: {
+                    _id: 0,
+                    'experiments': 1,
+                    'page': { $lt: ['$experiments.updated', new Date(req.query.date)] }
+                }
+            }, {
+                $match: {
+                    page: true
+                }
+            }, { 
+                $project: {
+                    _id: 0,
+                    'experiments': 1
+                }
+            }, {
+                $sort: { 
+                    'updated': -1
+                } 
+            }
+        ]);
+    
+        res.status(201).json({
+            success: true,
+            data: experiments
         })
     } catch (err) {
         res.status(500).json({

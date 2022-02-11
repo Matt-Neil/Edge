@@ -212,13 +212,12 @@ const Workspace = ({currentUser}) => {
     }
 
     const cancelRow = () => {
-        if (start === (page-1)*30 && end === page*30) {
-            setRow("")
-        } else {
+        if (!(start === (page-1)*30 && end === page*30)) {
             setStart((page-1)*30)
             setEnd(page*30)
             setRefreshTable(new Date().getTime())
         }
+        setRow("")
     }
 
     const previousPage = () => {
@@ -298,7 +297,6 @@ const Workspace = ({currentUser}) => {
         setChangedSettings(false)
     }
 
-    
     const replaceData = async () => {
         if (dataFile !== undefined) {
             const file = dataFile;
@@ -378,8 +376,7 @@ const Workspace = ({currentUser}) => {
                                 {!dataset.self && <p className="item-meta">{dataset.creatorName.name}</p>}
                                 <p className="item-meta">{date}</p>
                                 <span />
-                                {!dataset.self && <BookmarkIcon className={`item-icon ${bookmarked ? "blue" : "grey"}`} onClick={() => {updateBookmark()}} />}
-                                {dataset.self && 
+                                {dataset.self ?
                                     <>
                                         <label className="dataset-normalised-label">Normalised?</label>
                                         <input className="dataset-normalised-input"
@@ -387,7 +384,16 @@ const Workspace = ({currentUser}) => {
                                                 onChange={() => {setNormalised(previous => !previous)}}
                                                 checked={normalised} />
                                     </>
+                                :
+                                    <>
+                                        {normalised ?
+                                            <p className="dataset-normalised-label">Dataset is normalised</p>
+                                        :
+                                            <p className="dataset-normalised-label">Dataset not normalised</p>
+                                        }
+                                    </>
                                 }
+                                {!dataset.self && <BookmarkIcon className={`item-icon ${bookmarked ? "blue" : "grey"}`} onClick={() => {updateBookmark()}} />}
                                 {dataset.self && 
                                     <>
                                         {visibility ? 
@@ -460,8 +466,8 @@ const Workspace = ({currentUser}) => {
                                     </div>
                                     <div className="item-data-table-pagination">
                                         <input placeholder="Row number" value={row} onChange={e => {setRow(e.target.value)}} />
-                                        <button onClick={() => {cancelRow()}} className="white-button item-data-cancel-fetch">Cancel</button>
-                                        <button onClick={() => {fetchRow()}} className="blue-button item-data-fetch">Fetch</button>
+                                        <button onClick={() => {cancelRow()}} className="white-button item-data-cancel-find">Cancel</button>
+                                        <button onClick={() => {fetchRow()}} className="blue-button item-data-find">Find</button>
                                         <span />
                                         <ArrowBackIosNewIcon className="item-data-table-pagination-icon" onClick={() => {previousPage()}} />
                                         <p>Page {page} / {Math.ceil(maxRows/30)}</p>

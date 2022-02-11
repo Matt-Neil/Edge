@@ -81,16 +81,16 @@
     }
     .create-item-title {
         min-height: 40px;
-        background-color: $light-grey1;
-        border: 1px $mid-grey2 solid;
+        border: 1px solid #f7efcd;
         border-radius: 10px;
+        background-color: #fcf6dc;
         padding: 0 10px;
     }
     .create-item-description {
         min-height: 150px;
-        background-color: $light-grey1;
-        border: 1px $mid-grey2 solid;
+        border: 1px solid #f7efcd;
         border-radius: 10px;
+        background-color: #fcf6dc;
         padding: 10px;
         margin: 25px 0 0 0;
         resize: none;
@@ -126,9 +126,9 @@
             width: 350px;
             margin: 0 15px 0 0;
             padding: 0 10px;
-            border: 1px solid $mid-grey2;
+            border: 1px solid #f7efcd;
             border-radius: 10px;
-            background-color: $light-grey1;
+            background-color: #fcf6dc;
         }
         span {
             flex: 1;
@@ -203,18 +203,22 @@
         height: 100%;
 
         .create-item-model {
+            position: relative;
             display: flex;
             flex-direction: column;
             width: 70%;
-            height: calc(100% - 30px);
+            height: calc(100% - 75px);
             align-items: center;
+            overflow-x: hidden;
+            white-space: nowrap;
 
             .create-item-model-diagram {
+                position: absolute;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 width: 100%;
-                height: calc(100% - 75px);
+                height: 100%;
                 overflow-y: auto;
                 -ms-overflow-style: none; 
                 scrollbar-width: none;
@@ -224,7 +228,7 @@
                     align-items: flex-start;
 
                     .create-item-model-diagram-remove {
-                        margin: 10px -19px 0 7px;
+                        margin: 10px 0 0 8px;
                         color: $dark-grey1;
                         font-size: 12px;
                         cursor: pointer;
@@ -232,8 +236,7 @@
                 }
                 .create-item-model-diagram-add {
                     display: flex;
-                    align-items: flex-start;
-                    margin: 0 0 0 25px;
+                    flex-direction: column;
 
                     .create-item-model-diagram-add-options {
                         display: flex;
@@ -241,10 +244,13 @@
                         align-items: center;
                         width: 90px;
                         height: 90px;
-                        margin: 0 0 0 10px;
+                        margin: 5px 0 0 0;
                         border-radius: 10px;
                         background-color: $light-grey2;
                         border: 1px solid $mid-grey2;
+                        position: relative;
+                        left: 50%;
+                        transform: translateX(-60%);
     
                         button {
                             width: 70px;
@@ -261,7 +267,7 @@
                     margin: 5px 0 0 0;
                     position: relative;
                     left: 50%;
-                    transform: translateX(-50%);
+                    transform: translateX(-105%);
                     color: white;
                     font-size: 14px;
                     border: none;
@@ -282,7 +288,7 @@
                 bottom: 30px;
                 padding: 0 15px;
                 max-width: 375px;
-                width: 100%;
+                width: fit-content;
                 height: 50px;
                 border-radius: 10px;
                 background-color: $light-grey2;
@@ -291,8 +297,6 @@
                 
                 p {
                     font-weight: 500;
-                }
-                .create-item-model-selected-other {
                     height: 100%;
                     line-height: 50px;
                     padding: 0 20px 0 0;
@@ -370,20 +374,4 @@
 
 .create-item-cancel {
     margin: 0 20px 0 0;
-}
-::-webkit-input-placeholder {
-    font-family: 'Poppins', sans-serif;
-    color: $dark-grey1;
-}
-::-moz-placeholder {
-    font-family: 'Poppins', sans-serif;
-    color: $dark-grey1;
-}
-:-ms-input-placeholder {
-    font-family: 'Poppins', sans-serif;
-    color: $dark-grey1;
-}
-:-moz-placeholder {
-    font-family: 'Poppins', sans-serif;
-    color: $dark-grey1;
 }

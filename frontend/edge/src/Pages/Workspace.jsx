@@ -38,6 +38,7 @@ const Workspace = ({currentUser}) => {
     const [comments, setComments] = useState()
     const [comment, setComment] = useState("")
     const [experiments, setExperiments] = useState()
+    const [finishedExperiments, setFinishedExperiments] = useState(false)
     const [section, setSection] = useState("experiments")
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
@@ -55,9 +56,15 @@ const Workspace = ({currentUser}) => {
             try {
                 const workspace = await itemsAPI.get(`/${workspaceID}?type=workspace`);
                 const comments = await globalAPI.get(`/comment/${workspaceID}`);
+                const experiments = await itemsAPI.get(`/created-experiments/${workspaceID}?date=${new Date().toISOString()}`);
+                console.log(experiments.data.data)
 
                 if (workspace.data.data.creator === currentUser.id) {
                     addOpenItems(workspace.data.data._id, workspace.data.data.title, workspace.data.data.type)
+                }
+
+                if (experiments.data.data.length < 21) {
+                    setFinishedExperiments(true)
                 }
 
                 setWorkspace(workspace.data.data);
@@ -71,7 +78,7 @@ const Workspace = ({currentUser}) => {
                 setTitle(workspace.data.data.title)
                 setDescription(workspace.data.data.description)
                 setComments(comments.data.data)
-                setExperiments(workspace.data.data.experiments)
+                setExperiments(experiments.data.data)
 
                 fetch(`http://127.0.0.1:5000/files/${workspace.data.data.dataset.datafile}.csv`)
                     .then(response => response.text())
@@ -114,6 +121,26 @@ const Workspace = ({currentUser}) => {
             }
         }
     }, [loaded, updated])
+
+    const fetchDataExperiments = async (date) => {
+        if (!finishedExperiments) {
+            try {
+                const fetchedExperiments = await itemsAPI.get(`/created-experiments/${workspaceID}?date=${date}`);
+    
+                if (fetchedExperiments.data.data.length < 21) {
+                    setFinishedExperiments(true)
+                }
+
+                setExperiments(items => [...items, ...fetchedExperiments.data.data]);
+            } catch (err) {}
+        }
+    }
+
+    const loadMore = () => {
+        if (experiments.length !== 0) {
+            {fetchDataExperiments(experiments[experiments.length-1].updated)}
+        }
+    };
 
     const displayPublicInterval = () => {
         clearInterval(publicInterval.current)
@@ -217,13 +244,12 @@ const Workspace = ({currentUser}) => {
     }
 
     const cancelRow = () => {
-        if (start === (page-1)*30 && end === page*30) {
-            setRow("")
-        } else {
+        if (!(start === (page-1)*30 && end === page*30)) {
             setStart((page-1)*30)
             setEnd(page*30)
             setRefreshTable(new Date().getTime())
         }
+        setRow("")
     }
 
     const previousPage = () => {
@@ -390,18 +416,19 @@ const Workspace = ({currentUser}) => {
                                 <div className="item-experiments">
                                     <div className="item-experiments-middle">
                                         <p>{`${experiments.length} Experiments`}</p>
-                                        <Link className="blue-button item-experiments-create" to={`/${workspaceID}/create-experiment`}>Create Experiment</Link>
+                                        {workspace.self && <Link className="blue-button item-experiments-create" to={`/${workspaceID}/create-experiment`}>Create Experiment</Link>}
                                     </div> 
-                                    {experiments.length === 0 ?
-                                        <p className="end-items">No experiments</p>
-                                    :
-                                        <div className="item-experiments-list"> 
+                                    <div className="item-experiments-list"> 
                                             {experiments.map((experiment, i) => {
-                                                if (currentUser.id === workspace.creator) return <ExperimentCard experiment={experiment} created={true} key={i} />
+                                                if (currentUser.id === workspace.creator) return <ExperimentCard experiment={experiment.experiments} created={true} key={i} />
 
-                                                return <ExperimentCard experiment={experiment} created={false} key={i} />
+                                                return <ExperimentCard experiment={experiment.experiments} created={false} key={i} />
                                             })}
                                         </div>
+                                    {experiments.length >= 0 && finishedExperiments ?
+                                        <p className="end-items">No more experiments</p>
+                                        :
+                                        <p className="load-items" onClick={() => {loadMore()}}>Load more</p>
                                     }
                                 </div>
                             : section === "data" ?
@@ -432,8 +459,8 @@ const Workspace = ({currentUser}) => {
                                             }
                                             <div className="item-data-table-pagination">
                                                 <input placeholder="Row number" value={row} onChange={e => {setRow(e.target.value)}} />
-                                                <button onClick={() => {cancelRow()}} className="white-button item-data-cancel-fetch">Cancel</button>
-                                                <button onClick={() => {fetchRow()}} className="blue-button item-data-fetch">Fetch</button>
+                                                <button onClick={() => {cancelRow()}} className="white-button item-data-cancel-find">Cancel</button>
+                                                <button onClick={() => {fetchRow()}} className="blue-button item-data-find">Find</button>
                                                 <span />
                                                 <ArrowBackIosNewIcon className="item-data-table-pagination-icon" onClick={() => {previousPage()}} />
                                                 <p>Page {page} / {Math.ceil(maxRows/30)}</p>

@@ -162,7 +162,7 @@ const CreateWorkspace = ({currentUser}) => {
                                 disabled={setupStage}
                                 onClick={() => {setSetupStage(true)}}>Setup</button>
                         <button className={`${"create-sidebar-stage"} ${!setupStage ? "create-sidebar-stage-selected" : "create-sidebar-stage-unselected"}`}
-                                disabled>Import Data</button>
+                                disabled>Select Dataset</button>
                     </div>
                     <div className="inner-body">
                         <>

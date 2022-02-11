@@ -1,12 +1,8 @@
 const mongoose = require('mongoose');
 
 const ExperimentsSchema = new mongoose.Schema({
-    name: {
+    title: {
         type: String,
-        required: true
-    },
-    input: {
-        type: Number,
         required: true
     },
     visibility: {
@@ -19,6 +15,10 @@ const ExperimentsSchema = new mongoose.Schema({
     },
     configuration: {
         type: Object,
+        required: true
+    },
+    updated: {
+        type: Date,
         required: true
     }
 }, {timestamps: true})
