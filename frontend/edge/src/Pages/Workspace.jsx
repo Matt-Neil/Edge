@@ -57,7 +57,6 @@ const Workspace = ({currentUser}) => {
                 const workspace = await itemsAPI.get(`/${workspaceID}?type=workspace`);
                 const comments = await globalAPI.get(`/comment/${workspaceID}`);
                 const experiments = await itemsAPI.get(`/created-experiments/${workspaceID}?date=${new Date().toISOString()}`);
-                console.log(experiments.data.data)
 
                 if (workspace.data.data.creator === currentUser.id) {
                     addOpenItems(workspace.data.data._id, workspace.data.data.title, workspace.data.data.type)
@@ -289,7 +288,7 @@ const Workspace = ({currentUser}) => {
         }
     }
 
-    const updateSettings = async () => {
+    const updateWorkspace = async () => {
         if (image) {
             const formImage = new FormData();
             formImage.append('image', image);
@@ -397,9 +396,9 @@ const Workspace = ({currentUser}) => {
                                     <div className="item-middle">
                                         <button className="dark-grey-button item-delete"
                                                 onClick={() => {deleteWorkspace()}}>Delete</button>
-                                        <button className="blue-button"
+                                        <button className={`item-save ${!changedSettings ? "grey-button" : "blue-button"}`}
                                                 disabled={!changedSettings}
-                                                onClick={() => {updateSettings()}}>Save Changes</button>
+                                                onClick={() => {updateWorkspace()}}>Save Changes</button>
                                     </div>
                                 </>
                             : 
@@ -416,13 +415,13 @@ const Workspace = ({currentUser}) => {
                                 <div className="item-experiments">
                                     <div className="item-experiments-middle">
                                         <p>{`${experiments.length} Experiments`}</p>
-                                        {workspace.self && <Link className="blue-button item-experiments-create" to={`/${workspaceID}/create-experiment`}>Create Experiment</Link>}
+                                        {workspace.self && <Link className="blue-button item-experiments-create" to={`${workspaceID}/create-experiment`}>Create Experiment</Link>}
                                     </div> 
-                                    <div className="item-experiments-list"> 
+                                    <div className="item-experiments-list">
                                             {experiments.map((experiment, i) => {
-                                                if (currentUser.id === workspace.creator) return <ExperimentCard experiment={experiment.experiments} created={true} key={i} />
+                                                if (currentUser.id === workspace.creator) return <ExperimentCard experiment={experiment.experiments} created={true} workspaceID={workspaceID} key={i} />
 
-                                                return <ExperimentCard experiment={experiment.experiments} created={false} key={i} />
+                                                return <ExperimentCard experiment={experiment.experiments} created={false} workspaceID={workspaceID} key={i} />
                                             })}
                                         </div>
                                     {experiments.length >= 0 && finishedExperiments ?

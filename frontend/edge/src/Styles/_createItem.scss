@@ -188,21 +188,21 @@
         }
     }
 }
-.create-item-modelling {
+.create-experiment-modelling {
     display: flex;
     flex-direction: column;
     width: 100%;
     margin: 0 auto;
 
-    .create-item-modelling-top {
+    .create-experiment-modelling-top {
         margin: 0 0 15px auto;
         display: flex;
     }
-    .create-item-modelling-body {
+    .create-experiment-modelling-body {
         display: flex;
         height: 100%;
 
-        .create-item-model {
+        .create-experiment-model {
             position: relative;
             display: flex;
             flex-direction: column;
@@ -212,7 +212,7 @@
             overflow-x: hidden;
             white-space: nowrap;
 
-            .create-item-model-diagram {
+            .create-experiment-model-diagram {
                 position: absolute;
                 display: flex;
                 flex-direction: column;
@@ -223,22 +223,22 @@
                 -ms-overflow-style: none; 
                 scrollbar-width: none;
 
-                .create-item-model-diagram-node {
+                .create-experiment-model-diagram-node {
                     display: flex;
                     align-items: flex-start;
 
-                    .create-item-model-diagram-remove {
+                    .create-experiment-model-diagram-remove {
                         margin: 10px 0 0 8px;
                         color: $dark-grey1;
                         font-size: 12px;
                         cursor: pointer;
                     }
                 }
-                .create-item-model-diagram-add {
+                .create-experiment-model-diagram-add {
                     display: flex;
                     flex-direction: column;
 
-                    .create-item-model-diagram-add-options {
+                    .create-experiment-model-diagram-add-options {
                         display: flex;
                         flex-direction: column;
                         align-items: center;
@@ -263,7 +263,7 @@
                         }
                     }
                 }
-                .create-item-model-diagram-add-icon {
+                .create-experiment-model-diagram-add-icon {
                     margin: 5px 0 0 0;
                     position: relative;
                     left: 50%;
@@ -277,10 +277,10 @@
                     cursor: pointer;
                 }
             }
-            .create-item-model-diagram::-webkit-scrollbar {
+            .create-experiment-model-diagram::-webkit-scrollbar {
                 display: none;
             }
-            .create-item-model-selected {
+            .create-experiment-model-selected {
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -321,13 +321,13 @@
                 }
             }
         }
-        .create-item-configuration {
+        .create-experiment-model-configuration {
             display: flex;
             justify-content: center;
             width: 30%;
             height: fit-content;
 
-            .create-item-configuration-option {
+            .create-experiment-model-configuration-option {
                 display: flex;
                 flex-direction: column;
                 max-width: 350px;

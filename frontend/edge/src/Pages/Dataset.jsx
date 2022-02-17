@@ -16,7 +16,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-const Workspace = ({currentUser}) => {
+const Dataset = ({currentUser}) => {
     const [loaded, setLoaded] = useState(false)
     const [exist, setExist] = useState()
     const [dataset, setDataset] = useState()
@@ -173,7 +173,7 @@ const Workspace = ({currentUser}) => {
 
     const updateVisibility = async () => {
         try {
-            await globalAPI.put(`/visibility/${dataset._id}?state=${visibility}`);
+            await globalAPI.put(`/visibility/${dataset._id}`);
 
             setVisibility(state => !state)
         } catch (err) {}
@@ -257,7 +257,7 @@ const Workspace = ({currentUser}) => {
         }
     }
 
-    const updateSettings = async () => {
+    const updateDataset = async () => {
         if (image) {
             const formImage = new FormData();
             formImage.append('image', image);
@@ -418,9 +418,9 @@ const Workspace = ({currentUser}) => {
                                     <div className="item-middle">
                                         <button className="dark-grey-button item-delete"
                                                 onClick={() => {deleteDataset()}}>Delete</button>
-                                        <button className="blue-button"
+                                        <button className={`item-save ${!changedSettings ? "grey-button" : "blue-button"}`}
                                                 disabled={!changedSettings}
-                                                onClick={() => {updateSettings()}}>Save Changes</button>
+                                                onClick={() => {updateDataset()}}>Save Changes</button>
                                     </div>
                                 </>
                             : 
@@ -541,4 +541,4 @@ const Workspace = ({currentUser}) => {
     )
 }
 
-export default Workspace
+export default Dataset

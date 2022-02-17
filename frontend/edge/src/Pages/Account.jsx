@@ -73,7 +73,7 @@ const Account = () => {
                                     setPassword(e.target.value)
                                     setChanged(true)
                                 }} />
-                        <button className="blue-button account-save" 
+                        <button className={`account-save ${password === "" || !changed ? "grey-button" : "blue-button"}`}
                                 disabled={password === "" || !changed}
                                 onClick={() => {updateAccount()}}>Save Changes</button>
                         <button className="grey-button account-signout" 

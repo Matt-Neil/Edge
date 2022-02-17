@@ -69,8 +69,7 @@ exports.postSignup = async (req, res, next) => {
         const user = await Users.create({
             email: req.body.email,
             name: req.body.name,
-            password: hashedPassword,
-            skill: "Beginner"
+            password: hashedPassword
         });
         const token = createToken(user._id);
 

@@ -64,7 +64,7 @@ const WorkspaceRowCard = ({item, created, creator, currentUserID}) => {
 
     const updateVisibility = async () => {
         try {
-            await globalAPI.put(`/visibility/${item._id}?state=${visibility}`);
+            await globalAPI.put(`/visibility/${item._id}`);
 
             setVisibility(state => !state)
         } catch (err) {}

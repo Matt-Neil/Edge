@@ -1,14 +1,15 @@
 import React, {useState, useEffect} from 'react'
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import DeleteIcon from '@mui/icons-material/Delete';
+import itemsAPI from '../API/items'
+import { Link } from 'react-router-dom';
 
-const ExperimentCard = ({experiment, created}) => {
+const ExperimentCard = ({experiment, created, workspaceID}) => {
     const [date, setDate] = useState("");
     const [visibility, setVisibility] = useState(experiment.visibility)
 
     useEffect(() => {
-        const updatedDate = new Date(experiment.updatedAt);
+        const updatedDate = new Date(experiment.updated);
         const currentDate = new Date();
 
         if ((currentDate.getTime() - updatedDate.getTime()) / (1000 * 3600 * 24) >= 365) {
@@ -28,7 +29,7 @@ const ExperimentCard = ({experiment, created}) => {
 
     const updateVisibility = async () => {
         try {
-            //await globalAPI.put(`/visibility/${item._id}?state=${visibility}`);
+            await itemsAPI.put(`/experiment-visibility/${experiment._id}?workspace=${workspaceID}`);
 
             setVisibility(state => !state)
         } catch (err) {}
@@ -36,7 +37,7 @@ const ExperimentCard = ({experiment, created}) => {
 
     return (
         <div className="experiment-card">
-            <p className="experiment-card-title">{experiment.title}</p>
+            <Link className="experiment-card-title" to={`/workspace/${workspaceID}/experiment/${experiment._id}`}>{experiment.title}</Link>
             <p className="experiment-card-date">{date}</p>
             {created &&
                 <>
@@ -45,7 +46,6 @@ const ExperimentCard = ({experiment, created}) => {
                     :
                         <VisibilityOffIcon className="experiment-card-icon" onClick={() => {updateVisibility()}} />
                     }
-                    <DeleteIcon className="experiment-card-icon" />
                 </>
             }
         </div>

@@ -12,10 +12,6 @@ const UsersSchema = new mongoose.Schema({
     password: { 
         type: String, 
         required: true
-    },
-    skill: {
-        type: String,
-        required: true
     }
 })
 

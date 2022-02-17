@@ -606,6 +606,259 @@
   background-color: #FBFBFB;
 }
 
+.experiment-modelling-body {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  height: 600px;
+  margin: 0 0 30px 0;
+}
+
+.experiment-modelling-body .experiment-model {
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  width: 70%;
+  height: calc(100% - 75px);
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  overflow-x: hidden;
+  white-space: nowrap;
+}
+
+.model-diagram {
+  position: absolute;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.model-diagram .model-diagram-node {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+
+.model-diagram .model-diagram-node .model-diagram-remove {
+  margin: 10px 0 0 8px;
+  color: #474747;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.model-diagram .model-diagram-add {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.model-diagram .model-diagram-add .model-diagram-add-options {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  width: 90px;
+  height: 90px;
+  margin: 5px 0 0 0;
+  border-radius: 10px;
+  background-color: #FBFBFB;
+  border: 1px solid #E6E5E5;
+  position: relative;
+  left: 50%;
+  -webkit-transform: translateX(-60%);
+          transform: translateX(-60%);
+}
+
+.model-diagram .model-diagram-add .model-diagram-add-options button {
+  width: 70px;
+  height: 30px;
+  margin: 10px 0 0 0;
+  border-radius: 10px;
+  background-color: white;
+  border: 1px solid #E6E5E5;
+  cursor: pointer;
+}
+
+.model-diagram .model-diagram-add-icon {
+  margin: 5px 0 0 0;
+  position: relative;
+  left: 50%;
+  -webkit-transform: translateX(-105%);
+          transform: translateX(-105%);
+  color: white;
+  font-size: 14px;
+  border: none;
+  padding: 2px;
+  border-radius: 11px;
+  background-color: #2383F3;
+  cursor: pointer;
+}
+
+.model-diagram::-webkit-scrollbar {
+  display: none;
+}
+
+.model-configuration {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  width: 30%;
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+}
+
+.model-configuration button {
+  margin: 0 0 20px 0;
+}
+
+.model-configuration button:disabled {
+  cursor: not-allowed;
+}
+
+.model-configuration .model-configuration-option {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  max-width: 350px;
+  margin: 0 0 20px 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  background-color: #FBFBFB;
+  border: 1px solid #E6E5E5;
+}
+
+.model-configuration .model-configuration-option div {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.model-configuration .model-configuration-option div label {
+  font-size: 12px;
+  margin: 0 10px 0 0;
+  min-width: 125px;
+}
+
+.model-configuration .model-configuration-option div input, .model-configuration .model-configuration-option div select {
+  height: 30px;
+  width: 100%;
+  border-radius: 10px;
+  background-color: white;
+  border: 1px solid #E6E5E5;
+}
+
+.model-configuration .model-configuration-option div input {
+  font-size: 12px;
+  padding: 0 10px;
+}
+
+.model-configuration .model-configuration-option div select {
+  padding: 0 5px;
+}
+
+.model-configuration .model-configuration-option div:not(:last-child) {
+  margin: 15px 15px 0 15px;
+}
+
+.model-configuration .model-configuration-option div:last-child {
+  margin: 15px;
+}
+
+.model-configuration .model-selected {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding: 0 15px;
+  width: calc(100% - 30px);
+  height: 100px;
+  border-radius: 10px;
+  background-color: #FBFBFB;
+  border: 1px solid #E6E5E5;
+  font-size: 14px;
+}
+
+.model-configuration .model-selected p {
+  font-weight: 500;
+  height: 100%;
+  line-height: 100px;
+  padding: 0 20px 0 0;
+  max-width: 40px;
+  min-width: 40px;
+  border-right: 1px #E6E5E5 solid;
+}
+
+.model-configuration .model-selected div label {
+  margin: 0 10px 0 20px;
+}
+
+.model-configuration .model-selected div input, .model-configuration .model-selected div select {
+  height: 30px;
+  border-radius: 10px;
+  background-color: white;
+  border: 1px solid #E6E5E5;
+}
+
+.model-configuration .model-selected div input {
+  width: 40px;
+  padding: 0 10px;
+}
+
+.model-configuration .model-selected div select {
+  width: 100px;
+  padding: 0 5px;
+  margin: 15px 0 0 0;
+}
+
 .model-node {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -768,7 +1021,7 @@
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
           flex-direction: column;
-  height: calc(100vh - 91px);
+  height: calc(100vh - 81px);
   max-width: 325px;
   width: 100%;
   min-width: 250px;
@@ -1120,7 +1373,7 @@
   color: #474747;
 }
 
-.create-item-modelling {
+.create-experiment-modelling {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1132,21 +1385,21 @@
   margin: 0 auto;
 }
 
-.create-item-modelling .create-item-modelling-top {
+.create-experiment-modelling .create-experiment-modelling-top {
   margin: 0 0 15px auto;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
 }
 
-.create-item-modelling .create-item-modelling-body {
+.create-experiment-modelling .create-experiment-modelling-body {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   height: 100%;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-model {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model {
   position: relative;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -1164,7 +1417,7 @@
   white-space: nowrap;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-model .create-item-model-diagram {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model .create-experiment-model-diagram {
   position: absolute;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -1183,7 +1436,7 @@
   scrollbar-width: none;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-model .create-item-model-diagram .create-item-model-diagram-node {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model .create-experiment-model-diagram .create-experiment-model-diagram-node {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1192,14 +1445,14 @@
           align-items: flex-start;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-model .create-item-model-diagram .create-item-model-diagram-node .create-item-model-diagram-remove {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model .create-experiment-model-diagram .create-experiment-model-diagram-node .create-experiment-model-diagram-remove {
   margin: 10px 0 0 8px;
   color: #474747;
   font-size: 12px;
   cursor: pointer;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-model .create-item-model-diagram .create-item-model-diagram-add {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model .create-experiment-model-diagram .create-experiment-model-diagram-add {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1209,7 +1462,7 @@
           flex-direction: column;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-model .create-item-model-diagram .create-item-model-diagram-add .create-item-model-diagram-add-options {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model .create-experiment-model-diagram .create-experiment-model-diagram-add .create-experiment-model-diagram-add-options {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1232,7 +1485,7 @@
           transform: translateX(-60%);
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-model .create-item-model-diagram .create-item-model-diagram-add .create-item-model-diagram-add-options button {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model .create-experiment-model-diagram .create-experiment-model-diagram-add .create-experiment-model-diagram-add-options button {
   width: 70px;
   height: 30px;
   margin: 10px 0 0 0;
@@ -1242,7 +1495,7 @@
   cursor: pointer;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-model .create-item-model-diagram .create-item-model-diagram-add-icon {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model .create-experiment-model-diagram .create-experiment-model-diagram-add-icon {
   margin: 5px 0 0 0;
   position: relative;
   left: 50%;
@@ -1257,11 +1510,11 @@
   cursor: pointer;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-model .create-item-model-diagram::-webkit-scrollbar {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model .create-experiment-model-diagram::-webkit-scrollbar {
   display: none;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-model .create-item-model-selected {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model .create-experiment-model-selected {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1285,7 +1538,7 @@
   font-size: 14px;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-model .create-item-model-selected p {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model .create-experiment-model-selected p {
   font-weight: 500;
   height: 100%;
   line-height: 50px;
@@ -1293,28 +1546,28 @@
   border-right: 1px #E6E5E5 solid;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-model .create-item-model-selected label {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model .create-experiment-model-selected label {
   margin: 0 10px 0 20px;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-model .create-item-model-selected input, .create-item-modelling .create-item-modelling-body .create-item-model .create-item-model-selected select {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model .create-experiment-model-selected input, .create-experiment-modelling .create-experiment-modelling-body .create-experiment-model .create-experiment-model-selected select {
   height: 30px;
   border-radius: 10px;
   background-color: white;
   border: 1px solid #E6E5E5;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-model .create-item-model-selected input {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model .create-experiment-model-selected input {
   width: 40px;
   padding: 0 10px;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-model .create-item-model-selected select {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model .create-experiment-model-selected select {
   width: 100px;
   padding: 0 5px;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-configuration {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model-configuration {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1327,7 +1580,7 @@
   height: fit-content;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-configuration .create-item-configuration-option {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model-configuration .create-experiment-model-configuration-option {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1343,7 +1596,7 @@
   border: 1px solid #E6E5E5;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-configuration .create-item-configuration-option div {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model-configuration .create-experiment-model-configuration-option div {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1352,13 +1605,13 @@
           align-items: center;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-configuration .create-item-configuration-option div label {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model-configuration .create-experiment-model-configuration-option div label {
   font-size: 12px;
   margin: 0 10px 0 0;
   min-width: 125px;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-configuration .create-item-configuration-option div input, .create-item-modelling .create-item-modelling-body .create-item-configuration .create-item-configuration-option div select {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model-configuration .create-experiment-model-configuration-option div input, .create-experiment-modelling .create-experiment-modelling-body .create-experiment-model-configuration .create-experiment-model-configuration-option div select {
   height: 30px;
   width: 100%;
   border-radius: 10px;
@@ -1366,20 +1619,20 @@
   border: 1px solid #E6E5E5;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-configuration .create-item-configuration-option div input {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model-configuration .create-experiment-model-configuration-option div input {
   font-size: 12px;
   padding: 0 10px;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-configuration .create-item-configuration-option div select {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model-configuration .create-experiment-model-configuration-option div select {
   padding: 0 5px;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-configuration .create-item-configuration-option div:not(:last-child) {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model-configuration .create-experiment-model-configuration-option div:not(:last-child) {
   margin: 15px 15px 0 15px;
 }
 
-.create-item-modelling .create-item-modelling-body .create-item-configuration .create-item-configuration-option div:last-child {
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model-configuration .create-experiment-model-configuration-option div:last-child {
   margin: 15px;
 }
 
@@ -1423,10 +1676,20 @@
   margin: 10px 0 25px 0;
 }
 
+.item-body .item-top .item-heading {
+  margin: 0 0 30px 0;
+}
+
+.item-body .item-top .item-heading .experiment-back-icon {
+  font-size: 25px;
+  margin: 0 12px 0 0;
+  color: #474747;
+  cursor: pointer;
+}
+
 .item-body .item-top .item-heading .item-title-input {
   height: 40px;
   width: 100%;
-  margin: 0 0 30px 0;
   padding: 0 10px;
   border: 1px solid #f7efcd;
   border-radius: 10px;
@@ -1505,17 +1768,21 @@
   border-radius: 10px;
   background-color: #fcf6dc;
   padding: 10px;
-  margin: 30px 0 15px 0;
+  margin: 30px 0 5px 0;
   font-size: 14px;
   resize: none;
 }
 
 .item-body .item-top .item-middle {
-  margin: 0 0 30px auto;
+  margin: 20px 0 0 auto;
 }
 
 .item-body .item-top .item-middle .item-delete {
   margin: 0 20px 0 0;
+}
+
+.item-body .item-top .item-middle .item-save:disabled {
+  cursor: not-allowed;
 }
 
 .item-body .item-top .item-save:disabled {
@@ -1537,6 +1804,7 @@
   border-radius: 5px;
   border: 1px solid #E6E5E5;
   background-color: white;
+  margin: 40px 0 0 0;
 }
 
 .item-body .item-bottom .end-items {
@@ -1790,9 +2058,9 @@
   margin: 0 15px 0 0;
   height: 30px;
   padding: 0 10px;
-  border: 1px solid #f7efcd;
+  border: 1px solid #E6E5E5;
   border-radius: 10px;
-  background-color: #fcf6dc;
+  background-color: #FBFBFB;
 }
 
 .item-body .item-bottom .item-data-table-pagination .item-data-find {

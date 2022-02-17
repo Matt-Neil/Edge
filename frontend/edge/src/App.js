@@ -79,6 +79,12 @@ export default function App() {
                                         <ViewItems type={"all-datasets"} currentUser={currentUser} setSearchPhrase={setSearchPhrase} />
                                     </Route>
                                     <Route path="/search-results/:id" render={(props) => <Search currentUser={currentUser} searchPhrase={searchPhrase} setSearchPhrase={setSearchPhrase} key={props.location.key} />} />
+                                    <Route exact path="/workspace/:id/create-experiment">
+                                        <CreateExperiment currentUser={currentUser} />
+                                    </Route>
+                                    <Route exact path="/workspace/:workspace/experiment/:experiment">
+                                        <Experiment currentUser={currentUser} />
+                                    </Route>
                                     <Route exact path="/workspace/:id" render={(props) => <Workspace currentUser={currentUser} key={props.location.key} />} />
                                     <Route exact path="/dataset/:id" render={(props) => <Dataset currentUser={currentUser} key={props.location.key} />} />
                                     <Route exact path="/create-workspace">
@@ -86,9 +92,6 @@ export default function App() {
                                     </Route>
                                     <Route exact path="/create-dataset">
                                         <CreateDataset currentUser={currentUser} />
-                                    </Route>
-                                    <Route exact path="/:id/create-experiment">
-                                        <CreateExperiment currentUser={currentUser} />
                                     </Route>
                                     <Route exact path="/account">
                                         <Account />

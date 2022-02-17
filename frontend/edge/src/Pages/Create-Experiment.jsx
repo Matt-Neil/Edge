@@ -37,21 +37,22 @@ const CreateExperiment = ({currentUser}) => {
                     addOpenItems(workspace.data.data._id, workspace.data.data.title, workspace.data.data.type)
                 }
 
+                experiments.data.data.experiments.map((experiment) => {
+                    setExperiments(state => [...state, experiment.title]);
+                })
+
                 fetch(`http://127.0.0.1:5000/files/${workspace.data.data.dataset.datafile}.csv`)
                     .then(response => response.text())
                     .then(text => {
                         setModel([{type: "Input", value: text.slice(0, text.indexOf('\n')).split(',').length, activation: ""}])
                         setNoData(false)
+                        setLoaded(true);
+                        setExist(true)
                     }).catch(() => {
                         setNoData(true)
+                        setLoaded(true);
+                        setExist(true)
                     });
-
-                experiments.data.data.experiments.map((experiment) => {
-                    setExperiments(state => [...state, experiment.title]);
-                })
-
-                setExist(true)
-                setLoaded(true);
             } catch (err) {
                 setExist(false)
                 setLoaded(true)
@@ -137,20 +138,20 @@ const CreateExperiment = ({currentUser}) => {
                                             </div>
                                         </div>
                                     : (stage === "modelling") ?
-                                        <div className="create-item-modelling">
-                                            <div className="create-item-modelling-top">   
+                                        <div className="create-experiment-modelling">
+                                            <div className="create-experiment-modelling-top">   
                                                 <button className="white-button create-item-cancel"
                                                         onClick={() => {cancel()}}>Cancel</button>
                                                 <button className="blue-button"
                                                         onClick={() => {next()}}>Train</button>
                                             </div>
-                                            <div className="create-item-modelling-body">
-                                                <div className="create-item-model">
-                                                    <div className="create-item-model-diagram" key={refreshDiagram}>
+                                            <div className="create-experiment-modelling-body">
+                                                <div className="create-experiment-model">
+                                                    <div className="create-experiment-model-diagram" key={refreshDiagram}>
                                                         {model.map((node, i) => {
                                                             return (
                                                                 <div key={i}>
-                                                                    <div className={"create-item-model-diagram-node"}>
+                                                                    <div className={"create-experiment-model-diagram-node"}>
                                                                         <div onClick={() => {setSelectedNode(i)}}>
                                                                             <ModelNode setSelectedNode={setSelectedNode} type={node.type} value={node.value} selected={i === selectedNode} last={i === model.length-1} />
                                                                         </div>
@@ -170,23 +171,24 @@ const CreateExperiment = ({currentUser}) => {
                                                                                                 }
                                                                                                 model.splice(i, 1)
                                                                                                 setRefreshDiagram(new Date().getTime())}}>
-                                                                                <ClearIcon className="create-item-model-diagram-remove" />
+                                                                                <ClearIcon className="create-experiment-model-diagram-remove" />
                                                                             </div>
                                                                         }
                                                                     </div>
                                                                     {i === model.length-1 && node.type !== "Output" &&
                                                                         <>
                                                                             {addNode ?
-                                                                                <div className="create-item-model-diagram-add">
+                                                                                <div className="create-experiment-model-diagram-add">
                                                                                     <div onClick={() => {setAddNode(false)}}>
-                                                                                        <RemoveIcon className="create-item-model-diagram-add-icon" />
+                                                                                        <RemoveIcon className="create-experiment-model-diagram-add-icon" />
                                                                                     </div>
-                                                                                    <div className="create-item-model-diagram-add-options">
+                                                                                    <div className="create-experiment-model-diagram-add-options">
                                                                                         <button onClick={() => {setModel(state => [...state, {
                                                                                             type: "Dense",
                                                                                             value: 0,
                                                                                             activation: ""
                                                                                         }])
+                                                                                        setSelectedNode(state => state + 1)
                                                                                         setAddNode(false)
                                                                                         }}>Dense</button>
                                                                                         <button onClick={() => {setModel(state => [...state, {
@@ -194,13 +196,14 @@ const CreateExperiment = ({currentUser}) => {
                                                                                             value: 0,
                                                                                             activation: ""
                                                                                         }])
+                                                                                        setSelectedNode(state => state + 1)
                                                                                         setAddNode(false)
                                                                                         }}>Output</button>
                                                                                     </div>
                                                                                 </div>
                                                                             :
                                                                                 <div onClick={() => {setAddNode(true)}}>
-                                                                                    <AddIcon className="create-item-model-diagram-add-icon" />
+                                                                                    <AddIcon className="create-experiment-model-diagram-add-icon" />
                                                                                 </div>
                                                                             }
                                                                         </>
@@ -210,7 +213,7 @@ const CreateExperiment = ({currentUser}) => {
                                                         })}
                                                         <div ref={modelRef} />
                                                     </div>
-                                                    <div className="create-item-model-selected">
+                                                    <div className="create-experiment-model-selected">
                                                         <p>{model[selectedNode].type}</p>
                                                         <label>Units</label>
                                                         <input value={model[selectedNode].value} 
@@ -249,8 +252,8 @@ const CreateExperiment = ({currentUser}) => {
                                                         }  
                                                     </div>
                                                 </div>
-                                                <div className="create-item-configuration">
-                                                    <div className="create-item-configuration-option">
+                                                <div className="create-experiment-model-configuration">
+                                                    <div className="create-experiment-model-configuration-option">
                                                         <div>
                                                             <label>Epochs</label>
                                                             <input value={configuration.epochs} onChange={e => {setConfiguration(state => ({

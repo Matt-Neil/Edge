@@ -20,11 +20,17 @@
             margin: 10px 0 25px 0;
         }
         .item-heading {
-
+            margin: 0 0 30px 0;
+            
+            .experiment-back-icon {
+                font-size: 25px;
+                margin: 0 12px 0 0;
+                color: $dark-grey1;
+                cursor: pointer;
+            }
             .item-title-input {
                 height: 40px;
                 width: 100%;
-                margin: 0 0 30px 0;
                 padding: 0 10px;
                 border: 1px solid #f7efcd;
                 border-radius: 10px;
@@ -88,15 +94,18 @@
             border-radius: 10px;
             background-color: #fcf6dc;
             padding: 10px;
-            margin: 30px 0 15px 0;
+            margin: 30px 0 5px 0;
             font-size: 14px;
             resize: none;
         }
         .item-middle {
-            margin: 0 0 30px auto;
+            margin: 20px 0 0 auto;
             
             .item-delete {
                 margin: 0 20px 0 0;
+            }
+            .item-save:disabled {
+                cursor: not-allowed;
             }
         }
         .item-save:disabled {
@@ -114,6 +123,7 @@
             border-radius: 5px;
             border: 1px solid $mid-grey2;
             background-color: white;
+            margin: 40px 0 0 0;
         }
     }
     .item-bottom {
@@ -299,9 +309,9 @@
                 margin: 0 15px 0 0;
                 height: 30px;
                 padding: 0 10px;
-                border: 1px solid #f7efcd;
+                border: 1px solid $mid-grey2;
                 border-radius: 10px;
-                background-color: #fcf6dc;
+                background-color: $light-grey2;
             }
             .item-data-find {
                 height: 30px;

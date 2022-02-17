@@ -388,6 +388,21 @@ exports.getCreatedExperiments = async (req, res, next) => {
                     'experiments': 1
                 }
             }, {
+                $match: {
+                    $or: [
+                        { 
+                            $and: [
+                                {
+                                    'experiments.visibility': false,
+                                    self: true
+                                }
+                            ] 
+                        }, { 
+                            'experiments.visibility': true
+                        }
+                    ]
+                }
+            }, {
                 $sort: { 
                     'updated': -1
                 } 
@@ -398,6 +413,175 @@ exports.getCreatedExperiments = async (req, res, next) => {
             success: true,
             data: experiments
         })
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        })
+    }
+}
+
+exports.getExperiment = async (req, res, next) => {
+    try {
+        const experiment = await Items.aggregate([
+            { 
+                $match: {
+                    _id: mongoose.Types.ObjectId(req.query.workspace),
+                    type: "workspace"
+                }
+            }, {
+                $unwind: '$experiments'
+            }, { 
+                $match : {
+                    'experiments._id': mongoose.Types.ObjectId(req.params.id)
+                }
+            }, {
+                $project: {
+                    _id: 0,
+                    'self': { $eq: [mongoose.Types.ObjectId(res.locals.currentUser._id), '$creator']},
+                    'experiments': 1
+                }
+            }, {
+                $match: {
+                    $or: [
+                        { 
+                            $and: [
+                                {
+                                    'experiments.visibility': false,
+                                    self: true
+                                }
+                            ] 
+                        }, { 
+                            'experiments.visibility': true
+                        }
+                    ]
+                }
+            }
+        ]);
+
+        if (!experiment) {
+            res.status(201).json({
+                success: false,
+                data: ""
+            })
+        } else {
+            res.status(201).json({
+                success: true,
+                data: experiment[0]
+            })
+        }
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        })
+    }
+}
+
+exports.deleteExperiment = async (req, res, next) => {
+    try {
+        const workspace = await Items.findById(req.query.workspace)
+
+        if (!workspace) {
+            res.status(201).json({
+                success: false,
+                data: ""
+            })
+        } else {
+            let updatedExperiments = workspace.experiments
+
+            for (let i = 0; i < updatedExperiments.length; i++) {
+                if (updatedExperiments[i]._id.equals(mongoose.Types.ObjectId(req.params.id))) {
+                    updatedExperiments.splice(i, 1)
+                    break
+                }
+            }
+            
+            workspace.experiments = updatedExperiments
+
+            await workspace.save();
+
+            res.status(201).json({
+                success: true,
+                data: ""
+            })
+        }
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        })
+    }
+}
+
+exports.putExperiment = async (req, res, next) => {
+    try {
+        const workspace = await Items.findById(req.query.workspace);
+
+        if (!workspace) {
+            res.status(404).json({
+                success: false,
+                error: "No Workspace Found."
+            })
+        } else {
+            let updatedExperiments = workspace.experiments
+
+            for (let i = 0; i < updatedExperiments.length; i++) {
+                if (updatedExperiments[i]._id.equals(mongoose.Types.ObjectId(req.params.id))) {
+                    updatedExperiments[i].title = req.body.title
+                    updatedExperiments[i].model = req.body.model
+                    updatedExperiments[i].configuration = req.body.configuration
+                    updatedExperiments[i].updated = req.body.updated
+
+                    break
+                }
+            }
+            
+            workspace.experiments = updatedExperiments
+
+            await workspace.save();
+
+            res.status(201).json({
+                success: true
+            })
+        }
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        })
+    }
+}
+
+exports.putVisibilityExperiment = async (req, res, next) => {
+    try {
+        const workspace = await Items.findById(req.query.workspace);
+
+        if (!workspace) {
+            res.status(404).json({
+                success: false,
+                error: "No Workspace Found."
+            })
+        } else {
+            let updatedExperiments = workspace.experiments
+
+            for (let i = 0; i < updatedExperiments.length; i++) {
+                if (updatedExperiments[i]._id.equals(mongoose.Types.ObjectId(req.params.id))) {
+                    updatedExperiments[i].visibility = !updatedExperiments[i].visibility
+
+                    break
+                }
+            }
+            
+            workspace.experiments = updatedExperiments
+
+            await workspace.save();
+
+            res.status(201).json({
+                success: true
+            })
+        }
     } catch (err) {
         res.status(500).json({
             success: false,

@@ -66,7 +66,7 @@ const SignIn = () => {
         <>
             {signin ?
                 <form className="signin-side" method="POST" onSubmit={signinUser}>
-                    <h1>Welcome Back to Edge</h1>
+                    <h1>Welcome back to Edge</h1>
                     <label>Email Address</label>
                     <input type="text" value={email} onChange={e => {setEmail(e.target.value)}} />
                     <label>Password</label>
@@ -81,7 +81,7 @@ const SignIn = () => {
                 </form>
             :
                 <form className="signin-side" method="POST" onSubmit={signupUser}>
-                    <h1>Create an Account</h1>
+                    <h1>Create an account</h1>
                     <label>Name</label>
                     <input type="text" value={createName} onChange={e => {setCreateName(e.target.value)}} />
                     <label>Email Address</label>
