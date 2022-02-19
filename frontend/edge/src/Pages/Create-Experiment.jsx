@@ -191,14 +191,16 @@ const CreateExperiment = ({currentUser}) => {
                                                                                         setSelectedNode(state => state + 1)
                                                                                         setAddNode(false)
                                                                                         }}>Dense</button>
-                                                                                        <button onClick={() => {setModel(state => [...state, {
-                                                                                            type: "Output",
-                                                                                            value: 0,
-                                                                                            activation: ""
-                                                                                        }])
-                                                                                        setSelectedNode(state => state + 1)
-                                                                                        setAddNode(false)
-                                                                                        }}>Output</button>
+                                                                                        {model.length > 1 &&
+                                                                                            <button onClick={() => {setModel(state => [...state, {
+                                                                                                type: "Output",
+                                                                                                value: 0,
+                                                                                                activation: ""
+                                                                                            }])
+                                                                                            setSelectedNode(state => state + 1)
+                                                                                            setAddNode(false)
+                                                                                            }}>Output</button>
+                                                                                        }
                                                                                     </div>
                                                                                 </div>
                                                                             :
