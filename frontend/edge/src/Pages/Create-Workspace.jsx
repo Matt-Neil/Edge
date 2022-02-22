@@ -3,7 +3,7 @@ import {useHistory} from "react-router-dom"
 import usersAPI from '../API/users'
 import itemsAPI from '../API/items'
 import imageAPI from '../API/images'
-import ViewData from '../Components/View-Data'
+import DataTable from '../Components/Data-Table'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 
@@ -142,7 +142,8 @@ const CreateWorkspace = ({currentUser}) => {
                 comments: [],
                 bookmarks: [],
                 updated: new Date().toISOString(),
-                visibility: visibility
+                visibility: visibility,
+                type: "workspace"
             });
 
             history.push(`/workspace/${workspaceResponse.data.data}`)
@@ -169,7 +170,7 @@ const CreateWorkspace = ({currentUser}) => {
                             {setupStage &&
                                 <div className="create-item-setup-information">
                                     <div className="create-item-nav">   
-                                        <p className="create-item-filename">Workspace Information</p>
+                                        <p className="create-item-data-information-label">Workspace Information</p>
                                         <button className="white-button create-item-cancel"
                                                 onClick={() => {cancel()}}>Cancel</button>
                                         <button className="blue-button"
@@ -184,16 +185,16 @@ const CreateWorkspace = ({currentUser}) => {
                                                 onChange={e => {setDescription(e.target.value)}}
                                                 value={description} />
                                     <div className="create-item-setup">
-                                        <label className="create-item-setup-label">Public?</label>
-                                        <input type="checkbox" 
-                                                onChange={() => {setVisibility(previous => !previous)}}
-                                                checked={visibility} />
-                                    </div>
-                                    <div className="create-item-setup">
                                         <label className="create-item-setup-label">Picture</label>
                                         <input type="file" 
                                                 name="image" 
                                                 onChange={e => {setImage(e.target.files[0])}} />
+                                    </div>
+                                    <div className="create-item-setup">
+                                        <label className="create-item-setup-label">Public?</label>
+                                        <input type="checkbox" 
+                                                onChange={() => {setVisibility(previous => !previous)}}
+                                                checked={visibility} />
                                     </div>
                                 </div>
                             }
@@ -201,7 +202,7 @@ const CreateWorkspace = ({currentUser}) => {
                                 <div className="create-item-import">
                                     <div className="create-item-import-top">
                                         <input className="create-workspace-import-existing"
-                                                placeholder="Data ID"
+                                                placeholder="Dataset ID"
                                                 onChange={e => {setDataID(e.target.value)}}
                                                 value={dataID} />
                                         <button className="blue-button"
@@ -217,7 +218,7 @@ const CreateWorkspace = ({currentUser}) => {
                                     {dataID !== "" && dataTable !== undefined &&
                                         <div className="create-item-data">
                                             <div className="create-item-data-information">
-                                                <p className="create-item-filename">Data: {uploadedDataset.data}</p> 
+                                                <p className="create-item-data-information-label">Data: {uploadedDataset.data}</p> 
                                                 <button className="grey-button create-item-remove"
                                                         onClick={() => {remove()}}>Remove</button>
                                                 <span />
@@ -228,7 +229,7 @@ const CreateWorkspace = ({currentUser}) => {
                                                 </div>
                                             </div>
                                             <div className="create-item-data-table">
-                                                <ViewData dataTable={dataTable} start={start} end={end} key={new Date().getTime()} />
+                                                <DataTable dataTable={dataTable} start={start} end={end} key={new Date().getTime()} />
                                             </div>
                                         </div>
                                     }

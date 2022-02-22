@@ -85,6 +85,7 @@
         border-radius: 10px;
         background-color: #fcf6dc;
         padding: 0 10px;
+        font-size: 14px;
     }
     .create-item-description {
         min-height: 150px;
@@ -94,6 +95,7 @@
         padding: 10px;
         margin: 25px 0 0 0;
         resize: none;
+        font-size: 14px;
     }
     .create-item-setup {
         display: flex;
@@ -107,6 +109,15 @@
         }
         input {
             margin: 0 20px 0 5px;
+        }
+        select {
+            height: 36px;
+            width: 150px;
+            margin: 0 20px 0 10px;
+            padding: 0 5px;
+            border-radius: 10px;
+            background-color: $light-grey2;
+            border: 1px solid $mid-grey2;
         }
     }
 }
@@ -137,21 +148,144 @@
     .create-item-data {
         max-height: 80%;
         margin: 25px 0 0 0;
+        
+        .create-dataset-labels-row {
+            display: flex;
+            align-items: center;
+            margin: 15px 0 25px 0;
 
+            .create-dataset-label-input {
+                margin: 0 15px 0 0;
+                height: 30px;
+                width: 200px;
+                padding: 0 10px;
+                border: 1px solid #f7efcd;
+                border-radius: 10px;
+                background-color: #fcf6dc;
+            }
+            button {
+                height: 30px;
+                line-height: 30px;
+                margin: 0 25px 0 0;
+            }
+            .create-dataset-labels-list {
+                display: flex;
+                align-items: center;
+                flex: 1;
+                overflow-x: auto;
+                -ms-overflow-style: none; 
+                scrollbar-width: none;
+
+                p {
+                    font-size: 12px;
+                    margin: 0;
+                }
+                .create-dataset-created-label {
+                    display: flex;
+                    align-items: center;
+                    min-width: 86px;
+                    height: 30px;
+                    margin: 0 10px 0 0;
+                    padding: 0 7px;
+                    background-color: $light-grey2;
+                    border: 1px $mid-grey2 solid;
+                    border-radius: 10px;
+
+                    p {
+                        margin: 0 8px 0 0;
+                        font-size: 12px;
+                        color: $dark-grey1;
+                    }
+                    div {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 0 0 0 auto;
+                        width: 14px;
+                        height: 14px;
+                        cursor: pointer;
+                    }
+                    div:hover {
+                        background-color: white;
+                        border-radius: 10px;
+                    }
+                    .create-dataset-created-label-close {
+                        font-size: 14px;
+                        color: $dark-grey1;
+                    }
+                    .create-dataset-created-label-close:hover {
+                        color: $blue2;
+                    }
+                }
+            }
+        }
+        .create-item-data-images {
+            display: flex;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            margin: 15px 0 40px 0;
+            
+            .create-item-data-images-list {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin: 0 20px 30px 0;
+                
+                div {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    height: 250px;
+                    width: 200px;
+                    border-radius: 10px;
+                    background-color: $light-grey2;
+                    border: 1px $mid-grey2 solid;
+
+                    img {
+                        height: auto;
+                        max-height: 200px;
+                        width: 100%;
+                        border-top-left-radius: 9px;
+                        border-top-right-radius: 9px;
+                        object-fit: contain;
+                    }
+                    select {
+                        width: 95%;
+                        height: 30px;
+                        margin: auto 0 5px 0;
+                        padding: 0 5px;
+                        border-radius: 10px;
+                        background-color: white;
+                        border: 1px solid $mid-grey2;
+                    }
+                }
+            }
+        }
         .create-item-data-information {
             display: flex;
             align-items: center;
             margin: 0 0 25px 0;
 
-            .create-item-filename {
+            .create-item-data-information-label {
                 text-align: left;
                 font-size: 14px;
                 color: $dark-grey1;
                 margin: 0 25px 0 0;
             }
+            button {
+                margin: 0 40px 0 0;
+            }
             .create-item-remove {
                 height: 30px;
                 line-height: 30px;
+            }
+            select {
+                padding: 0 5px;
+                height: 30px;
+                width: 150px;
+                border-radius: 10px;
+                background-color: white;
+                border: 1px solid $mid-grey2;
             }
             span {
                 flex: 1;
@@ -163,11 +297,11 @@
             height: 100%;
             border: 1px solid $mid-grey2;
         }
-        .create-item-data-table-pagination {
+        .create-item-data-pagination {
             display: flex;
             align-items: center;
 
-            .create-item-data-table-pagination-icon {
+            .create-item-data-pagination-icon {
                 font-size: 14px;
                 border: 1px solid $mid-grey2;
                 background-color: white;
@@ -175,14 +309,14 @@
                 border-radius: 15px;
                 cursor: pointer;
             }
-            .create-item-data-table-pagination-icon:first-child {
+            .create-item-data-pagination-icon:first-child {
                 margin: 0 20px 0 0;
             }
-            .create-item-data-table-pagination-icon:last-child {
+            .create-item-data-pagination-icon:last-child {
                 margin: 0 0 0 20px;
             }
             p {
-                font-size: 14px;
+                font-size: 12px;
                 color: $dark-grey1;
             }
         }

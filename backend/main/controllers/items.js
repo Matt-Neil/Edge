@@ -85,8 +85,35 @@ exports.getItem = async (req, res, next) => {
                         'description': 1,
                         'picture': 1,
                         'datafile': 1,
+                        'dataType': 1,
                         'visibility': 1,
-                        'normalised': 1,
+                        'normalised': {
+                            $cond: {
+                                if: {
+                                    $eq: ['$dataType', 'value']
+                                },
+                                then: 0,
+                                else: 1,
+                            }
+                        },
+                        'encoded': {
+                            $cond: {
+                                if: {
+                                    $eq: ['$dataType', 'value']
+                                },
+                                then: 0,
+                                else: 1,
+                            }
+                        },
+                        'target': {
+                            $cond: {
+                                if: {
+                                    $eq: ['$dataType', 'value']
+                                },
+                                then: 0,
+                                else: 1,
+                            }
+                        },
                         'self': { $eq: [mongoose.Types.ObjectId(res.locals.currentUser._id), '$creator']},
                         'bookmarked': { $in: [res.locals.currentUser._id, '$bookmarks'] },
                         'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
@@ -154,6 +181,7 @@ exports.getItem = async (req, res, next) => {
                         'upvotes': { $size: '$upvotes' },
                         'updated': 1,
                         'dataset.datafile': 1,
+                        'dataset.dataType': 1,
                         'dataset._id': 1,
                         'creatorName.name': 1,
                         'type': 1
@@ -198,6 +226,7 @@ exports.postItem = async (req, res, next) => {
             data: item._id
         })
     } catch (err) {
+        console.log(err)
         res.status(500).json({
             success: false,
             error: 'Server Error'

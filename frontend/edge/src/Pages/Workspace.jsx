@@ -1,9 +1,9 @@
 import React, {useState, useEffect, useContext, useRef} from 'react'
-import {Link, useParams} from "react-router-dom"
+import {Link, useParams, useHistory} from "react-router-dom"
 import globalAPI from '../API/global'
 import imageAPI from '../API/images'
 import itemsAPI from '../API/items'
-import ViewData from '../Components/View-Data';
+import DataTable from '../Components/Data-Table';
 import { OpenItemsContext } from '../Contexts/openItemsContext';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
@@ -43,13 +43,14 @@ const Workspace = ({currentUser}) => {
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
     const [image, setImage] = useState();
-    const [refreshTable, setRefreshTable] = useState()
+    const [refreshData, setRefreshData] = useState()
     const [displayPublic, setDisplayPublic] = useState(false)
     const [displayExist, setDisplayExist] = useState(false)
-    const {addOpenItems} = useContext(OpenItemsContext);
+    const {addOpenItems, removeOpenItems} = useContext(OpenItemsContext);
     const workspaceID = useParams().id;
     const publicInterval = useRef(0)
     const existInterval = useRef(0)
+    const history = useHistory()
 
     useEffect(() => {
         const fetchData = async () => {
@@ -79,19 +80,35 @@ const Workspace = ({currentUser}) => {
                 setComments(comments.data.data)
                 setExperiments(experiments.data.data)
 
-                fetch(`http://127.0.0.1:5000/files/${workspace.data.data.dataset.datafile}.csv`)
-                    .then(response => response.text())
-                    .then(text => {
-                        setDataTable(text)
-                        setMaxRows(text.slice(text.indexOf('\n')+1).split('\n').length)
-                        setExist(true)
-                        setNoData(false)
-                        setLoaded(true)
-                    }).catch(() => {
-                        setExist(true)
-                        setNoData(true)
-                        setLoaded(true)
-                    });
+                if (workspace.data.data.dataset.dataType === "value") {
+                    fetch(`http://127.0.0.1:5000/files/${workspace.data.data.dataset.datafile}.csv`)
+                        .then(response => response.text())
+                        .then(text => {
+                            setDataTable(text)
+                            setMaxRows(text.slice(text.indexOf('\n')+1).split('\n').length)
+                            setExist(true)
+                            setNoData(false)
+                            setLoaded(true)
+                        }).catch(() => {
+                            setExist(true)
+                            setNoData(true)
+                            setLoaded(true)
+                        });
+                } else {
+                    fetch(`http://127.0.0.1:5000/files/${workspace.data.data.dataset.datafile}/`)
+                        .then(response => response.text())
+                        .then(text => {
+                            setDataTable(text)
+                            setMaxRows(text.slice(text.indexOf('\n')+1).split('\n').length)
+                            setExist(true)
+                            setNoData(false)
+                            setLoaded(true)
+                        }).catch(() => {
+                            setExist(true)
+                            setNoData(true)
+                            setLoaded(true)
+                        });
+                }
             } catch (err) {
                 setExist(false)
                 setLoaded(true)
@@ -170,7 +187,7 @@ const Workspace = ({currentUser}) => {
                         setDataTable(text)
                         setMaxRows(text.slice(text.indexOf('\n')+1).split('\n').length)
                         setDataset(checkPublic._id)
-                        setRefreshTable(new Date().getTime())
+                        setRefreshData(new Date().getTime())
                     })
             } else if (checkPublic.data.success && !checkPublic.data.data.visibility) {
                 displayPublicInterval()
@@ -230,14 +247,14 @@ const Workspace = ({currentUser}) => {
         if (!isNaN(row) && row !== "") {
             setStart(row-1)
             setEnd(row)
-            setRefreshTable(new Date().getTime())
+            setRefreshData(new Date().getTime())
         } else {
             if (start === (page-1)*30 && end === page*30) {
                 setRow("")
             } else {
                 setStart((page-1)*30)
                 setEnd(page*30)
-                setRefreshTable(new Date().getTime())
+                setRefreshData(new Date().getTime())
             }
         }
     }
@@ -246,26 +263,27 @@ const Workspace = ({currentUser}) => {
         if (!(start === (page-1)*30 && end === page*30)) {
             setStart((page-1)*30)
             setEnd(page*30)
-            setRefreshTable(new Date().getTime())
+            setRefreshData(new Date().getTime())
         }
         setRow("")
     }
 
     const previousPage = () => {
         if (page > 1) {
+            setStart((page-2)*30)
+            setEnd((page-1)*30)
             setPage(state => state-1)
+            setRefreshData(new Date().getTime())
         }
-        setStart((page-1)*30)
-        setEnd(page*30)
-        setRefreshTable(new Date().getTime())
     }
-
+    
     const nextPage = () => {
-        if (page*30 < maxRows && maxRows > 30) {
+        if ((workspace.dataset.dataType === "value" && page*30 < maxRows && maxRows > 30) ||
+            (workspace.dataset.dataType === "image" && page*30 < maxRows && maxRows > 30)) {
             setPage(state => state+1)
             setStart((page)*30)
             setEnd((page+1)*30)
-            setRefreshTable(new Date().getTime())
+            setRefreshData(new Date().getTime())
         }
     }
 
@@ -331,6 +349,9 @@ const Workspace = ({currentUser}) => {
     const deleteWorkspace = async () => {
         try {
             await itemsAPI.delete(`/${workspaceID}`)
+
+            removeOpenItems(workspaceID)
+            history.replace("/home")
         } catch (err) {}
     }
 
@@ -465,9 +486,39 @@ const Workspace = ({currentUser}) => {
                                                 <p>Page {page} / {Math.ceil(maxRows/30)}</p>
                                                 <ArrowForwardIosIcon className="item-data-table-pagination-icon" onClick={() => {nextPage()}} />
                                             </div>
-                                            <div className="item-data-table">
-                                                <ViewData dataTable={dataTable} start={start} end={end} key={refreshTable} />
-                                            </div>
+                                            {workspace.dataset.dataType ==="value" ?
+                                                <div className="item-data-table">
+                                                    <DataTable dataTable={dataTable} start={start} end={end} key={refreshData} />
+                                                </div>
+                                            :
+                                                <div className="create-item-data-images" key={refreshData}>
+                                                    {/* {[...dataFile].map((image, i) => {
+                                                        if (i >= start && i < end) {
+                                                            return (
+                                                                <div className="create-item-data-images-list" key={i}>
+                                                                    <div>
+                                                                        <img src={`http://127.0.0.1:5000/files/${dataID}/${i}.jpg`} />
+                                                                        <select value={assignedLabels[i]}
+                                                                                onChange={e => {setAssignedLabels(state => {
+                                                                                            const stateCopy = [...state]
+                                                                                        
+                                                                                            stateCopy[i] = e.target.value
+                                                                                        
+                                                                                            return stateCopy
+                                                                                        })
+                                                                                        setRefreshLabels(new Date().getTime())}}>
+                                                                            <option value="No label">No label</option>
+                                                                            {labels.map((label, j) => 
+                                                                                <option value={label} key={j}>{label}</option>
+                                                                            )}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        }
+                                                    })} */}
+                                                </div>
+                                            }
                                         </>
                                     }
                                 </>

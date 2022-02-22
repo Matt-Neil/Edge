@@ -206,7 +206,7 @@ const Experiment = ({currentUser}) => {
                                                                                 activation: ""
                                                                             }])
                                                                             setAddNode(false)
-                                                                            setSelectedNode(state => state + 1)
+                                                                            setSelectedNode(model.length)
                                                                             {!changedModel && setChangedModel(true)}
                                                                             }}>Dense</button>
                                                                             {model.length > 1 &&
@@ -215,7 +215,7 @@ const Experiment = ({currentUser}) => {
                                                                                     value: 0,
                                                                                     activation: ""
                                                                                 }])
-                                                                                setSelectedNode(state => state + 1)
+                                                                                setSelectedNode(model.length)
                                                                                 setAddNode(false)
                                                                                 }}>Output</button>
                                                                             }
@@ -314,7 +314,7 @@ const Experiment = ({currentUser}) => {
                                                             optimiser: e.target.value
                                                         }))
                                                         {!changedModel && setChangedModel(true)}}}>
-                                                    <option disabled selected value=""></option>
+                                                    <option disabled defaultValue value=""></option>
                                                     <option value="Sigmoid">Sigmoid</option>
                                                     <option value="Relu">Relu</option>
                                                 </select>
@@ -328,7 +328,7 @@ const Experiment = ({currentUser}) => {
                                                             model: e.target.value
                                                         }))
                                                         {!changedModel && setChangedModel(true)}}}>
-                                                    <option disabled selected value=""></option>
+                                                    <option disabled defaultValue value=""></option>
                                                     <option value="Regression">Regression</option>
                                                     <option value="Classification">Classification</option>
                                                 </select>
@@ -352,7 +352,7 @@ const Experiment = ({currentUser}) => {
                                                                         })
                                                                         setRefreshDiagram(new Date().getTime())
                                                                         {!changedModel && setChangedModel(true)}}} />
-                                                {model[selectedNode].type !== "Output" && model[selectedNode].type !== "Input" &&
+                                                {model[selectedNode].type !== "Input" &&
                                                     <>
                                                         <label>Activation</label>
                                                         <select value={model[selectedNode].activation} 
@@ -368,7 +368,7 @@ const Experiment = ({currentUser}) => {
                                                                                 })
                                                                                 setRefreshDiagram(new Date().getTime())
                                                                                 {!changedModel && setChangedModel(true)}}}>
-                                                                <option disabled selected value=""></option>
+                                                                <option disabled defaultValue value=""></option>
                                                                 <option value="Relu">Relu</option>
                                                                 <option value="Sigmoid">Sigmoid</option>
                                                         </select>

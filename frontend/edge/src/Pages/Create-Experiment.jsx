@@ -120,7 +120,7 @@ const CreateExperiment = ({currentUser}) => {
                                     {stage === "setup" ?
                                         <div className="create-item-setup-information">
                                             <div className="create-item-nav">   
-                                                <p className="create-item-filename">Experiment Information</p>
+                                                <p className="create-item-data-information-label">Experiment Information</p>
                                                 <button className="white-button create-item-cancel"
                                                         onClick={() => {cancel()}}>Cancel</button>
                                                 <button className="blue-button"
@@ -188,7 +188,7 @@ const CreateExperiment = ({currentUser}) => {
                                                                                             value: 0,
                                                                                             activation: ""
                                                                                         }])
-                                                                                        setSelectedNode(state => state + 1)
+                                                                                        setSelectedNode(model.length)
                                                                                         setAddNode(false)
                                                                                         }}>Dense</button>
                                                                                         {model.length > 1 &&
@@ -197,7 +197,7 @@ const CreateExperiment = ({currentUser}) => {
                                                                                                 value: 0,
                                                                                                 activation: ""
                                                                                             }])
-                                                                                            setSelectedNode(state => state + 1)
+                                                                                            setSelectedNode(model.length)
                                                                                             setAddNode(false)
                                                                                             }}>Output</button>
                                                                                         }
@@ -246,7 +246,7 @@ const CreateExperiment = ({currentUser}) => {
                                                                                             return stateCopy
                                                                                         })
                                                                                         setRefreshDiagram(new Date().getTime())}}>
-                                                                        <option disabled selected value=""></option>
+                                                                        <option disabled defaultValue value=""></option>
                                                                         <option value="Relu">Relu</option>
                                                                         <option value="Sigmoid">Sigmoid</option>
                                                                 </select>
@@ -304,7 +304,7 @@ const CreateExperiment = ({currentUser}) => {
                                                                                                                     ...state,
                                                                                                                     optimiser: e.target.value
                                                                                                                 }))}}>
-                                                                <option disabled selected value=""></option>
+                                                                <option disabled defaultValue value=""></option>
                                                                 <option value="Sigmoid">Sigmoid</option>
                                                                 <option value="Relu">Relu</option>
                                                             </select>
@@ -315,7 +315,7 @@ const CreateExperiment = ({currentUser}) => {
                                                                                                                     ...state,
                                                                                                                     model: e.target.value
                                                                                                                 }))}}>
-                                                                <option disabled selected value=""></option>
+                                                                <option disabled defaultValue value=""></option>
                                                                 <option value="Regression">Regression</option>
                                                                 <option value="Classification">Classification</option>
                                                             </select>

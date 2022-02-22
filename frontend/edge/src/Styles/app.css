@@ -610,8 +610,7 @@
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  height: 600px;
-  margin: 0 0 30px 0;
+  height: 640px;
 }
 
 .experiment-modelling-body .experiment-model {
@@ -1073,7 +1072,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  padding: 39px 0 10px 0;
+  padding: 39px 0 20px 0;
   margin: 0 auto;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -1233,6 +1232,7 @@
   border-radius: 10px;
   background-color: #fcf6dc;
   padding: 0 10px;
+  font-size: 14px;
 }
 
 .create-item-setup-information .create-item-description {
@@ -1243,6 +1243,7 @@
   padding: 10px;
   margin: 25px 0 0 0;
   resize: none;
+  font-size: 14px;
 }
 
 .create-item-setup-information .create-item-setup {
@@ -1263,6 +1264,16 @@
 
 .create-item-setup-information .create-item-setup input {
   margin: 0 20px 0 5px;
+}
+
+.create-item-setup-information .create-item-setup select {
+  height: 36px;
+  width: 150px;
+  margin: 0 20px 0 10px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background-color: #FBFBFB;
+  border: 1px solid #E6E5E5;
 }
 
 .create-item-import {
@@ -1307,6 +1318,168 @@
   margin: 25px 0 0 0;
 }
 
+.create-item-import .create-item-data .create-dataset-labels-row {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin: 15px 0 25px 0;
+}
+
+.create-item-import .create-item-data .create-dataset-labels-row .create-dataset-label-input {
+  margin: 0 15px 0 0;
+  height: 30px;
+  width: 200px;
+  padding: 0 10px;
+  border: 1px solid #f7efcd;
+  border-radius: 10px;
+  background-color: #fcf6dc;
+}
+
+.create-item-import .create-item-data .create-dataset-labels-row button {
+  height: 30px;
+  line-height: 30px;
+  margin: 0 25px 0 0;
+}
+
+.create-item-import .create-item-data .create-dataset-labels-row .create-dataset-labels-list {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.create-item-import .create-item-data .create-dataset-labels-row .create-dataset-labels-list p {
+  font-size: 12px;
+  margin: 0;
+}
+
+.create-item-import .create-item-data .create-dataset-labels-row .create-dataset-labels-list .create-dataset-created-label {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  min-width: 86px;
+  height: 30px;
+  margin: 0 10px 0 0;
+  padding: 0 7px;
+  background-color: #FBFBFB;
+  border: 1px #E6E5E5 solid;
+  border-radius: 10px;
+}
+
+.create-item-import .create-item-data .create-dataset-labels-row .create-dataset-labels-list .create-dataset-created-label p {
+  margin: 0 8px 0 0;
+  font-size: 12px;
+  color: #474747;
+}
+
+.create-item-import .create-item-data .create-dataset-labels-row .create-dataset-labels-list .create-dataset-created-label div {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  margin: 0 0 0 auto;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.create-item-import .create-item-data .create-dataset-labels-row .create-dataset-labels-list .create-dataset-created-label div:hover {
+  background-color: white;
+  border-radius: 10px;
+}
+
+.create-item-import .create-item-data .create-dataset-labels-row .create-dataset-labels-list .create-dataset-created-label .create-dataset-created-label-close {
+  font-size: 14px;
+  color: #474747;
+}
+
+.create-item-import .create-item-data .create-dataset-labels-row .create-dataset-labels-list .create-dataset-created-label .create-dataset-created-label-close:hover {
+  color: #5293DF;
+}
+
+.create-item-import .create-item-data .create-item-data-images {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  margin: 15px 0 40px 0;
+}
+
+.create-item-import .create-item-data .create-item-data-images .create-item-data-images-list {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin: 0 20px 30px 0;
+}
+
+.create-item-import .create-item-data .create-item-data-images .create-item-data-images-list div {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  height: 250px;
+  width: 200px;
+  border-radius: 10px;
+  background-color: #FBFBFB;
+  border: 1px #E6E5E5 solid;
+}
+
+.create-item-import .create-item-data .create-item-data-images .create-item-data-images-list div img {
+  height: auto;
+  max-height: 200px;
+  width: 100%;
+  border-top-left-radius: 9px;
+  border-top-right-radius: 9px;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+
+.create-item-import .create-item-data .create-item-data-images .create-item-data-images-list div select {
+  width: 95%;
+  height: 30px;
+  margin: auto 0 5px 0;
+  padding: 0 5px;
+  border-radius: 10px;
+  background-color: white;
+  border: 1px solid #E6E5E5;
+}
+
 .create-item-import .create-item-data .create-item-data-information {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -1317,16 +1490,29 @@
   margin: 0 0 25px 0;
 }
 
-.create-item-import .create-item-data .create-item-data-information .create-item-filename {
+.create-item-import .create-item-data .create-item-data-information .create-item-data-information-label {
   text-align: left;
   font-size: 14px;
   color: #474747;
   margin: 0 25px 0 0;
 }
 
+.create-item-import .create-item-data .create-item-data-information button {
+  margin: 0 40px 0 0;
+}
+
 .create-item-import .create-item-data .create-item-data-information .create-item-remove {
   height: 30px;
   line-height: 30px;
+}
+
+.create-item-import .create-item-data .create-item-data-information select {
+  padding: 0 5px;
+  height: 30px;
+  width: 150px;
+  border-radius: 10px;
+  background-color: white;
+  border: 1px solid #E6E5E5;
 }
 
 .create-item-import .create-item-data .create-item-data-information span {
@@ -1342,7 +1528,7 @@
   border: 1px solid #E6E5E5;
 }
 
-.create-item-import .create-item-data .create-item-data-table-pagination {
+.create-item-import .create-item-data .create-item-data-pagination {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1351,7 +1537,7 @@
           align-items: center;
 }
 
-.create-item-import .create-item-data .create-item-data-table-pagination .create-item-data-table-pagination-icon {
+.create-item-import .create-item-data .create-item-data-pagination .create-item-data-pagination-icon {
   font-size: 14px;
   border: 1px solid #E6E5E5;
   background-color: white;
@@ -1360,16 +1546,16 @@
   cursor: pointer;
 }
 
-.create-item-import .create-item-data .create-item-data-table-pagination .create-item-data-table-pagination-icon:first-child {
+.create-item-import .create-item-data .create-item-data-pagination .create-item-data-pagination-icon:first-child {
   margin: 0 20px 0 0;
 }
 
-.create-item-import .create-item-data .create-item-data-table-pagination .create-item-data-table-pagination-icon:last-child {
+.create-item-import .create-item-data .create-item-data-pagination .create-item-data-pagination-icon:last-child {
   margin: 0 0 0 20px;
 }
 
-.create-item-import .create-item-data .create-item-data-table-pagination p {
-  font-size: 14px;
+.create-item-import .create-item-data .create-item-data-pagination p {
+  font-size: 12px;
   color: #474747;
 }
 
@@ -1650,7 +1836,7 @@
           flex-direction: column;
   max-width: 990px;
   min-width: 990px;
-  margin: 40px auto 0 auto;
+  margin: 40px auto 40px auto;
 }
 
 .item-body .item-top {

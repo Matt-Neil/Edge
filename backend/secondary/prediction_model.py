@@ -2,6 +2,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
+from tensorflow.keras.callbacks import LearningRateScheduler
 from sklearn.compose import make_column_transformer
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.metrics import accuracy_score, mean_squared_error
@@ -34,7 +35,9 @@ def model():
 
     model.compile(loss='mse', optimizer='sgd', metrics=['mae', 'mse'])
 
-    history = model.fit(X_train, y_train, epochs=10, validation_split=0.2, batch_size=1)
+    lr_scheduler = LearningRateScheduler(lambda epoch: 1e-4 * 10**(epoch/20))
+
+    history = model.fit(X_train, y_train, epochs=10, validation_split=0.2, callbacks=[lr_scheduler], batch_size=1)
 
     y_hat = model.predict(X_test)
     # y_hat = [0 if val < 0.5 else 1 for val in y_hat]
@@ -44,5 +47,3 @@ def model():
     model.save('files/test')
 
     return "%.5f" % mean_squared_error(y_test, y_hat)
-
-

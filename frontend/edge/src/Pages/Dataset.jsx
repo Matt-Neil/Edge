@@ -1,10 +1,10 @@
 import React, {useState, useEffect, useRef, useContext} from 'react'
-import {useParams} from "react-router-dom"
+import {useParams, useHistory} from "react-router-dom"
 import itemsAPI from '../API/items'
 import globalAPI from '../API/global'
 import imageAPI from '../API/images'
 import fileAPI from '../API/files'
-import ViewData from '../Components/View-Data';
+import DataTable from '../Components/Data-Table';
 import { OpenItemsContext } from '../Contexts/openItemsContext';
 import ItemRowCard from '../Components/Item-Row-Card'
 import ItemSquareCard from '../Components/Item-Square-Card'
@@ -15,6 +15,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+const fs = require('fs')
 
 const Dataset = ({currentUser}) => {
     const [loaded, setLoaded] = useState(false)
@@ -48,10 +49,11 @@ const Dataset = ({currentUser}) => {
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
     const [image, setImage] = useState();
-    const [refreshTable, setRefreshTable] = useState()
-    const {addOpenItems} = useContext(OpenItemsContext);
+    const [refreshData, setRefreshData] = useState()
+    const {addOpenItems, removeOpenItems} = useContext(OpenItemsContext);
     const copyInterval = useRef(0)
     const datasetID = useParams().id;
+    const history = useHistory()
 
     useEffect(() => {
         const fetchData = async () => {
@@ -82,14 +84,29 @@ const Dataset = ({currentUser}) => {
                 setWorkspaces(workspaces.data.data)
                 setComments(comments.data.data)
 
-                fetch(`http://127.0.0.1:5000/files/${dataset.data.data.datafile}.csv`)
-                    .then(response => response.text())
-                    .then(text => {
-                        setDataTable(text)
-                        setMaxRows(text.slice(text.indexOf('\n')+1).split('\n').length)
-                        setExist(true)
-                        setLoaded(true)
-                    })
+                if (dataset.data.data.dataType === "value") {
+                    fetch(`http://127.0.0.1:5000/files/${dataset.data.data.datafile}.csv`)
+                        .then(response => response.text())
+                        .then(text => {
+                            setDataTable(text)
+                            setMaxRows(text.slice(text.indexOf('\n')+1).split('\n').length)
+                            setExist(true)
+                            setLoaded(true)
+                        }).catch(() => {
+                            setExist(true)
+                            setLoaded(true)
+                        });
+                } else {
+                    fetch(`http://127.0.0.1:5000/files/${dataset.data.data.datafile}/`)
+                        .then(response => console.log(response))
+                        .then(text => {
+                            setExist(true)
+                            setLoaded(true)
+                        }).catch(() => {
+                            setExist(true)
+                            setLoaded(true)
+                        });
+                }
             } catch (err) {
                 setExist(false)
                 setLoaded(true)
@@ -199,14 +216,14 @@ const Dataset = ({currentUser}) => {
         if (!isNaN(row) && row !== "") {
             setStart(row-1)
             setEnd(row)
-            setRefreshTable(new Date().getTime())
+            setRefreshData(new Date().getTime())
         } else {
             if (start === (page-1)*30 && end === page*30) {
                 setRow("")
             } else {
                 setStart((page-1)*30)
                 setEnd(page*30)
-                setRefreshTable(new Date().getTime())
+                setRefreshData(new Date().getTime())
             }
         }
     }
@@ -215,26 +232,27 @@ const Dataset = ({currentUser}) => {
         if (!(start === (page-1)*30 && end === page*30)) {
             setStart((page-1)*30)
             setEnd(page*30)
-            setRefreshTable(new Date().getTime())
+            setRefreshData(new Date().getTime())
         }
         setRow("")
     }
 
     const previousPage = () => {
         if (page > 1) {
+            setStart((page-2)*30)
+            setEnd((page-1)*30)
             setPage(state => state-1)
+            setRefreshData(new Date().getTime())
         }
-        setStart((page-1)*30)
-        setEnd(page*30)
-        setRefreshTable(new Date().getTime())
     }
-
+    
     const nextPage = () => {
-        if (page*30 < maxRows && maxRows > 30) {
+        if ((dataset.dataType === "value" && page*30 < maxRows && maxRows > 30) ||
+            (dataset.dataType === "image" && page*30 < maxRows && maxRows > 30)) {
             setPage(state => state+1)
             setStart((page)*30)
             setEnd((page+1)*30)
-            setRefreshTable(new Date().getTime())
+            setRefreshData(new Date().getTime())
         }
     }
 
@@ -307,7 +325,7 @@ const Dataset = ({currentUser}) => {
             reader.onload = function(e) {
                 setDataTable(e.target.result);
                 setMaxRows(e.target.result.slice(e.target.result.indexOf('\n')+1).split('\n').length)
-                setRefreshTable(new Date().getTime())
+                setRefreshData(new Date().getTime())
             }
 
             reader.readAsText(file)
@@ -337,6 +355,9 @@ const Dataset = ({currentUser}) => {
     const deleteDataset = async () => {
         try {
             await itemsAPI.delete(`/${datasetID}`)
+
+            removeOpenItems(datasetID)
+            history.replace("/home")
         } catch (err) {}
     }
 
@@ -447,7 +468,7 @@ const Dataset = ({currentUser}) => {
                                                         }} />
                                                 <button className="blue-button item-replace-button"
                                                         disabled={!changedData}
-                                                        onClick={() => {replaceData()}}>Save</button>
+                                                        onClick={() => {replaceData()}}>Upload</button>
                                                 <button className="white-button item-replace-button"
                                                         onClick={() => {
                                                             setDataFile(undefined)
@@ -465,17 +486,55 @@ const Dataset = ({currentUser}) => {
                                         <a href={`http://127.0.0.1:5000/files/${dataset.datafile}.csv`} download>Download</a>
                                     </div>
                                     <div className="item-data-table-pagination">
-                                        <input placeholder="Row number" value={row} onChange={e => {setRow(e.target.value)}} />
-                                        <button onClick={() => {cancelRow()}} className="white-button item-data-cancel-find">Cancel</button>
-                                        <button onClick={() => {fetchRow()}} className="blue-button item-data-find">Find</button>
-                                        <span />
+                                        {dataset.dataType ==="value" &&
+                                            <>
+                                                <input placeholder="Row number" value={row} onChange={e => {setRow(e.target.value)}} />
+                                                <button onClick={() => {cancelRow()}} className="white-button item-data-cancel-find">Cancel</button>
+                                                <button onClick={() => {fetchRow()}} className="blue-button item-data-find">Find</button>
+                                                <span />
+                                            </>
+                                        }
                                         <ArrowBackIosNewIcon className="item-data-table-pagination-icon" onClick={() => {previousPage()}} />
-                                        <p>Page {page} / {Math.ceil(maxRows/30)}</p>
+                                        {dataset.dataType ==="value" ?
+                                            <p>Page {page} / {Math.ceil(maxRows/30)}</p>
+                                        :
+                                            <p>Page {page} / {Math.ceil(maxRows/30)}</p>
+                                        }
                                         <ArrowForwardIosIcon className="item-data-table-pagination-icon" onClick={() => {nextPage()}} />
                                     </div>
-                                    <div className="item-data-table">
-                                        <ViewData dataTable={dataTable} start={start} end={end} key={refreshTable} />
-                                    </div>
+                                    {dataset.dataType ==="value" ?
+                                        <div className="item-data-table">
+                                            <DataTable dataTable={dataTable} start={start} end={end} key={refreshData} />
+                                        </div>
+                                    :
+                                        <div className="create-item-data-images" key={refreshData}>
+                                            {/* {[...dataFile].map((image, i) => {
+                                                if (i >= start && i < end) {
+                                                    return (
+                                                        <div className="create-item-data-images-list" key={i}>
+                                                            <div>
+                                                                <img src={`http://127.0.0.1:5000/files/${dataID}/${i}.jpg`} />
+                                                                <select value={assignedLabels[i]}
+                                                                        onChange={e => {setAssignedLabels(state => {
+                                                                                    const stateCopy = [...state]
+                                                                                
+                                                                                    stateCopy[i] = e.target.value
+                                                                                
+                                                                                    return stateCopy
+                                                                                })
+                                                                                setRefreshLabels(new Date().getTime())}}>
+                                                                    <option value="No label">No label</option>
+                                                                    {labels.map((label, j) => 
+                                                                        <option value={label} key={j}>{label}</option>
+                                                                    )}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    )
+                                                }
+                                            })} */}
+                                        </div>
+                                    }
                                 </>
                             : section === "workspaces" ?
                                 <>

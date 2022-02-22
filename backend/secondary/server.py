@@ -1,8 +1,9 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, json
 import os
 import training_model
 import prediction_model
 import test
+import sys
 
 ALLOWED_EXTENSIONS = {'csv'}
 
@@ -33,9 +34,25 @@ def test_model():
 
 @app.route('/api/file/upload', methods = ['POST'])
 def upload_file():
-    file = request.files['data']
-    filename = request.form['id'] + ".csv"
-    file.save('files/' + filename)
+    if request.form['type'] == "image":
+        images = request.files.getlist("data[]")
+        assignedLabels = request.form.getlist("labels[]")
+        os.makedirs('files/' + request.form['id'])
+        labels = []
+
+        for i in range(len(images)):
+            labels.append({
+                'filename': i,
+                'label': assignedLabels[i]
+            })
+            images[i].save('files/{}/{}.jpg'.format(request.form['id'], i))
+        
+        with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
+            json.dump(labels, outfile)
+    else:
+        file = request.files['data']
+        filename = request.form['id'] + ".csv"
+        file.save('files/' + filename)
 
     return "OK"
 

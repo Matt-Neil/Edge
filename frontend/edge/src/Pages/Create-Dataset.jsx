@@ -4,9 +4,10 @@ import itemsAPI from '../API/items'
 import usersAPI from '../API/users'
 import fileAPI from '../API/files'
 import imageAPI from '../API/images'
-import ViewData from '../Components/View-Data'
+import DataTable from '../Components/Data-Table'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import CloseIcon from '@mui/icons-material/Close';
 
 const CreateDataset = ({currentUser}) => {
     const [setupStage, setSetupStage] = useState(true);
@@ -14,15 +15,24 @@ const CreateDataset = ({currentUser}) => {
     const [description, setDescription] = useState("");
     const [visibility, setVisibility] = useState(false);
     const [normalised, setNormalised] = useState(false);
+    const [encoded, setEncoded] = useState(false);
     const [dataFile, setDataFile] = useState();
     const [dataTable, setDataTable] = useState();
+    const [dataAttributes, setDataAttributes] = useState([])
+    const [targetAttribute, setTargetAttribute] = useState("")
+    const [dataType, setDataType] = useState("")
     const [maxRows, setMaxRows] = useState()
     const [start, setStart] = useState(0)
     const [end, setEnd] = useState(30)
     const [page, setPage] = useState(1)
     const [image, setImage] = useState();
     const [datasets, setDatasets] = useState([]);
+    const [labels, setLabels] = useState([])
+    const [assignedLabels, setAssignedLabels] = useState()
+    const [addLabel, setAddLabel] = useState("")
     const [loaded, setLoaded] = useState(false);
+    const [refreshData, setRefreshData] = useState()
+    const [refreshLabels, setRefreshLabels] = useState()
     const [disableCreate, setDisabledCreate] = useState(false)
     const history = useHistory();
 
@@ -42,20 +52,23 @@ const CreateDataset = ({currentUser}) => {
 
     useEffect(() => {
         if (dataFile !== undefined) {
-            const file = dataFile;
-            const reader = new FileReader();
-
-            reader.onload = function(e) {
-                setDataTable(e.target.result);
-                setMaxRows(e.target.result.slice(e.target.result.indexOf('\n')+1).split('\n').length)
+            if (dataType !== "image") {
+                const file = dataFile;
+                const reader = new FileReader();
+    
+                reader.onload = function(e) {
+                    setDataTable(e.target.result);
+                    setMaxRows(e.target.result.slice(e.target.result.indexOf('\n')+1).split('\n').length)
+                    setDataAttributes(e.target.result.slice(0, e.target.result.indexOf('\n')).split(','))
+                }
+    
+                reader.readAsText(file)
             }
-
-            reader.readAsText(file)
         }
     }, [dataFile])
 
     const next = () => {
-        if ((title !== "" || description !== "") && !datasets.includes(title)) {
+        if (title !== "" && description !== "" && dataType !== "" && !datasets.includes(title)) {
             setSetupStage(false)
         }
     }
@@ -70,17 +83,28 @@ const CreateDataset = ({currentUser}) => {
         setPage(1)
         setStart(0)
         setEnd(30)
+        setRefreshData(new Date().getTime())
     }
 
     const uploadImage = async () => {
         setDisabledCreate(true)
 
-        if (dataFile !== undefined) {
+        if (dataFile !== undefined && ((dataType === "image" && !assignedLabels.includes("No label")) 
+            || (dataType === "value" && targetAttribute !== ""))) {
             const formData = new FormData();
             const id = new Date().toISOString();
 
-            formData.append('data', dataFile);
+            formData.append('type', dataType)
             formData.append('id', id)
+
+            if (dataType === "image") {
+                for (let i = 0; i < dataFile.length; i++) {
+                    formData.append('data[]', dataFile[i]);
+                    formData.append('labels[]', assignedLabels[i]);
+                }
+            } else {
+                formData.append('data', dataFile);
+            }
 
             try {
                 await fileAPI.post("/upload", formData);
@@ -105,25 +129,29 @@ const CreateDataset = ({currentUser}) => {
 
     const previousPage = () => {
         if (page > 1) {
+            setStart((page-2)*30)
+            setEnd((page-1)*30)
             setPage(state => state-1)
+            setRefreshData(new Date().getTime())
         }
-        setStart((page-1)*30)
-        setEnd(page*30)
     }
-
+    
     const nextPage = () => {
-        if (page*30 < maxRows && maxRows > 30) {
+        if ((dataType === "value" && page*30 < maxRows && maxRows > 30) ||
+            (dataType === "image" && page*30 < dataFile.length && dataFile.length > 30)) {
             setPage(state => state+1)
             setStart((page)*30)
             setEnd((page+1)*30)
+            setRefreshData(new Date().getTime())
         }
     }
 
     const uploadDataset = async (imageName, id) => {
         try {
-            const datasetResponse = await itemsAPI.post("/", {
+            let newDataset = {
                 title: title,
                 datafile: id,
+                dataType: dataType,
                 creator: currentUser.id,
                 description: description,
                 comments: [],
@@ -132,8 +160,16 @@ const CreateDataset = ({currentUser}) => {
                 bookmarks: [],
                 updated: new Date().toISOString(),
                 visibility: visibility,
-                normalised: normalised
-            });
+                type: "dataset"
+            }
+
+            if (dataType === "value") {
+                newDataset.target = targetAttribute
+                newDataset.normalised = normalised
+                newDataset.encoded = encoded
+            }
+
+            const datasetResponse = await itemsAPI.post("/", newDataset);
 
             history.push(`/dataset/${datasetResponse.data.data}`)
         } catch (err) {}
@@ -150,7 +186,11 @@ const CreateDataset = ({currentUser}) => {
                         </div>
                         <button className={`${"create-sidebar-stage"} ${setupStage ? "create-sidebar-stage-selected" : "create-sidebar-stage-unselected"}`}
                                 disabled={setupStage}
-                                onClick={() => {setSetupStage(true)}}>Setup</button>
+                                onClick={() => {
+                                    setSetupStage(true)
+                                    setStart(0)
+                                    setEnd(30)
+                                }}>Setup</button>
                         <button className={`${"create-sidebar-stage"} ${!setupStage ? "create-sidebar-stage-selected" : "create-sidebar-stage-unselected"}`}
                                 disabled>Upload Data</button>
                     </div>
@@ -174,29 +214,66 @@ const CreateDataset = ({currentUser}) => {
                                                 onChange={e => {setDescription(e.target.value)}}
                                                 value={description} />
                                     <div className="create-item-setup">
-                                        <label className="create-item-setup-label">Public?</label>
-                                        <input type="checkbox" 
-                                                onChange={() => {setVisibility(previous => !previous)}}
-                                                checked={visibility} />
-                                        <label className="create-item-setup-label">Normalised?</label>
-                                        <input type="checkbox" 
-                                                onChange={() => {setNormalised(previous => !previous)}}
-                                                checked={normalised} />
-                                    </div>
-                                    <div className="create-item-setup">
                                         <label className="create-item-setup-label">Picture</label>
                                         <input type="file" 
                                                 name="image" 
                                                 onChange={e => {setImage(e.target.files[0])}} />
                                     </div>
+                                    <div className="create-item-setup">
+                                        <label className="create-item-setup-label">Public?</label>
+                                        <input type="checkbox" 
+                                                onChange={() => {setVisibility(previous => !previous)}}
+                                                checked={visibility} />
+                                    </div>
+                                    <div className="create-item-setup">
+                                        <label className="create-item-setup-label">Select data type</label>
+                                        <select value={dataType} onChange={e => {
+                                            setDataType(e.target.value)
+                                            setDataFile()
+                                        }}>
+                                            <option disabled defaultValue value=""></option>
+                                            <option value="value">Value Data</option>
+                                            <option value="image">Image Data</option>
+                                        </select>
+                                    </div>
+                                    {dataType === "value" &&
+                                        <div className="create-item-setup">
+                                            <label className="create-item-setup-label">Normalised?</label>
+                                            <input type="checkbox" 
+                                                    onChange={() => {setNormalised(previous => !previous)}}
+                                                    checked={normalised} />
+                                            <label className="create-item-setup-label">Encoded?</label>
+                                            <input type="checkbox" 
+                                                    onChange={() => {setEncoded(previous => !previous)}}
+                                                    checked={encoded} />
+                                        </div>
+                                    }
                                 </div>
                             }
                             {!setupStage &&
                                 <div className="create-item-import">
                                     <div className="create-item-import-top">
-                                        <input type="file" 
-                                                name="data"
-                                                onChange={e => {setDataFile(e.target.files[0])}} />
+                                        {dataType === "image" ?
+                                            <input type="file" 
+                                                    name="data"
+                                                    accept="image/*"
+                                                    multiple
+                                                    onChange={e => {
+                                                        setDataFile(e.target.files)
+                                                        setAssignedLabels(Array(e.target.files.length).fill("No label"))
+                                                        setPage(1)
+                                                        setRefreshData(new Date().getTime())
+                                                    }} />
+                                        :
+                                            <input type="file" 
+                                                    name="data"
+                                                    accept=".txt, .csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                                                    onChange={e => {
+                                                        setDataFile(e.target.files[0])
+                                                        setPage(1)
+                                                        setRefreshData(new Date().getTime())
+                                                    }} />
+                                        }
                                         <span />
                                         <button className="white-button create-item-cancel"
                                                 onClick={() => {cancel()}}>Cancel</button>
@@ -204,23 +281,117 @@ const CreateDataset = ({currentUser}) => {
                                                 disabled={disableCreate}
                                                 onClick={() => {uploadImage()}}>Create</button>
                                     </div>
-                                    {dataFile !== undefined && dataTable !== undefined &&
+                                    {dataType === "image" ?
                                         <div className="create-item-data">
-                                            <div className="create-item-data-information">
-                                                <p className="create-item-filename">File: {dataFile.name}</p>
-                                                <button className="grey-button create-item-remove"
-                                                        onClick={() => {remove()}}>Remove</button>
-                                                <span />
-                                                <div className="create-item-data-table-pagination">
-                                                    <ArrowBackIosNewIcon className="create-item-data-table-pagination-icon" onClick={() => {previousPage()}} />
-                                                    <p>Page {page} / {Math.ceil(maxRows/30)}</p>
-                                                    <ArrowForwardIosIcon className="create-item-data-table-pagination-icon" onClick={() => {nextPage()}} />
-                                                </div>
-                                            </div>
-                                            <div className="create-item-data-table">
-                                                <ViewData dataTable={dataTable} start={start} end={end} key={new Date().getTime()} />
-                                            </div>
+                                            {dataFile !== undefined &&
+                                                <>
+                                                    <div className="create-dataset-labels-row">
+                                                        <input className="create-dataset-label-input"
+                                                                placeholder="Label name"
+                                                                onChange={e => {setAddLabel(e.target.value)}}
+                                                                value={addLabel} />
+                                                        <button className="blue-button"
+                                                                onClick={() => {
+                                                                    addLabel !== "" && !labels.includes(addLabel) && setLabels(state => [...state, addLabel])
+                                                                    setAddLabel("")
+                                                                }}>Add</button>
+                                                        <div className="create-dataset-labels-list" key={refreshLabels}>
+                                                            {labels.length === 0 ?
+                                                                <p>No labels created</p>
+                                                            :
+                                                                <>
+                                                                    {labels.map((label, i) => {
+                                                                        return (
+                                                                            <div className="create-dataset-created-label" key={i}>
+                                                                                <p>{label}</p>
+                                                                                <div onClick={() => {
+                                                                                    assignedLabels.map((assignedLabel, j) => {
+                                                                                        if (assignedLabel === labels[i]) {
+                                                                                            setAssignedLabels(state => {
+                                                                                                const stateCopy = [...state]
+                                                                                            
+                                                                                                stateCopy[j] = "No label"
+                                                                                            
+                                                                                                return stateCopy
+                                                                                            })
+                                                                                        }
+                                                                                    })
+                                                                                    labels.splice(i, 1)
+                                                                                    setRefreshLabels(new Date().getTime())
+                                                                                }}>
+                                                                                    <CloseIcon className="create-dataset-created-label-close" /> 
+                                                                                </div>
+                                                                            </div>
+                                                                        )
+                                                                    })}
+                                                                </>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                    <div className="create-item-data-pagination">
+                                                        <ArrowBackIosNewIcon className="create-item-data-pagination-icon" onClick={() => {previousPage()}} />
+                                                        <p>Page {page} / {Math.ceil(dataFile.length/30)}</p>
+                                                        <ArrowForwardIosIcon className="create-item-data-pagination-icon" onClick={() => {nextPage()}} />
+                                                    </div>
+                                                    <div className="create-item-data-images" key={refreshData}>
+                                                        {[...dataFile].map((image, i) => {
+                                                            if (i >= start && i < end) {
+                                                                return (
+                                                                    <div className="create-item-data-images-list" key={i}>
+                                                                        <div>
+                                                                            <img src={URL.createObjectURL(image)} />
+                                                                            <select value={assignedLabels[i]}
+                                                                                    onChange={e => {setAssignedLabels(state => {
+                                                                                                const stateCopy = [...state]
+                                                                                            
+                                                                                                stateCopy[i] = e.target.value
+                                                                                            
+                                                                                                return stateCopy
+                                                                                            })
+                                                                                            setRefreshLabels(new Date().getTime())}}>
+                                                                                <option value="No label">No label</option>
+                                                                                {labels.map((label, j) => 
+                                                                                    <option value={label} key={j}>{label}</option>
+                                                                                )}
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                )
+                                                            }
+                                                        })}
+                                                    </div>
+                                                </>
+                                            }
                                         </div>
+                                    :
+                                        <>
+                                            {dataFile !== undefined && dataTable !== undefined &&
+                                                <div className="create-item-data">
+                                                    <div className="create-item-data-information">
+                                                        <p className="create-item-data-information-label">File: {dataFile.name}</p>
+                                                        <button className="grey-button create-item-remove"
+                                                                onClick={() => {remove()}}>Remove</button>
+                                                        <p className="create-item-data-information-label">Target Attribute</p>
+                                                        <select value={targetAttribute}
+                                                                onChange={e => {setTargetAttribute(e.target.value)}}>
+                                                            <option defaultValue value=""></option>
+                                                            {dataAttributes.map((attribute, j) => 
+                                                                <option value={attribute} key={j}>{attribute}</option>
+                                                            )}
+                                                        </select>
+                                                        <span />
+                                                        <div className="create-item-data-pagination">
+                                                            <ArrowBackIosNewIcon className="create-item-data-pagination-icon" onClick={() => {previousPage()}} />
+                                                            <p>Page {page} / {Math.ceil(maxRows/30)}</p>
+                                                            <ArrowForwardIosIcon className="create-item-data-pagination-icon" onClick={() => {nextPage()}} />
+                                                        </div>
+                                                    </div>
+                                                    <div className="create-item-data-table">
+                                                        <DataTable dataTable={dataTable} start={start} end={end} key={refreshData} />
+                                                    </div>
+                                                </div>
+                                            }
+                                        </>
                                     }
                                 </div>
                             }

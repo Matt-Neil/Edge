@@ -87,12 +87,24 @@ const ItemsSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    dataType: {
+        type: String,
+        required: false
+    },
     updated: {
         type: Date,
         required: true
     },
     normalised: {
         type: Boolean,
+        required: false
+    },
+    encoded: {
+        type: Boolean,
+        required: false
+    },
+    target: {
+        type: String,
         required: false
     },
     type: {
