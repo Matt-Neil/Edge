@@ -1907,16 +1907,6 @@
   cursor: pointer;
 }
 
-.item-body .item-top div .dataset-normalised-label {
-  margin: 0 10px 0 0;
-  font-size: 14px;
-  color: #474747;
-}
-
-.item-body .item-top div .dataset-normalised-input {
-  margin: 0 25px 0 0;
-}
-
 .item-body .item-top div .item-visibility {
   color: #474747;
   font-size: 26px;
@@ -2208,10 +2198,270 @@
   color: white;
 }
 
+.item-body .item-bottom .item-labels-row {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin: 15px 0 25px 0;
+}
+
+.item-body .item-bottom .item-labels-row .item-label-input {
+  margin: 0 15px 0 0;
+  height: 30px;
+  width: 200px;
+  padding: 0 10px;
+  border: 1px solid #f7efcd;
+  border-radius: 10px;
+  background-color: #fcf6dc;
+}
+
+.item-body .item-bottom .item-labels-row button {
+  height: 30px;
+  line-height: 30px;
+  margin: 0 25px 0 0;
+}
+
+.item-body .item-bottom .item-labels-row .item-labels-list {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.item-body .item-bottom .item-labels-row .item-labels-list p {
+  font-size: 12px;
+  margin: 0;
+}
+
+.item-body .item-bottom .item-labels-row .item-labels-list .item-created-label {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  min-width: 86px;
+  height: 30px;
+  margin: 0 10px 0 0;
+  padding: 0 7px;
+  background-color: #FBFBFB;
+  border: 1px #E6E5E5 solid;
+  border-radius: 10px;
+}
+
+.item-body .item-bottom .item-labels-row .item-labels-list .item-created-label p {
+  margin: 0 8px 0 0;
+  font-size: 12px;
+  color: #474747;
+}
+
+.item-body .item-bottom .item-labels-row .item-labels-list .item-created-label div {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  margin: 0 0 0 auto;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.item-body .item-bottom .item-labels-row .item-labels-list .item-created-label div:hover {
+  background-color: white;
+  border-radius: 10px;
+}
+
+.item-body .item-bottom .item-labels-row .item-labels-list .item-created-label .item-created-label-close {
+  font-size: 14px;
+  color: #474747;
+}
+
+.item-body .item-bottom .item-labels-row .item-labels-list .item-created-label .item-created-label-close:hover {
+  color: #5293DF;
+}
+
 .item-body .item-bottom .item-data-table {
   margin: 0 0 30px 0;
   overflow-y: auto;
   min-height: 100vh;
+  border: 1px solid #E6E5E5;
+}
+
+.item-body .item-bottom .create-dataset-labels-row {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin: 15px 0 25px 0;
+}
+
+.item-body .item-bottom .create-dataset-labels-row .create-dataset-label-input {
+  margin: 0 15px 0 0;
+  height: 30px;
+  width: 200px;
+  padding: 0 10px;
+  border: 1px solid #f7efcd;
+  border-radius: 10px;
+  background-color: #fcf6dc;
+}
+
+.item-body .item-bottom .create-dataset-labels-row button {
+  height: 30px;
+  line-height: 30px;
+  margin: 0 25px 0 0;
+}
+
+.item-body .item-bottom .create-dataset-labels-row .create-dataset-labels-list {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.item-body .item-bottom .create-dataset-labels-row .create-dataset-labels-list p {
+  font-size: 12px;
+  margin: 0;
+}
+
+.item-body .item-bottom .create-dataset-labels-row .create-dataset-labels-list .create-dataset-created-label {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  min-width: 86px;
+  height: 30px;
+  margin: 0 10px 0 0;
+  padding: 0 7px;
+  background-color: #FBFBFB;
+  border: 1px #E6E5E5 solid;
+  border-radius: 10px;
+}
+
+.item-body .item-bottom .create-dataset-labels-row .create-dataset-labels-list .create-dataset-created-label p {
+  margin: 0 8px 0 0;
+  font-size: 12px;
+  color: #474747;
+}
+
+.item-body .item-bottom .create-dataset-labels-row .create-dataset-labels-list .create-dataset-created-label div {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  margin: 0 0 0 auto;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.item-body .item-bottom .create-dataset-labels-row .create-dataset-labels-list .create-dataset-created-label div:hover {
+  background-color: white;
+  border-radius: 10px;
+}
+
+.item-body .item-bottom .create-dataset-labels-row .create-dataset-labels-list .create-dataset-created-label .create-dataset-created-label-close {
+  font-size: 14px;
+  color: #474747;
+}
+
+.item-body .item-bottom .create-dataset-labels-row .create-dataset-labels-list .create-dataset-created-label .create-dataset-created-label-close:hover {
+  color: #5293DF;
+}
+
+.item-body .item-bottom .item-data-images {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  margin: 15px 0 40px 0;
+}
+
+.item-body .item-bottom .item-data-images .item-data-images-list {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin: 0 20px 30px 0;
+}
+
+.item-body .item-bottom .item-data-images .item-data-images-list div {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  height: 250px;
+  width: 200px;
+  border-radius: 10px;
+  background-color: #FBFBFB;
+  border: 1px #E6E5E5 solid;
+}
+
+.item-body .item-bottom .item-data-images .item-data-images-list div img {
+  height: auto;
+  max-height: 200px;
+  width: 100%;
+  border-top-left-radius: 9px;
+  border-top-right-radius: 9px;
+  -o-object-fit: contain;
+     object-fit: contain;
+}
+
+.item-body .item-bottom .item-data-images .item-data-images-list div select {
+  width: 95%;
+  height: 30px;
+  margin: auto 0 5px 0;
+  padding: 0 5px;
+  border-radius: 10px;
+  background-color: white;
   border: 1px solid #E6E5E5;
 }
 

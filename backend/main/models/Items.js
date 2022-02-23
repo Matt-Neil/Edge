@@ -95,16 +95,12 @@ const ItemsSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
-    normalised: {
-        type: Boolean,
-        required: false
-    },
-    encoded: {
-        type: Boolean,
-        required: false
-    },
     target: {
         type: String,
+        required: false
+    },
+    labels: {
+        type: [],
         required: false
     },
     type: {

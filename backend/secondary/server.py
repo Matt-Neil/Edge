@@ -56,9 +56,12 @@ def upload_file():
 
     return "OK"
 
-@app.route('/api/file/remove')
+@app.route('/api/file/remove', methods = ['POST'])
 def remove_file():
-    os.remove('files/file.csv')
+    if request.form['type'] == "image":
+        os.remove('files/{}'.format(request.form['id']))
+    else:
+        os.remove('files/{}.csv'.format(request.form['id']))
     
     return "OK"
 

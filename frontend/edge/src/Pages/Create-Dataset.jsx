@@ -14,8 +14,6 @@ const CreateDataset = ({currentUser}) => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [visibility, setVisibility] = useState(false);
-    const [normalised, setNormalised] = useState(false);
-    const [encoded, setEncoded] = useState(false);
     const [dataFile, setDataFile] = useState();
     const [dataTable, setDataTable] = useState();
     const [dataAttributes, setDataAttributes] = useState([])
@@ -165,8 +163,8 @@ const CreateDataset = ({currentUser}) => {
 
             if (dataType === "value") {
                 newDataset.target = targetAttribute
-                newDataset.normalised = normalised
-                newDataset.encoded = encoded
+            } else {
+                newDataset.labels = labels
             }
 
             const datasetResponse = await itemsAPI.post("/", newDataset);
@@ -236,18 +234,6 @@ const CreateDataset = ({currentUser}) => {
                                             <option value="image">Image Data</option>
                                         </select>
                                     </div>
-                                    {dataType === "value" &&
-                                        <div className="create-item-setup">
-                                            <label className="create-item-setup-label">Normalised?</label>
-                                            <input type="checkbox" 
-                                                    onChange={() => {setNormalised(previous => !previous)}}
-                                                    checked={normalised} />
-                                            <label className="create-item-setup-label">Encoded?</label>
-                                            <input type="checkbox" 
-                                                    onChange={() => {setEncoded(previous => !previous)}}
-                                                    checked={encoded} />
-                                        </div>
-                                    }
                                 </div>
                             }
                             {!setupStage &&

@@ -87,31 +87,22 @@ exports.getItem = async (req, res, next) => {
                         'datafile': 1,
                         'dataType': 1,
                         'visibility': 1,
-                        'normalised': {
-                            $cond: {
-                                if: {
-                                    $eq: ['$dataType', 'value']
-                                },
-                                then: 0,
-                                else: 1,
-                            }
-                        },
-                        'encoded': {
-                            $cond: {
-                                if: {
-                                    $eq: ['$dataType', 'value']
-                                },
-                                then: 0,
-                                else: 1,
-                            }
-                        },
                         'target': {
                             $cond: {
                                 if: {
                                     $eq: ['$dataType', 'value']
                                 },
-                                then: 0,
-                                else: 1,
+                                then: '$target',
+                                else: 0
+                            }
+                        },
+                        'labels': {
+                            $cond: {
+                                if: {
+                                    $eq: ['$dataType', 'image']
+                                },
+                                then: '$labels',
+                                else: 0
                             }
                         },
                         'self': { $eq: [mongoose.Types.ObjectId(res.locals.currentUser._id), '$creator']},
