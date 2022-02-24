@@ -422,7 +422,7 @@
             display: flex;
             align-items: flex-start;
             flex-wrap: wrap;
-            margin: 15px 0 40px 0;
+            margin: 25px 0 40px 0;
             
             .item-data-images-list {
                 display: flex;
@@ -449,10 +449,21 @@
                         object-fit: contain;
                     }
                     select {
-                        width: 95%;
+                        width: calc(100% - 10px);
                         height: 30px;
-                        margin: auto 0 5px 0;
+                        margin: auto 5px 5px 5px;
                         padding: 0 5px;
+                        border-radius: 10px;
+                        background-color: white;
+                        border: 1px solid $mid-grey2;
+                    }
+                    p {
+                        width: calc(100% - 28px);
+                        height: 30px;
+                        margin: auto 5px 5px 5px;
+                        padding: 0 8px;
+                        font-size: 12px;
+                        line-height: 30px;
                         border-radius: 10px;
                         background-color: white;
                         border: 1px solid $mid-grey2;
@@ -460,12 +471,12 @@
                 }
             }
         }
-        .item-data-table-pagination {
+        .item-data-pagination {
             display: flex;
             align-items: center;
             margin: 0 0 15px 0;
            
-            .item-data-table-pagination-icon {
+            .item-data-pagination-icon {
                 font-size: 14px;
                 border: 1px solid $mid-grey2;
                 background-color: white;
@@ -474,7 +485,7 @@
                 cursor: pointer;
             }
             p {
-                font-size: 14px;
+                font-size: 12px;
                 color: $dark-grey1; 
                 margin: 0 20px;
             }
@@ -496,6 +507,19 @@
                 line-height: 30px;
                 border-radius: 7px;
                 margin: 0 15px 0 0;
+            }
+            .item-data-information-label {
+                font-size: 14px;
+                color: $dark-grey1;
+                margin: 0 25px 0 0;
+            }
+            select {
+                padding: 0 5px;
+                height: 30px;
+                width: 150px;
+                border-radius: 10px;
+                background-color: white;
+                border: 1px solid $mid-grey2;
             }
             span {
                 flex: 1;

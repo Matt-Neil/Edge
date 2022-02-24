@@ -46,7 +46,8 @@ const Dataset = ({currentUser}) => {
     const [addLabel, setAddLabel] = useState("")
     const [upvotes, setUpvotes] = useState()
     const [visibility, setVisibility] = useState()
-    const [target, setTarget] = useState()
+    const [targetAttribute, setTargetAttribute] = useState()
+    const [dataAttributes, setDataAttributes] = useState([])
     const [comments, setComments] = useState()
     const [comment, setComment] = useState("")
     const [data, setData] = useState()
@@ -89,13 +90,14 @@ const Dataset = ({currentUser}) => {
                 setComments(comments.data.data)
 
                 if (dataset.data.data.dataType === "value") {
-                    setTarget(dataset.data.data.target)
+                    setTargetAttribute(dataset.data.data.target)
 
                     fetch(`http://127.0.0.1:5000/files/${dataset.data.data.datafile}.csv`)
                         .then(response => response.text())
                         .then(text => {
                             setDataTable(text)
                             setMaxRows(text.slice(text.indexOf('\n')+1).split('\n').length)
+                            setDataAttributes(text.slice(0, text.indexOf('\n')).split(','))
                             setExist(true)
                             setLoaded(true)
                         }).catch(() => {
@@ -170,7 +172,7 @@ const Dataset = ({currentUser}) => {
 
     const copiedInterval = () => {
         clearInterval(copyInterval.current)
-        navigator.clipboard.writeText(dataset.data);
+        navigator.clipboard.writeText(dataset.datafile);
         setCopyData(false);
         copyInterval.current = setInterval(() => {
             setCopyData(true);
@@ -296,13 +298,21 @@ const Dataset = ({currentUser}) => {
                 const tempPicture = picture
                 const imageResponse = await imageAPI.post("/upload", formImage);
 
-                await itemsAPI.put(`/${datasetID}?type=dataset`, {
+                let updateDataset = {
                     title: title,
                     description: description,
                     picture: imageResponse.data.data,
                     datafile: data,
                     updated: new Date().toISOString()
-                })
+                }
+
+                if (dataset.dataType === "value") {
+                    updateDataset.target = targetAttribute
+                } else {
+                    updateDataset.labels = labels
+                }
+
+                await itemsAPI.put(`/${datasetID}?type=dataset`, updateDataset)
 
                 setImage(undefined)
                 setPicture(imageResponse.data.data)
@@ -313,13 +323,21 @@ const Dataset = ({currentUser}) => {
             } catch (err) {}
         } else {
             try {
-                await itemsAPI.put(`/${datasetID}?type=dataset`, {
+                let updateDataset = {
                     title: title,
                     description: description,
                     picture: picture,
                     datafile: data,
                     updated: new Date().toISOString()
-                })
+                }
+
+                if (dataset.dataType === "value") {
+                    updateDataset.target = targetAttribute
+                } else {
+                    updateDataset.labels = labels
+                }
+
+                await itemsAPI.put(`/${datasetID}?type=dataset`, updateDataset)
             } catch (err) {}
         }
 
@@ -328,33 +346,51 @@ const Dataset = ({currentUser}) => {
     }
 
     const replaceData = async () => {
-        if (dataFile !== undefined) {
+        if (dataFile !== undefined && ((dataset.dataType === "image" && !assignedLabels.includes("No label")) 
+            || (dataset.dataType === "value" && targetAttribute !== ""))) {
+
+            const formData = new FormData();
             const file = dataFile;
             const reader = new FileReader();
-            const formData = new FormData();
             const removeData = new FormData();
             const id = new Date().toISOString();
 
-            reader.onload = function(e) {
-                setDataTable(e.target.result);
-                setMaxRows(e.target.result.slice(e.target.result.indexOf('\n')+1).split('\n').length)
-                setRefreshData(new Date().getTime())
-            }
+            if (dataset.dataType === "image") {
+                for (let i = 0; i < dataFile.length; i++) {
+                    formData.append('data[]', dataFile[i]);
+                    formData.append('labels[]', assignedLabels[i]);
+                }
+            } else {
+                reader.onload = function(e) {
+                    setDataTable(e.target.result);
+                    setMaxRows(e.target.result.slice(e.target.result.indexOf('\n')+1).split('\n').length)
+                    setRefreshData(new Date().getTime())
+                }
+    
+                reader.readAsText(file)
 
-            reader.readAsText(file)
+                formData.append('data', dataFile);
+            }
             
-            formData.append('data', dataFile);
             formData.append('id', id)
             removeData.append('id', dataset.datafile)
 
             try {
-                await itemsAPI.put(`/${datasetID}?type=dataset`, {
+                let updateDataset = {
                     title: title,
                     description: description,
                     picture: picture,
                     datafile: id,
                     updated: new Date().toISOString()
-                })
+                }
+
+                if (dataset.dataType === "value") {
+                    updateDataset.target = targetAttribute
+                } else {
+                    updateDataset.labels = labels
+                }
+
+                await itemsAPI.put(`/${datasetID}?type=dataset`, updateDataset)
 
                 await fileAPI.post("/upload", formData);
                 await fileAPI.post("/remove", formData);
@@ -363,6 +399,7 @@ const Dataset = ({currentUser}) => {
                 setUpdated(new Date().toISOString())
                 setDataFile(undefined)
                 setChangedData(false)
+                setRefreshData(new Date().getTime())
             } catch (err) {}
         }
     }
@@ -394,13 +431,16 @@ const Dataset = ({currentUser}) => {
                             }
                             <div className="item-heading">
                                 {dataset.self ? 
-                                    <input className="item-title-input"
-                                            placeholder="Title" 
-                                            value={title}
-                                            onChange={e => {
-                                                setTitle(e.target.value)
-                                                {!changedSettings && setChangedSettings(true)}
-                                            }} /> 
+                                    <>
+                                        <img src="http://localhost:3000/dataset.png" />
+                                        <input className="item-title-input"
+                                                placeholder="Title" 
+                                                value={title}
+                                                onChange={e => {
+                                                    setTitle(e.target.value)
+                                                    {!changedSettings && setChangedSettings(true)}
+                                                }} /> 
+                                    </>
                                 : 
                                     <>
                                         <img src="http://localhost:3000/dataset.png" />
@@ -466,7 +506,6 @@ const Dataset = ({currentUser}) => {
                                                                 setDataFile(e.target.files[0])
                                                                 setPage(1)
                                                                 setChangedData(true)
-                                                                setRefreshData(new Date().getTime())
                                                             }} />
                                                 :
                                                     <input type="file" 
@@ -478,7 +517,6 @@ const Dataset = ({currentUser}) => {
                                                                 setAssignedLabels(Array(e.target.files.length).fill("No label"))
                                                                 setPage(1)
                                                                 setChangedData(true)
-                                                                setRefreshData(new Date().getTime())
                                                             }} />
                                                 }
                                                 <button className="blue-button item-replace-button"
@@ -545,22 +583,34 @@ const Dataset = ({currentUser}) => {
                                             </div>
                                         </div>
                                     }
-                                    <div className="item-data-table-pagination">
+                                    <div className="item-data-pagination">
                                         {dataset.dataType ==="value" &&
                                             <>
                                                 <input placeholder="Row number" value={row} onChange={e => {setRow(e.target.value)}} />
                                                 <button onClick={() => {cancelRow()}} className="white-button item-data-cancel-find">Cancel</button>
                                                 <button onClick={() => {fetchRow()}} className="blue-button item-data-find">Find</button>
                                                 <span />
+                                                <p className="item-data-information-label">Target Attribute</p>
+                                                <select value={targetAttribute}
+                                                        onChange={e => {
+                                                            setTargetAttribute(e.target.value)
+                                                            setChangedSettings(true)
+                                                        }}>
+                                                    <option defaultValue value=""></option>
+                                                    {dataAttributes.map((attribute, j) => 
+                                                        <option value={attribute} key={j}>{attribute}</option>
+                                                    )}
+                                                </select>
                                             </>
                                         }
-                                        <ArrowBackIosNewIcon className="item-data-table-pagination-icon" onClick={() => {previousPage()}} />
+                                        <span />
+                                        <ArrowBackIosNewIcon className="item-data-pagination-icon" onClick={() => {previousPage()}} />
                                         {dataset.dataType ==="value" ?
                                             <p>Page {page} / {Math.ceil(maxRows/30)}</p>
                                         :
                                             <p>Page {page} / {Math.ceil(images.length/30)}</p>
                                         }
-                                        <ArrowForwardIosIcon className="item-data-table-pagination-icon" onClick={() => {nextPage()}} />
+                                        <ArrowForwardIosIcon className="item-data-pagination-icon" onClick={() => {nextPage()}} />
                                     </div>
                                     {dataset.dataType ==="value" ?
                                         <div className="item-data-table">
@@ -568,31 +618,63 @@ const Dataset = ({currentUser}) => {
                                         </div>
                                     :
                                         <div className="item-data-images" key={refreshData}>
-                                            {images.map((image, i) => {
-                                                if (i >= start && i < end) {
-                                                    return (
-                                                        <div className="item-data-images-list" key={i}>
-                                                            <div>
-                                                                <img src={`http://127.0.0.1:5000/files/${dataset.datafile}/${image}.jpg`} />
-                                                                <select value={assignedLabels[i]}
-                                                                        onChange={e => {setAssignedLabels(state => {
-                                                                                    const stateCopy = [...state]
-                                                                                
-                                                                                    stateCopy[i] = e.target.value
-                                                                                
-                                                                                    return stateCopy
-                                                                                })
-                                                                                setRefreshLabels(new Date().getTime())}}>
-                                                                    <option value="No label">No label</option>
-                                                                    {labels.map((label, j) => 
-                                                                        <option value={label} key={j}>{label}</option>
-                                                                    )}
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    )
-                                                }
-                                            })}
+                                            {dataFile !== undefined && changedData ?
+                                                <>
+                                                    {[...dataFile].map((image, i) => {
+                                                        if (i >= start && i < end) {
+                                                            return (
+                                                                <div className="item-data-images-list" key={i}>
+                                                                    <div>
+                                                                        <img src={URL.createObjectURL(image)} />
+                                                                        <select value={assignedLabels[i]}
+                                                                                onChange={e => {setAssignedLabels(state => {
+                                                                                            const stateCopy = [...state]
+                                                                                        
+                                                                                            stateCopy[i] = e.target.value
+                                                                                        
+                                                                                            return stateCopy
+                                                                                        })
+                                                                                        setRefreshLabels(new Date().getTime())}}>
+                                                                            <option value="No label">No label</option>
+                                                                            {labels.map((label, j) => 
+                                                                                <option value={label} key={j}>{label}</option>
+                                                                            )}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        }
+                                                    })}
+                                                </>
+                                            :
+                                                <>
+                                                    {images.map((image, i) => {
+                                                        if (i >= start && i < end) {
+                                                            return (
+                                                                <div className="item-data-images-list" key={i}>
+                                                                    <div>
+                                                                        <img src={`http://127.0.0.1:5000/files/${dataset.datafile}/${image}.jpg`} />
+                                                                        <select value={assignedLabels[i]}
+                                                                                onChange={e => {setAssignedLabels(state => {
+                                                                                            const stateCopy = [...state]
+                                                                                        
+                                                                                            stateCopy[i] = e.target.value
+                                                                                        
+                                                                                            return stateCopy
+                                                                                        })
+                                                                                        setRefreshLabels(new Date().getTime())}}>
+                                                                            <option value="No label">No label</option>
+                                                                            {labels.map((label, j) => 
+                                                                                <option value={label} key={j}>{label}</option>
+                                                                            )}
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        }
+                                                    })}
+                                                </>
+                                            }
                                         </div>
                                     }
                                 </>

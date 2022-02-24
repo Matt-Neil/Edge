@@ -250,10 +250,21 @@
                         object-fit: contain;
                     }
                     select {
-                        width: 95%;
+                        width: calc(100% - 10px);
                         height: 30px;
-                        margin: auto 0 5px 0;
+                        margin: auto 5px 5px 5px;
                         padding: 0 5px;
+                        border-radius: 10px;
+                        background-color: white;
+                        border: 1px solid $mid-grey2;
+                    }
+                    p {
+                        width: calc(100% - 28px);
+                        height: 30px;
+                        margin: auto 5px 5px 5px;
+                        padding: 0 8px;
+                        font-size: 12px;
+                        line-height: 30px;
                         border-radius: 10px;
                         background-color: white;
                         border: 1px solid $mid-grey2;

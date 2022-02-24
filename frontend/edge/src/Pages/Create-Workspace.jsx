@@ -19,8 +19,11 @@ const CreateWorkspace = ({currentUser}) => {
     const [page, setPage] = useState(1)
     const [image, setImage] = useState();
     const [dataID, setDataID] = useState("")
-    const [uploadedDataset, setUploadedDataset] = useState({data: ""})
+    const [uploadedDataset, setUploadedDataset] = useState()
     const [workspaces, setWorkspaces] = useState([]);
+    const [images, setImages] = useState([])
+    const [assignedLabels, setAssignedLabels] = useState([])
+    const [refreshData, setRefreshData] = useState()
     const [loaded, setLoaded] = useState(false);
     const [disableCreate, setDisabledCreate] = useState(false)
     const [displayPublic, setDisplayPublic] = useState(false)
@@ -81,13 +84,25 @@ const CreateWorkspace = ({currentUser}) => {
             const checkPublic = await itemsAPI.get(`/check-public-dataset?datafile=${dataID}`)
     
             if (checkPublic.data.success && checkPublic.data.data.visibility) {
-                fetch(`http://127.0.0.1:5000/files/${dataID}.csv`)
-                    .then(response => response.text())
-                    .then(text => {
-                        setDataTable(text)
-                        setMaxRows(text.slice(text.indexOf('\n')+1).split('\n').length)
-                        setUploadedDataset(checkPublic.data.data)
-                    })
+                if (checkPublic.data.data.dataType === "value") {
+                    fetch(`http://127.0.0.1:5000/files/${dataID}.csv`)
+                        .then(response => response.text())
+                        .then(text => {
+                            setDataTable(text)
+                            setMaxRows(text.slice(text.indexOf('\n')+1).split('\n').length)
+                            setUploadedDataset(checkPublic.data.data)
+                        })
+                } else {
+                    fetch(`http://127.0.0.1:5000/files/${dataID}/labels.json`)
+                        .then(response => response.json())
+                        .then(images => {
+                            images.map(image => {
+                                setImages(state => [...state, image.filename])
+                                setAssignedLabels(state => [...state, image.label])
+                            })
+                            setUploadedDataset(checkPublic.data.data)
+                        })
+                }
             } else if (checkPublic.data.success && !checkPublic.data.data.visibility) {
                 displayPublicInterval()
             } else {
@@ -98,17 +113,20 @@ const CreateWorkspace = ({currentUser}) => {
 
     const previousPage = () => {
         if (page > 1) {
+            setStart((page-2)*30)
+            setEnd((page-1)*30)
             setPage(state => state-1)
+            setRefreshData(new Date().getTime())
         }
-        setStart((page-1)*30)
-        setEnd(page*30)
     }
-
+    
     const nextPage = () => {
-        if (page*30 < maxRows && maxRows > 30) {
+        if ((uploadedDataset.dataType === "value" && page*30 < maxRows && maxRows > 30) ||
+            (uploadedDataset.dataType === "image" && page*30 < images.length && images.length > 30)) {
             setPage(state => state+1)
             setStart((page)*30)
             setEnd((page+1)*30)
+            setRefreshData(new Date().getTime())
         }
     }
 
@@ -149,7 +167,7 @@ const CreateWorkspace = ({currentUser}) => {
             history.push(`/workspace/${workspaceResponse.data.data}`)
         } catch (err) {}
     }
-
+    
     return (
         <>
             {loaded &&
@@ -207,7 +225,10 @@ const CreateWorkspace = ({currentUser}) => {
                                                 value={dataID} />
                                         <button className="blue-button"
                                                 disabled={dataID === ""}
-                                                onClick={() => {existingWorkspace()}}>Import</button>
+                                                onClick={() => {
+                                                    existingWorkspace()
+                                                    setRefreshData(new Date().getTime())
+                                                }}>Import</button>
                                         <span />
                                         <button className="white-button create-item-cancel"
                                                 onClick={() => {cancel()}}>Cancel</button>
@@ -215,22 +236,43 @@ const CreateWorkspace = ({currentUser}) => {
                                                 disabled={disableCreate}
                                                 onClick={() => {uploadImage()}}>Create</button>
                                     </div>
-                                    {dataID !== "" && dataTable !== undefined &&
+                                    {dataID !== "" && uploadedDataset !== undefined &&
                                         <div className="create-item-data">
                                             <div className="create-item-data-information">
-                                                <p className="create-item-data-information-label">Data: {uploadedDataset.data}</p> 
+                                                <p className="create-item-data-information-label">Data: {uploadedDataset.datafile}</p> 
                                                 <button className="grey-button create-item-remove"
                                                         onClick={() => {remove()}}>Remove</button>
                                                 <span />
-                                                <div className="create-item-data-table-pagination">
-                                                    <ArrowBackIosNewIcon className="create-item-data-table-pagination-icon" onClick={() => {previousPage()}} />
-                                                    <p>Page {page} / {Math.ceil(maxRows/30)}</p>
-                                                    <ArrowForwardIosIcon className="create-item-data-table-pagination-icon" onClick={() => {nextPage()}} />
+                                                <div className="create-item-data-pagination">
+                                                    <ArrowBackIosNewIcon className="create-item-data-pagination-icon" onClick={() => {previousPage()}} />
+                                                    {uploadData.dataType ==="value" ?
+                                                        <p>Page {page} / {Math.ceil(maxRows/30)}</p>
+                                                    :
+                                                        <p>Page {page} / {Math.ceil(images.length/30)}</p>
+                                                    }
+                                                    <ArrowForwardIosIcon className="create-item-data-pagination-icon" onClick={() => {nextPage()}} />
                                                 </div>
                                             </div>
-                                            <div className="create-item-data-table">
-                                                <DataTable dataTable={dataTable} start={start} end={end} key={new Date().getTime()} />
-                                            </div>
+                                            {uploadedDataset.dataType === "value" ?
+                                                <div className="create-item-data-table">
+                                                    <DataTable dataTable={dataTable} start={start} end={end} key={refreshData} />
+                                                </div>
+                                            :
+                                                <div className="create-item-data-images" key={refreshData}>
+                                                    {images.map((image, i) => {
+                                                        if (i >= start && i < end) {
+                                                            return (
+                                                                <div className="create-item-data-images-list" key={i}>
+                                                                    <div>
+                                                                        <img src={`http://127.0.0.1:5000/files/${uploadedDataset.datafile}/${image}.jpg`} />
+                                                                        <p>{assignedLabels[i]}</p>
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        }
+                                                    })}
+                                                </div>
+                                            }
                                         </div>
                                     }
                                     {displayPublic && <p className="create-item-data-public">Dataset not public</p>}

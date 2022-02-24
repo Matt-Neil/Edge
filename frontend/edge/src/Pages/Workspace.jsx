@@ -33,6 +33,8 @@ const Workspace = ({currentUser}) => {
     const [bookmarked, setBookmarked] = useState()
     const [upvoted, setUpvoted] = useState()
     const [upvotes, setUpvotes] = useState()
+    const [images, setImages] = useState([])
+    const [assignedLabels, setAssignedLabels] = useState([])
     const [picture, setPicture] = useState()
     const [visibility, setVisibility] = useState()
     const [comments, setComments] = useState()
@@ -95,11 +97,13 @@ const Workspace = ({currentUser}) => {
                             setLoaded(true)
                         });
                 } else {
-                    fetch(`http://127.0.0.1:5000/files/${workspace.data.data.dataset.datafile}/`)
-                        .then(response => response.text())
-                        .then(text => {
-                            setDataTable(text)
-                            setMaxRows(text.slice(text.indexOf('\n')+1).split('\n').length)
+                    fetch(`http://127.0.0.1:5000/files/${workspace.data.data.dataset.datafile}/labels.json`)
+                        .then(response => response.json())
+                        .then(images => {
+                            images.map(image => {
+                                setImages(state => [...state, image.filename])
+                                setAssignedLabels(state => [...state, image.label])
+                            })
                             setExist(true)
                             setNoData(false)
                             setLoaded(true)
@@ -111,11 +115,12 @@ const Workspace = ({currentUser}) => {
                 }
             } catch (err) {
                 setExist(false)
+                setNoData(true)
                 setLoaded(true)
             }
         }
         fetchData();
-    }, [])    
+    }, [])
 
     useEffect(() => {
         if (loaded && exist) {
@@ -279,7 +284,7 @@ const Workspace = ({currentUser}) => {
     
     const nextPage = () => {
         if ((workspace.dataset.dataType === "value" && page*30 < maxRows && maxRows > 30) ||
-            (workspace.dataset.dataType === "image" && page*30 < maxRows && maxRows > 30)) {
+            (workspace.dataset.dataType === "image" && page*30 < images.length && images.length > 30)) {
             setPage(state => state+1)
             setStart((page)*30)
             setEnd((page+1)*30)
@@ -373,13 +378,16 @@ const Workspace = ({currentUser}) => {
                             }
                             <div className="item-heading">
                                 {workspace.self ? 
-                                    <input className="item-title-input"
-                                            placeholder="Title" 
-                                            value={title}
-                                            onChange={e => {
-                                                setTitle(e.target.value)
-                                                {!changedSettings && setChangedSettings(true)}
-                                            }} /> 
+                                    <>
+                                        <img src="http://localhost:3000/workspace.png" />
+                                        <input className="item-title-input"
+                                                placeholder="Title" 
+                                                value={title}
+                                                onChange={e => {
+                                                    setTitle(e.target.value)
+                                                    {!changedSettings && setChangedSettings(true)}
+                                                }} /> 
+                                    </>
                                 : 
                                     <>
                                         <img src="http://localhost:3000/workspace.png" />
@@ -477,46 +485,41 @@ const Workspace = ({currentUser}) => {
                                                     {displayExist && <p className="create-item-data-public">Dataset does not exist</p>}
                                                 </div>
                                             }
-                                            <div className="item-data-table-pagination">
-                                                <input placeholder="Row number" value={row} onChange={e => {setRow(e.target.value)}} />
-                                                <button onClick={() => {cancelRow()}} className="white-button item-data-cancel-find">Cancel</button>
-                                                <button onClick={() => {fetchRow()}} className="blue-button item-data-find">Find</button>
+                                            <div className="item-data-pagination">
+                                                {workspace.dataset.dataType ==="value" &&
+                                                    <>
+                                                        <input placeholder="Row number" value={row} onChange={e => {setRow(e.target.value)}} />
+                                                        <button onClick={() => {cancelRow()}} className="white-button item-data-cancel-find">Cancel</button>
+                                                        <button onClick={() => {fetchRow()}} className="blue-button item-data-find">Find</button>
+                                                    </>
+                                                }
                                                 <span />
-                                                <ArrowBackIosNewIcon className="item-data-table-pagination-icon" onClick={() => {previousPage()}} />
-                                                <p>Page {page} / {Math.ceil(maxRows/30)}</p>
-                                                <ArrowForwardIosIcon className="item-data-table-pagination-icon" onClick={() => {nextPage()}} />
+                                                <ArrowBackIosNewIcon className="item-data-pagination-icon" onClick={() => {previousPage()}} />
+                                                {workspace.dataset.dataType ==="value" ?
+                                                    <p>Page {page} / {Math.ceil(maxRows/30)}</p>
+                                                :
+                                                    <p>Page {page} / {Math.ceil(images.length/30)}</p>
+                                                }
+                                                <ArrowForwardIosIcon className="item-data-pagination-icon" onClick={() => {nextPage()}} />
                                             </div>
                                             {workspace.dataset.dataType ==="value" ?
                                                 <div className="item-data-table">
                                                     <DataTable dataTable={dataTable} start={start} end={end} key={refreshData} />
                                                 </div>
                                             :
-                                                <div className="create-item-data-images" key={refreshData}>
-                                                    {/* {[...dataFile].map((image, i) => {
+                                                <div className="item-data-images" key={refreshData}>
+                                                    {images.map((image, i) => {
                                                         if (i >= start && i < end) {
                                                             return (
-                                                                <div className="create-item-data-images-list" key={i}>
+                                                                <div className="item-data-images-list" key={i}>
                                                                     <div>
-                                                                        <img src={`http://127.0.0.1:5000/files/${dataID}/${i}.jpg`} />
-                                                                        <select value={assignedLabels[i]}
-                                                                                onChange={e => {setAssignedLabels(state => {
-                                                                                            const stateCopy = [...state]
-                                                                                        
-                                                                                            stateCopy[i] = e.target.value
-                                                                                        
-                                                                                            return stateCopy
-                                                                                        })
-                                                                                        setRefreshLabels(new Date().getTime())}}>
-                                                                            <option value="No label">No label</option>
-                                                                            {labels.map((label, j) => 
-                                                                                <option value={label} key={j}>{label}</option>
-                                                                            )}
-                                                                        </select>
+                                                                        <img src={`http://127.0.0.1:5000/files/${workspace.dataset.datafile}/${image}.jpg`} />
+                                                                        <p>{assignedLabels[i]}</p>
                                                                     </div>
                                                                 </div>
                                                             )
                                                         }
-                                                    })} */}
+                                                    })}
                                                 </div>
                                             }
                                         </>

@@ -173,6 +173,7 @@ exports.getItem = async (req, res, next) => {
                         'updated': 1,
                         'dataset.datafile': 1,
                         'dataset.dataType': 1,
+                        'dataset.target': 1,
                         'dataset._id': 1,
                         'creatorName.name': 1,
                         'type': 1
@@ -242,6 +243,12 @@ exports.putItem = async (req, res, next) => {
 
             if (item.type === "dataset") {
                 item.datafile = req.body.datafile
+
+                if (item.dataType === "image") {
+                    item.labels = req.body.labels
+                } else {
+                    item.target = req.body.target
+                }
             } else {
                 item.dataset = req.body.dataset
             }
@@ -262,7 +269,7 @@ exports.putItem = async (req, res, next) => {
 
 exports.getCheckPublicDataset = async (req, res, next) => {
     try {
-        const check = await Items.findOne({ datafile: req.query.datafile }, '_id visibility dataset')
+        const check = await Items.findOne({ datafile: req.query.datafile }, '_id visibility datafile dataType')
         
         if (check) {
             res.status(201).json({

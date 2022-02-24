@@ -24,7 +24,6 @@ const Header = ({openItems}) => {
             <span />
             <Link to="/account" className="header-account">
                 <AccountCircleIcon className="header-account-icon" />
-                <p>Account</p>
             </Link>
         </div>
     )
