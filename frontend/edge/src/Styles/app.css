@@ -1807,6 +1807,7 @@
   font-size: 12px;
   margin: 0 10px 0 0;
   min-width: 125px;
+  max-width: 125px;
 }
 
 .create-experiment-modelling .create-experiment-modelling-body .create-experiment-model-configuration .create-experiment-model-configuration-option div input, .create-experiment-modelling .create-experiment-modelling-body .create-experiment-model-configuration .create-experiment-model-configuration-option div select {
@@ -1824,6 +1825,11 @@
 
 .create-experiment-modelling .create-experiment-modelling-body .create-experiment-model-configuration .create-experiment-model-configuration-option div select {
   padding: 0 5px;
+}
+
+.create-experiment-modelling .create-experiment-modelling-body .create-experiment-model-configuration .create-experiment-model-configuration-option div .create-experiment-model-configuration-option-checkbox {
+  width: 15px;
+  height: 15px;
 }
 
 .create-experiment-modelling .create-experiment-modelling-body .create-experiment-model-configuration .create-experiment-model-configuration-option div:not(:last-child) {

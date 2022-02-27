@@ -490,6 +490,7 @@
                         font-size: 12px;
                         margin: 0 10px 0 0;
                         min-width: 125px;
+                        max-width: 125px;
                     }
                     input, select {
                         height: 30px;
@@ -504,6 +505,10 @@
                     }
                     select {
                         padding: 0 5px;
+                    }
+                    .create-experiment-model-configuration-option-checkbox {
+                        width: 15px;
+                        height: 15px;
                     }
                 }
                 div:not(:last-child) {

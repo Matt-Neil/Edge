@@ -14,6 +14,8 @@ const CreateDataset = ({currentUser}) => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [visibility, setVisibility] = useState(false);
+    const [normalised, setNormalised] = useState(false);
+    const [encoded, setEncoded] = useState(false);
     const [dataFile, setDataFile] = useState();
     const [dataTable, setDataTable] = useState();
     const [dataAttributes, setDataAttributes] = useState([])
@@ -163,7 +165,14 @@ const CreateDataset = ({currentUser}) => {
 
             if (dataType === "value") {
                 newDataset.target = targetAttribute
+                newDataset.normalised = normalised
+                newDataset.encoded = encoded
             } else {
+                dataTable.slice(dataTable.indexOf('\n')+1).split('\n').map(row => {
+                    if (!labels.includes(row.split(',')[row.split(',').length-1])) {
+                        setLabels(previous => [...previous, row.split(',')[row.split(',').length-1]])
+                    }
+                })
                 newDataset.labels = labels
             }
 
@@ -227,6 +236,7 @@ const CreateDataset = ({currentUser}) => {
                                         <label className="create-item-setup-label">Select data type</label>
                                         <select value={dataType} onChange={e => {
                                             setDataType(e.target.value)
+                                            setLabels([])
                                             setDataFile()
                                         }}>
                                             <option disabled defaultValue value=""></option>
@@ -234,6 +244,18 @@ const CreateDataset = ({currentUser}) => {
                                             <option value="image">Image Data</option>
                                         </select>
                                     </div>
+                                    {dataType === "value" &&
+                                        <div className="create-item-setup">
+                                            <label className="create-item-setup-label">Normalised?</label>
+                                            <input type="checkbox" 
+                                                    onChange={() => {setNormalised(previous => !previous)}}
+                                                    checked={normalised} />
+                                            <label className="create-item-setup-label">Encoded?</label>
+                                            <input type="checkbox" 
+                                                    onChange={() => {setEncoded(previous => !previous)}}
+                                                    checked={encoded} />
+                                        </div>
+                                    }
                                 </div>
                             }
                             {!setupStage &&

@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useContext, useRef} from 'react'
 import {useHistory, useParams} from "react-router-dom"
 import itemsAPI from '../API/items'
+import trainAPI from '../API/train'
 import { OpenItemsContext } from '../Contexts/openItemsContext';
 import ModelNode from '../Components/Model-Node';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -15,12 +16,15 @@ const CreateExperiment = ({currentUser}) => {
     const [exist, setExist] = useState(false)
     const [visibility, setVisibility] = useState(false);
     const [model, setModel] = useState([])
+    const [dataset, setDataset] = useState()
     const [selectedNode, setSelectedNode] = useState(0)
-    const [configuration, setConfiguration] = useState({epochs: "", trainingSplit: "", validationSplit: "", testSplit: "", 
-                                                        maxError: "", batch: "", optimiser: "", model: ""})
+    const [configuration, setConfiguration] = useState({epochs: "", training_split: "", validation_split: "", test_split: "", improvement: "",
+                                                        patience: "", batch: "", lr_scheduler: false, optimiser: "", loss: ""})
     const [experiments, setExperiments] = useState([]);
     const [addNode, setAddNode] = useState(false)
     const [disableTrain, setDisabledTrain] = useState(true)
+    const [results, setResults] = useState()
+    const [experimentID, setExperimentID] = useState()
     const [refreshDiagram, setRefreshDiagram] = useState()
     const {addOpenItems} = useContext(OpenItemsContext);
     const modelRef = useRef(null)
@@ -40,19 +44,25 @@ const CreateExperiment = ({currentUser}) => {
                 experiments.data.data.experiments.map((experiment) => {
                     setExperiments(state => [...state, experiment.title]);
                 })
-
-                fetch(`http://127.0.0.1:5000/files/${workspace.data.data.dataset.datafile}.csv`)
-                    .then(response => response.text())
-                    .then(text => {
-                        setModel([{type: "Input", value: text.slice(0, text.indexOf('\n')).split(',').length, activation: ""}])
-                        setNoData(false)
-                        setLoaded(true);
-                        setExist(true)
-                    }).catch(() => {
-                        setNoData(true)
-                        setLoaded(true);
-                        setExist(true)
-                    });
+                
+                if (workspace.data.data.dataset.dataType === "image") {
+                    setModel([{type: "Input", value: 1, activation: ""}])
+                    setDataset(workspace.data.data.dataset)
+                } else {
+                    fetch(`http://127.0.0.1:5000/files/${workspace.data.data.dataset.datafile}.csv`)
+                        .then(response => response.text())
+                        .then(text => {
+                            setModel([{type: "Input", value: text.slice(0, text.indexOf('\n')).split(',').length, activation: ""}])
+                            setDataset(workspace.data.data.dataset)
+                            setNoData(false)
+                            setLoaded(true);
+                            setExist(true)
+                        }).catch(() => {
+                            setNoData(true)
+                            setLoaded(true);
+                            setExist(true)
+                        });
+                }
             } catch (err) {
                 setExist(false)
                 setLoaded(true)
@@ -76,14 +86,59 @@ const CreateExperiment = ({currentUser}) => {
             setStage("modelling")
         }
         if (stage === "modelling" && model.length > 2 && model[model.length-1].type === "Output" && configuration.epochs !== "" && 
-            configuration.trainingSplit !== "" && configuration.validationSplit !== "" && configuration.testSplit !== "" && 
-            configuration.maxError !== "" && configuration.batch !== "" && configuration.optimiser !== "" && 
+            configuration.training_split !== "" && configuration.validation_split !== "" && configuration.test_split !== "" && 
+            configuration.patience !== "" && configuration.batch !== "" && configuration.optimiser !== "" && 
             configuration.model !== "") {
             setStage("training")
         }
-        if (stage === "training" && !disableTrain) {
-            setStage("evaluation")
-        }
+    }
+
+    const train = async () => {
+        try {
+            // setDisabledTrain(true)
+            setStage("training")
+            setExperimentID(new Date().toISOString())
+    
+            const formData = new FormData();
+        
+            formData.append('epochs', configuration.epochs)
+            formData.append('training_split', configuration.training_split)
+            formData.append('validation_split', configuration.validation_split)
+            formData.append('test_split', configuration.test_split)
+            formData.append('improvement', configuration.improvement)
+            formData.append('patience', configuration.patience)
+            formData.append('batch', configuration.batch)
+            formData.append('lr_scheduler', configuration.lr_scheduler)
+            formData.append('optimiser', configuration.optimiser)
+            formData.append('loss', configuration.loss)
+            formData.append('datafile', dataset.datafile)
+            formData.append('dataType', dataset.dataType)
+            formData.append('labels', dataset.labels)
+            formData.append('id', experimentID)
+
+            if (dataset.dataType === "value") {
+                formData.append('target', dataset.target)
+                formData.append('encoded', dataset.encoded)
+                formData.append('normalised', dataset.normalised)
+            }
+
+            model.map(node => {
+                formData.append('activations[]', node.activation)
+                formData.append('units[]', node.value)
+            })
+            console.log(dataset)
+
+            const response = await trainAPI.post("", formData);
+
+            if (response) {
+                setResults(response)
+                setStage("evaluation")
+                console.log(results)
+            } else {
+                setDisabledTrain(false)
+                setStage("modelling")
+            }
+        } catch (err) {}
     }
 
     const cancel = () => {
@@ -104,9 +159,10 @@ const CreateExperiment = ({currentUser}) => {
                                     <p className="create-item-title">{title}</p> 
                                 </div>
                                 <button className={`${"create-sidebar-stage"} ${stage === "setup" ? "create-sidebar-stage-selected" : "create-sidebar-stage-unselected"}`}
-                                        disabled={stage === "setup"}
+                                        disabled={stage === "setup" || disableTrain}
                                         onClick={() => {setStage("setup")}}>Setup</button>
                                 <button className={`${"create-sidebar-stage"} ${stage === "modelling" ? "create-sidebar-stage-selected" : "create-sidebar-stage-unselected"}`}
+                                        // disabled={stage === "setup" || stage === "modelling" || disableTrain}
                                         disabled={stage === "setup" || stage === "modelling"}
                                         onClick={() => {setStage("modelling")}}>Modelling</button>
                                 <button className={`${"create-sidebar-stage"} ${stage === "training" ? "create-sidebar-stage-selected" : "create-sidebar-stage-unselected"}`}
@@ -143,7 +199,7 @@ const CreateExperiment = ({currentUser}) => {
                                                 <button className="white-button create-item-cancel"
                                                         onClick={() => {cancel()}}>Cancel</button>
                                                 <button className="blue-button"
-                                                        onClick={() => {next()}}>Train</button>
+                                                        onClick={() => {train()}}>Train</button>
                                             </div>
                                             <div className="create-experiment-modelling-body">
                                                 <div className="create-experiment-model">
@@ -192,11 +248,20 @@ const CreateExperiment = ({currentUser}) => {
                                                                                         setAddNode(false)
                                                                                         }}>Dense</button>
                                                                                         {model.length > 1 &&
-                                                                                            <button onClick={() => {setModel(state => [...state, {
-                                                                                                type: "Output",
-                                                                                                value: 0,
-                                                                                                activation: ""
-                                                                                            }])
+                                                                                            <button onClick={() => {
+                                                                                                {dataset.labels.length == 2 ?
+                                                                                                    setModel(state => [...state, {
+                                                                                                        type: "Output",
+                                                                                                        value: 1,
+                                                                                                        activation: ""
+                                                                                                    }])
+                                                                                                :
+                                                                                                    setModel(state => [...state, {
+                                                                                                        type: "Output",
+                                                                                                        value: dataset.labels.length,
+                                                                                                        activation: ""
+                                                                                                    }])
+                                                                                                }
                                                                                             setSelectedNode(model.length)
                                                                                             setAddNode(false)
                                                                                             }}>Output</button>
@@ -219,7 +284,7 @@ const CreateExperiment = ({currentUser}) => {
                                                         <p>{model[selectedNode].type}</p>
                                                         <label>Units</label>
                                                         <input value={model[selectedNode].value} 
-                                                                disabled={model[selectedNode].type === "Input"}
+                                                                disabled={model[selectedNode].type === "Input" || model[selectedNode].type === "Output"}
                                                                 onChange={e => {setModel(state => {
                                                                                     const stateCopy = [...state]
                                                                                 
@@ -231,7 +296,7 @@ const CreateExperiment = ({currentUser}) => {
                                                                                     return stateCopy
                                                                                 })
                                                                                 setRefreshDiagram(new Date().getTime())}} />
-                                                        {model[selectedNode].type !== "Output" && model[selectedNode].type !== "Input" &&
+                                                        {model[selectedNode].type !== "Input" &&
                                                             <>
                                                                 <label>Activation</label>
                                                                 <select value={model[selectedNode].activation} 
@@ -247,8 +312,19 @@ const CreateExperiment = ({currentUser}) => {
                                                                                         })
                                                                                         setRefreshDiagram(new Date().getTime())}}>
                                                                         <option disabled defaultValue value=""></option>
-                                                                        <option value="Relu">Relu</option>
-                                                                        <option value="Sigmoid">Sigmoid</option>
+                                                                        <option value="sigmoid">Sigmoid</option>
+                                                                        <option value="softmax">Softmax</option>
+                                                                        <option value="softplus">Softplus</option>
+                                                                        <option value="softsign">Softsign</option>
+                                                                        <option value="swish">Swish</option>
+                                                                        <option value="selu">Selu</option>
+                                                                        <option value="tanh">Tanh</option>
+                                                                        <option value="elu">Elu</option>
+                                                                        <option value="exponential">Exponential</option>
+                                                                        <option value="gelu">Gelu</option>
+                                                                        <option value="hard_sigmoid">Hard Sigmoid</option>
+                                                                        <option value="linear">Linear</option>
+                                                                        <option value="relu">Relu</option>
                                                                 </select>
                                                             </>
                                                         }  
@@ -265,30 +341,37 @@ const CreateExperiment = ({currentUser}) => {
                                                         </div>
                                                         <div>
                                                             <label>Training Split</label>
-                                                            <input value={configuration.trainingSplit} onChange={e => {setConfiguration(state => ({
+                                                            <input value={configuration.training_split} onChange={e => {setConfiguration(state => ({
                                                                                                                     ...state,
-                                                                                                                    trainingSplit: e.target.value
+                                                                                                                    training_split: e.target.value
                                                                                                                 }))}} />
                                                         </div>
                                                         <div>
                                                             <label>Validation Split</label>
-                                                            <input value={configuration.validationSplit} onChange={e => {setConfiguration(state => ({
+                                                            <input value={configuration.validation_split} onChange={e => {setConfiguration(state => ({
                                                                                                                     ...state,
-                                                                                                                    validationSplit: e.target.value
+                                                                                                                    validation_split: e.target.value
                                                                                                                 }))}} />
                                                         </div>
                                                         <div>
                                                             <label>Test Split</label>
-                                                            <input value={configuration.testSplit} onChange={e => {setConfiguration(state => ({
+                                                            <input value={configuration.test_split} onChange={e => {setConfiguration(state => ({
                                                                                                                     ...state,
-                                                                                                                    testSplit: e.target.value
+                                                                                                                    test_split: e.target.value
                                                                                                                 }))}} />
                                                         </div>
                                                         <div>
-                                                            <label>Maximum Error</label>
-                                                            <input value={configuration.maxError} onChange={e => {setConfiguration(state => ({
+                                                            <label>Minimum Improvement</label>
+                                                            <input value={configuration.improvement} onChange={e => {setConfiguration(state => ({
                                                                                                                     ...state,
-                                                                                                                    maxError: e.target.value
+                                                                                                                    improvement: e.target.value
+                                                                                                                }))}} />
+                                                        </div>
+                                                        <div>
+                                                            <label>Patience</label>
+                                                            <input value={configuration.patience} onChange={e => {setConfiguration(state => ({
+                                                                                                                    ...state,
+                                                                                                                    patience: e.target.value
                                                                                                                 }))}} />
                                                         </div>
                                                         <div>
@@ -299,25 +382,53 @@ const CreateExperiment = ({currentUser}) => {
                                                                                                                 }))}} />
                                                         </div>
                                                         <div>
+                                                            <label>Learning Rate Scheduler</label>
+                                                            <input className="create-experiment-model-configuration-option-checkbox"
+                                                                    type="checkbox" 
+                                                                    onChange={e => {setConfiguration(state => ({
+                                                                        ...state,
+                                                                        lr_scheduler: !configuration.lr_scheduler
+                                                                    }))}}
+                                                                    checked={configuration.lr_scheduler} />
+                                                        </div>
+                                                        <div>
                                                             <label>Optimiser</label>
                                                             <select value={configuration.optimiser} onChange={e => {setConfiguration(state => ({
                                                                                                                     ...state,
                                                                                                                     optimiser: e.target.value
                                                                                                                 }))}}>
                                                                 <option disabled defaultValue value=""></option>
-                                                                <option value="Sigmoid">Sigmoid</option>
-                                                                <option value="Relu">Relu</option>
+                                                                <option value="Adadelta">Adadelta</option>
+                                                                <option value="Adagrad">Adagrad</option>
+                                                                <option value="Adam">Adam</option>
+                                                                <option value="Adamax">Adamax</option>
+                                                                <option value="Ftrl">Ftrl</option>
+                                                                <option value="Nadam">Nadam</option>
+                                                                <option value="RMSprop">RMSprop</option>
+                                                                <option value="SGD">SGD</option>
                                                             </select>
                                                         </div>
                                                         <div>
-                                                            <label>Model Type</label>
-                                                            <select value={configuration.model} onChange={e => {setConfiguration(state => ({
+                                                            <label>Loss</label>
+                                                            <select value={configuration.loss} onChange={e => {setConfiguration(state => ({
                                                                                                                     ...state,
-                                                                                                                    model: e.target.value
+                                                                                                                    loss: e.target.value
                                                                                                                 }))}}>
                                                                 <option disabled defaultValue value=""></option>
-                                                                <option value="Regression">Regression</option>
-                                                                <option value="Classification">Classification</option>
+                                                                {dataset.labels.length === 2 &&
+                                                                    <>
+                                                                        <option value="binary_crossentropy">Binary Crossentropy</option>
+                                                                        <option value="hinge">Hinge</option>
+                                                                        <option value="squared_hinge">Squared Hinge</option>
+                                                                    </>
+                                                                }
+                                                                {dataset.labels.length > 2 &&
+                                                                    <>
+                                                                        <option value="categorical_crossentropy">Categorical Crossentropy</option>
+                                                                        <option value="sparse_categorical_crossentropy">Sparse Categorical Crossentropy</option>
+                                                                        <option value="kl_divergence">Kullback Leibler Divergence</option>
+                                                                    </>
+                                                                }
                                                             </select>
                                                         </div>
                                                     </div>

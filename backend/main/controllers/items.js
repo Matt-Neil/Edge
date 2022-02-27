@@ -96,15 +96,25 @@ exports.getItem = async (req, res, next) => {
                                 else: 0
                             }
                         },
-                        'labels': {
+                        'encoded': {
                             $cond: {
                                 if: {
-                                    $eq: ['$dataType', 'image']
+                                    $eq: ['$dataType', 'value']
                                 },
-                                then: '$labels',
+                                then: '$encoded',
                                 else: 0
                             }
                         },
+                        'normalised': {
+                            $cond: {
+                                if: {
+                                    $eq: ['$dataType', 'value']
+                                },
+                                then: '$normalised',
+                                else: 0
+                            }
+                        },
+                        'labels': 1,
                         'self': { $eq: [mongoose.Types.ObjectId(res.locals.currentUser._id), '$creator']},
                         'bookmarked': { $in: [res.locals.currentUser._id, '$bookmarks'] },
                         'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
@@ -173,7 +183,34 @@ exports.getItem = async (req, res, next) => {
                         'updated': 1,
                         'dataset.datafile': 1,
                         'dataset.dataType': 1,
-                        'dataset.target': 1,
+                        'dataset.target': {
+                            $cond: {
+                                if: {
+                                    $eq: ['$dataset.dataType', 'value']
+                                },
+                                then: '$dataset.target',
+                                else: 0
+                            }
+                        },
+                        'dataset.encoded': {
+                            $cond: {
+                                if: {
+                                    $eq: ['$dataset.dataType', 'value']
+                                },
+                                then: '$dataset.encoded',
+                                else: 0
+                            }
+                        },
+                        'dataset.normalised': {
+                            $cond: {
+                                if: {
+                                    $eq: ['$dataset.dataType', 'value']
+                                },
+                                then: '$dataset.normalised',
+                                else: 0
+                            }
+                        },
+                        'dataset.labels': 1,
                         'dataset._id': 1,
                         'creatorName.name': 1,
                         'type': 1
@@ -247,6 +284,8 @@ exports.putItem = async (req, res, next) => {
                 if (item.dataType === "image") {
                     item.labels = req.body.labels
                 } else {
+                    item.encoded = req.body.encoded
+                    item.normalised = req.body.normalised
                     item.target = req.body.target
                 }
             } else {
@@ -269,7 +308,7 @@ exports.putItem = async (req, res, next) => {
 
 exports.getCheckPublicDataset = async (req, res, next) => {
     try {
-        const check = await Items.findOne({ datafile: req.query.datafile }, '_id visibility datafile dataType')
+        const check = await Items.findOne({ datafile: req.query.datafile }, '_id visibility datafile dataType encoded normalised target labels')
         
         if (check) {
             res.status(201).json({
