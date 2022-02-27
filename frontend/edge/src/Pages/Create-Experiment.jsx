@@ -113,20 +113,19 @@ const CreateExperiment = ({currentUser}) => {
             formData.append('loss', configuration.loss)
             formData.append('datafile', dataset.datafile)
             formData.append('dataType', dataset.dataType)
-            formData.append('labels', dataset.labels)
             formData.append('id', experimentID)
 
             if (dataset.dataType === "value") {
                 formData.append('target', dataset.target)
-                formData.append('encoded', dataset.encoded)
-                formData.append('normalised', dataset.normalised)
             }
 
+            dataset.labels.map(label => {
+                formData.append('labels[]', label)
+            })
             model.map(node => {
                 formData.append('activations[]', node.activation)
                 formData.append('units[]', node.value)
             })
-            console.log(dataset)
 
             const response = await trainAPI.post("", formData);
 
