@@ -8,17 +8,13 @@ const Header = ({openItems}) => {
     return (
         <div className="header">
             <Link to="/home" className="header-link">Home</Link>
-            <Link to="/created-workspaces" className="header-link">Workspaces</Link>
-            <Link to="/created-datasets" className="header-link">Datasets</Link>
             <div className="header-open">
-                {openItems.length !== 0 ?
+                {openItems.length !== 0 &&
                     <>
                         {openItems.map((item, i) => {
                             return <HeaderOpenItem item={item} key={i} />
                         })}
                     </>
-                :
-                    <p>No items open</p>
                 }
             </div>
             <span />

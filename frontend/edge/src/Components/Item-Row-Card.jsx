@@ -86,9 +86,9 @@ const WorkspaceRowCard = ({item, created, creator, currentUserID}) => {
                 </div>
             </div>
             <div>
-                {!created && item.creator !== currentUserID && <BookmarkIcon className={`item-row-card-icon ${bookmarked ? "blue" : "grey"}`} onClick={() => {updateBookmark()}} />}
-                <ThumbUpIcon className={`item-row-card-icon ${upvoted ? "blue" : "grey"}`} onClick={() => {updateUpvote()}} />
-                <p className={`item-row-card-upvotes ${upvoted ? "blue" : "grey"}`}>{upvotes}</p>
+                {!created && item.creator !== currentUserID && <BookmarkIcon className={`item-row-card-icon ${bookmarked ? "blue2" : "white"}`} onClick={() => {updateBookmark()}} />}
+                <ThumbUpIcon className={`item-row-card-icon ${upvoted ? "blue2" : "white"}`} onClick={() => {updateUpvote()}} />
+                <p className={`item-row-card-upvotes ${upvoted ? "blue2" : "white"}`}>{upvotes}</p>
                 {created && 
                     <>
                         {visibility ? 

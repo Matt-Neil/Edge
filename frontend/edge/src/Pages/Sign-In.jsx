@@ -66,7 +66,7 @@ const SignIn = () => {
         <>
             {signin ?
                 <form className="signin-side" method="POST" onSubmit={signinUser}>
-                    <h1>Welcome back to Edge</h1>
+                    <h1>Welcome back</h1>
                     <label>Email Address</label>
                     <input type="text" value={email} onChange={e => {setEmail(e.target.value)}} />
                     <label>Password</label>

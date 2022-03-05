@@ -1,9 +1,11 @@
 import React, {useState, useEffect} from 'react'
-import {useHistory, useParams} from "react-router-dom"
+import {Link, useHistory, useParams} from "react-router-dom"
 import ItemRowCard from '../Components/Item-Row-Card'
 import ItemSquareCard from '../Components/Item-Square-Card'
 import globalAPI from '../API/global'
 import SearchIcon from '@mui/icons-material/Search';
+import Shortcut from '../Components/Shortcut'
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const AccountWorkspaces = ({searchPhrase, setSearchPhrase, currentUser}) => {
     const [items, setItems] = useState();
@@ -80,23 +82,39 @@ const AccountWorkspaces = ({searchPhrase, setSearchPhrase, currentUser}) => {
     return (
         <>
             {loaded &&
-                <div className="width-body">  
-                    <div className="view-items-body">
-                        <div className="view-items-search">
-                            <input className="view-items-search-input"
+                <div className="main-body">
+                    <div className="sidebar">
+                        <div className="home-search">
+                            <input className="home-search-input" 
                                     placeholder="Search"
                                     value={input}
                                     onChange={e => setInput(e.target.value)}
                                     onKeyPress={searchFunctionKey} />
-                            <SearchIcon className="view-items-search-icon" onClick={() => searchFunctionButton()} />
+                            <SearchIcon className="home-search-icon" onClick={e => searchFunctionButton()} />
                         </div>
-                        <div className="view-items-top">
-                            <h1>Search Results</h1>
-                        </div>
-                        <div className="view-items-middle">
+                        <div className="sidebar-divided" />
+                        <Link className="home-options-link" to="/public-workspaces">
+                            <p>Public Workspaces</p>
+                            <ArrowForwardIosIcon className="home-options-icon" />
+                        </Link>
+                        <Link className="home-options-link" to="public-datasets">
+                            <p>Public Datasets</p>
+                            <ArrowForwardIosIcon className="home-options-icon" />
+                        </Link>
+                        <div className="sidebar-divided" />
+                        <Shortcut type={"workspaces"} />
+                        <div className="sidebar-divided" />
+                        <Shortcut type={"datasets"} />
+                        <div className="sidebar-divided" />
+                        <Shortcut type={"bookmarked"} />
+                    </div>
+                    <div className="inner">
+                        <h1>Search Results: {urlPhrase}</h1>
+                        <div className="toggle-card-type">
                             <p>{`${items.length} Results`}</p>
-                            <img src="http://localhost:3000/List.png" className="view-items-row-icon" onClick={() => {setRowFormat(true)}} />
-                            <img src="http://localhost:3000/Grid.png" className="view-items-grid-icon" onClick={() => {setRowFormat(false)}} />
+                            <span />
+                            <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {setRowFormat(true)}} />
+                            <img src="http://localhost:3000/Grid.png" className="toggle-card-type-grid-icon" onClick={() => {setRowFormat(false)}} />
                         </div>
                         <div className="view-items-list">
                             {items.length > 0 &&
@@ -111,7 +129,7 @@ const AccountWorkspaces = ({searchPhrase, setSearchPhrase, currentUser}) => {
                             }
                         </div>
                         {items.length >= 0 && finishedItems ?
-                            <p className="end-items">No more results</p>
+                            <p className="end-items">End reached</p>
                             :
                             <p className="load-items" onClick={() => {loadMore()}}>Load more</p>
                         }

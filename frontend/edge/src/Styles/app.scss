@@ -2,7 +2,6 @@
 @import "variables";
 @import "mixins";
 @import "components";
-@import "home";
 @import "createItem";
 @import "item";
 @import "signin";
@@ -11,6 +10,7 @@
 
 body {
     margin: 0;
+    background-color: $grey2;
 }
 p {
     font-family: 'Poppins', sans-serif;
@@ -20,40 +20,89 @@ label {
 }
 h1 {
     font-family: 'Poppins', sans-serif;
-    font-size: 24px;
-    font-weight: 500;
-    color: $dark-grey1;
+    font-size: 20px;
+    font-weight: 400;
+    color: $grey7;
+    flex: 1;
 }
 input, textarea {
     font-family: 'Poppins', sans-serif;
+    background-color: $grey4;
 }
 .whole-body {
     width: 100%;
-}
-.width-body {
-    display: flex;
-    margin: 41px 30px 0 30px;
-}
-.sidebar-body {
-    display: flex;
-    height: calc(100vh - 41px);
-    margin: 41px 0 0 0;
-}
-.inner-body {
-    position: relative;
-    left: 290px;
-    display: flex;
-    width: calc(100% - 350px);
-    margin: 30px;
+
+    .main-body {
+        display: flex;
+        min-height: calc(100vh - 40px);
+        margin: 40px 0 0 0;
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 70px);
+            min-width: 300px;
+            max-width: 300px;
+            padding: 0 0 30px 0;
+            overflow-y: auto;
+            background-color: $grey3;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+
+            .sidebar-divided {
+                margin: 15px;
+                border-top: 1px $grey4 solid;
+            }
+        }
+        .sidebar::-webkit-scrollbar {
+            display: none;
+        }
+        .inner {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            background-color: $grey2;
+            padding: 15px 40px;
+
+            .toggle-card-type {
+                display: flex;
+                align-items: center;
+                margin: 0 0 25px 0;
+                
+                p {
+                    color: $grey5;
+                }
+                span {
+                    flex: 1;
+                }
+                .toggle-card-type-row-icon {
+                    width: 18px;
+                    height: 18px;
+                    cursor: pointer;
+                    margin: 0 10px 0 0;
+                }
+                .toggle-card-type-grid-icon {
+                    width: 18px;
+                    height: 18px;
+                    cursor: pointer;
+                }
+            }
+            .view-items-list {
+                display: flex;
+                flex-wrap: wrap;
+            }
+        }
+    }
 }
 .blue-button {
     width: fit-content;
     height: 36px;
     padding: 0 15px;
     background-color: $blue1;
-    border: none;
     border-radius: 10px;
-    color: white;
+    border: none;
+    color: $grey7;
     text-decoration: none;
     font-family: 'Poppins', sans-serif;
     font-weight: 400;
@@ -61,29 +110,18 @@ input, textarea {
     line-height: 36px;
     cursor: pointer;
 }
-.dark-grey-button {
-    width: fit-content;
-    height: 36px;
-    padding: 0 15px;
-    background-color: $dark-grey1;
-    border: none;
-    border-radius: 10px;
-    color: white;
-    text-decoration: none;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 400;
-    font-size: 13px;
-    line-height: 36px;
-    cursor: pointer;
+.blue-button:disabled {
+    background-color: $blue2;
+    cursor: not-allowed;
 }
-.grey-button {
+.black-button {
     width: fit-content;
     height: 36px;
     padding: 0 15px;
-    background-color: $light-grey1;
+    background-color: $grey2;
     border-radius: 10px;
-    border: 1px $mid-grey2 solid;
-    color: $dark-grey1;
+    border: none;
+    color: $grey7;
     text-decoration: none;
     font-family: 'Poppins', sans-serif;
     font-weight: 400;
@@ -95,10 +133,10 @@ input, textarea {
     width: fit-content;
     height: 36px;
     padding: 0 15px;
-    background-color: white;
+    background-color: $grey2;
     border-radius: 10px;
-    border: 1px $mid-grey2 solid;
-    color: $dark-grey1;
+    border: none;
+    color: $grey7;
     text-decoration: none;
     font-family: 'Poppins', sans-serif;
     font-weight: 400;
@@ -114,29 +152,18 @@ input, textarea {
     display: flex;
     align-items: center;
     height: 40px;
-    border-bottom: 1px $mid-grey2 solid;
-    background-color: white;
+    background-color: $grey1;
     font-size: 14px;
     font-weight: 500;
-    color: $dark-grey1;
 
     .header-link {
         display: flex;
         justify-content: center;
-        margin: 0 0 0 25px;
+        margin: 0 25px;
         text-decoration: none;
         font-family: 'Poppins', sans-serif;
-        color: $dark-grey1;
+        color: $grey7;
         @include not-selectable();
-    }
-    .header-link:nth-child(1) {
-        margin: 0 0 0 30px;
-    }
-    .header-link:nth-child(3) {
-        margin: 0 25px;
-    }
-    .header-link:hover {
-        color: $blue2;
     }
     .header-open {
         display: flex;
@@ -147,12 +174,12 @@ input, textarea {
         white-space: nowrap;
         -ms-overflow-style: none;
         scrollbar-width: thin;
-        scrollbar-color: $mid-grey2 white;
+        scrollbar-color: $grey2 white;
         scrollbar-track-color: none;
 
         p {
             font-size: 12px;
-            color: $dark-grey2;
+            color: $grey2;
             cursor: default;
         }
     }
@@ -172,31 +199,30 @@ input, textarea {
         margin: 0 30px 0 0;
         text-decoration: none;
     }
-    .header-account p {
-        margin: 0 0 0 7px;
-        color: $dark-grey1;
-    }
     .header-account-icon {
         font-size: 20px;
-        color: $dark-grey1;
+        color: $grey7;
     }
 }
 .end-items {
-    color: $blue2;
-    margin: 25px 0 0 15px;
+    color: $grey5;
+    margin: 25px 0 0 0;
     @include not-selectable()
 }
 .load-items {
-    color: $blue2;
-    margin: 25px 0 0 15px;
+    color: $grey5;
+    margin: 25px 0 0 0;
     cursor: pointer;
     @include not-selectable()
 }
-.blue {
+.blue1 {
+    color: $blue1;
+}
+.blue2 {
     color: $blue2;
 }
-.grey {
-    color: $mid-grey1;
+.white {
+    color: $grey7;
 }
 .page-not-found {
     position: absolute;
@@ -211,19 +237,19 @@ input, textarea {
 }
 ::placeholder {
     font-family: 'Poppins', sans-serif;
-    color: black;
+    color: $grey5;
     letter-spacing: 0.05mm;
     font-size: 13px;
 }
 :-ms-input-placeholder {
     font-family: 'Poppins', sans-serif;
-    color: black;
+    color: $grey5;
     letter-spacing: 0.05mm;
     font-size: 14px;
 }
 ::-ms-input-placeholder {
     font-family: 'Poppins', sans-serif;
-    color: black;
+    color: $grey5;
     letter-spacing: 0.05mm;
     font-size: 14px;
 }

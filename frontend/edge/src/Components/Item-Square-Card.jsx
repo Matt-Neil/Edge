@@ -84,8 +84,8 @@ const WorkspaceSquareCard = ({item, created, creator, currentUserID}) => {
                 <p className="item-square-card-meta">{date}</p>
                 {created && 
                     <div className="item-square-card-bottom">
-                        <ThumbUpIcon className={`item-square-card-icon ${upvoted ? "blue" : "grey"}`} onClick={() => {updateUpvote()}} />
-                        <p className={`item-square-card-upvotes ${upvoted ? "blue" : "grey"}`}>{upvotes}</p>
+                        <ThumbUpIcon className={`item-square-card-icon ${upvoted ? "blue2" : "white"}`} onClick={() => {updateUpvote()}} />
+                        <p className={`item-square-card-upvotes ${upvoted ? "blue2" : "white"}`}>{upvotes}</p>
                         {created && 
                             <>
                                 {visibility ? 
@@ -100,9 +100,9 @@ const WorkspaceSquareCard = ({item, created, creator, currentUserID}) => {
             </div>
             {!created &&
                 <div className="item-square-card-other">
-                    {item.creator !== currentUserID && <BookmarkIcon className={`item-square-card-icon ${bookmarked ? "blue" : "grey"}`} onClick={() => {updateBookmark()}} />}
-                    <ThumbUpIcon className={`item-square-card-icon ${upvoted ? "blue" : "grey"}`} onClick={() => {updateUpvote()}} />
-                    <p className={`item-square-card-upvotes ${upvoted ? "blue" : "grey"}`}>{upvotes}</p>
+                    {item.creator !== currentUserID && <BookmarkIcon className={`item-square-card-icon ${bookmarked ? "blue2" : "white"}`} onClick={() => {updateBookmark()}} />}
+                    <ThumbUpIcon className={`item-square-card-icon ${upvoted ? "blue2" : "white"}`} onClick={() => {updateUpvote()}} />
+                    <p className={`item-square-card-upvotes ${upvoted ? "blue2" : "white"}`}>{upvotes}</p>
                 </div>
             }
         </div>

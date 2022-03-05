@@ -1,23 +1,25 @@
 import React, {useState, useEffect} from 'react'
 import { Link, useHistory } from 'react-router-dom'
-import globalAPI from '../API/global'
-import ItemFeedCard from '../Components/Item-Feed-Card'
-import Shortcut from '../Components/Shortcut';
+import itemsAPI from '../API/items'
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ItemRowCard from '../Components/Item-Row-Card'
+import ItemSquareCard from '../Components/Item-Square-Card'
+import Shortcut from '../Components/Shortcut';
 
-const Home = ({setSearchPhrase, currentUser}) => {
-    const [feed, setFeed] = useState()
+const Home = ({setSearchPhrase}) => {
+    const [recent, setRecent] = useState()
     const [loaded, setLoaded] = useState(false)
     const [input, setInput] = useState("");
+    const [rowFormat, setRowFormat] = useState(false)
     const history = useHistory();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const feed = await globalAPI.get("/feed");
+                const recent = await itemsAPI.get("/recent");
 
-                setFeed(feed.data.data);
+                setRecent(recent.data.data);
                 setLoaded(true);
             } catch (err) {}
         }
@@ -41,8 +43,8 @@ const Home = ({setSearchPhrase, currentUser}) => {
     return (
         <>
             {loaded &&
-                <div className="width-body">
-                    <div className="home-left-column">
+                <div className="main-body">
+                    <div className="sidebar">
                         <div className="home-search">
                             <input className="home-search-input" 
                                     placeholder="Search"
@@ -51,27 +53,40 @@ const Home = ({setSearchPhrase, currentUser}) => {
                                     onKeyPress={searchFunctionKey} />
                             <SearchIcon className="home-search-icon" onClick={e => searchFunctionButton()} />
                         </div>
-                        <Shortcut type="workspaces" currentUserID={currentUser.id} />
-                        <Shortcut type="datasets" currentUserID={currentUser.id} />
-                        <Shortcut type="bookmarked" currentUserID={currentUser.id} />
+                        <div className="sidebar-divided" />
+                        <Link className="home-options-link" to="/all-workspaces">
+                            <p>Public Workspaces</p>
+                            <ArrowForwardIosIcon className="home-options-icon" />
+                        </Link>
+                        <Link className="home-options-link" to="all-datasets">
+                            <p>Public Datasets</p>
+                            <ArrowForwardIosIcon className="home-options-icon" />
+                        </Link>
+                        <div className="sidebar-divided" />
+                        <Shortcut type={"workspaces"} />
+                        <div className="sidebar-divided" />
+                        <Shortcut type={"datasets"} />
+                        <div className="sidebar-divided" />
+                        <Shortcut type={"bookmarked"} />
                     </div>
-                    <div className="home-middle-column">
-                        <div className="home-feed">
-                            {feed.map((item, i) => {
-                                return <ItemFeedCard item={item} creator={item.creatorName.name} key={i} />
-                            })}
-                            <p className="blue">End of feed</p>
+                    <div className="inner">
+                        <div className="view-items-top">
+                            <h1>Recently Updated</h1>
                         </div>
-                    </div>
-                    <div className="home-right-column">
-                        <Link to="/all-workspaces" className="home-filter-workspaces">
-                            <p className="home-filter-workspaces-heading">All Workspaces</p>
-                            <ArrowForwardIosIcon className="home-filter-workspaces-icon" />
-                        </Link>
-                        <Link to="/all-datasets" className="home-filter-workspaces">
-                            <p className="home-filter-workspaces-heading">All Datasets</p>
-                            <ArrowForwardIosIcon className="home-filter-workspaces-icon" />
-                        </Link>
+                        <div className="toggle-card-type">
+                            <span />
+                            <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {setRowFormat(true)}} />
+                            <img src="http://localhost:3000/Grid.png" className="toggle-card-type-grid-icon" onClick={() => {setRowFormat(false)}} />
+                        </div>
+                        <div className="view-items-list">
+                            {recent.length > 0 &&
+                                <>
+                                    {recent.map((item, i) => {
+                                        return rowFormat ? <ItemRowCard item={item} created={true} key={i} /> : <ItemSquareCard item={item} created={true} key={i} />
+                                    })}
+                                </>
+                            }
+                        </div>
                     </div>
                 </div>
             }

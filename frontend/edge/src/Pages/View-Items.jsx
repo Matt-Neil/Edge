@@ -2,9 +2,11 @@ import React, {useState, useEffect} from 'react'
 import {useHistory, Link} from "react-router-dom"
 import ItemRowCard from '../Components/Item-Row-Card'
 import ItemSquareCard from '../Components/Item-Square-Card'
+import Shortcut from '../Components/Shortcut'
 import usersAPI from '../API/users'
 import itemsAPI from '../API/items'
 import SearchIcon from '@mui/icons-material/Search';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const ViewItems = ({type, currentUser, setSearchPhrase}) => {
     const [items, setItems] = useState();
@@ -26,14 +28,14 @@ const ViewItems = ({type, currentUser, setSearchPhrase}) => {
                     case "created-workspaces":
                         items = await usersAPI.get(`/created?type=workspace&date=${new Date().toISOString()}`);
                         break;
-                    case "bookmarked":
+                    case "bookmarks":
                         items = await usersAPI.get(`/bookmarked?date=${new Date().toISOString()}`);
                         break;
-                    case "all-workspaces":
-                        items = await itemsAPI.get(`/all?type=workspace&date=${new Date().toISOString()}`);
+                    case "public-workspaces":
+                        items = await itemsAPI.get(`/public?type=workspace&date=${new Date().toISOString()}`);
                         break;
-                    case "all-datasets":
-                        items = await itemsAPI.get(`/all?type=dataset&date=${new Date().toISOString()}`);
+                    case "public-datasets":
+                        items = await itemsAPI.get(`/public?type=dataset&date=${new Date().toISOString()}`);
                         break;
                 }
 
@@ -74,14 +76,14 @@ const ViewItems = ({type, currentUser, setSearchPhrase}) => {
                     case "created-workspaces":
                         items = await usersAPI.get(`/created?type=workspace&date=${date}`);
                         break;
-                    case "bookmarked":
+                    case "bookmarks":
                         items = await usersAPI.get(`/bookmarked?date=${date}`);
                         break;
-                    case "all-workspaces":
-                        items = await itemsAPI.get(`/all?type=workspace&date=${date}`);
+                    case "public-workspaces":
+                        items = await itemsAPI.get(`/public?type=workspace&date=${date}`);
                         break;
-                    case "all-datasets":
-                        items = await itemsAPI.get(`/all?type=dataset&date=${date}`);
+                    case "public-datasets":
+                        items = await itemsAPI.get(`/public?type=dataset&date=${date}`);
                         break;   
                 }
     
@@ -96,7 +98,7 @@ const ViewItems = ({type, currentUser, setSearchPhrase}) => {
 
     const loadMore = () => {
         if (items.length !== 0) {
-            if (type === "all-workspaces" || type === "all-datasets") {
+            if (type === "public-workspaces" || type === "public-datasets") {
                 {fetchDataItems(items[items.length-1].createdAt)}
             } else {
                 {fetchDataItems(items[items.length-1].updatedAt)}
@@ -109,19 +111,19 @@ const ViewItems = ({type, currentUser, setSearchPhrase}) => {
 
         switch (type) {
             case "created-workspaces":
-                heading = "Created Workspaces"
+                heading = "Your Workspaces"
                 break;
             case "created-datasets":
-                heading = "Created Datasets"
+                heading = "Your Datasets"
                 break;
-            case "bookmarked":
-                heading = "Bookmarked"
+            case "bookmarks":
+                heading = "Your Bookmarks"
                 break;
-            case "all-workspaces":
-                heading = "All Workspaces"
+            case "public-workspaces":
+                heading = "Public Workspaces"
                 break;
-            case "all-datasets":
-                heading = "All Datasets"
+            case "public-datasets":
+                heading = "Public Datasets"
                 break;
         }
 
@@ -131,33 +133,49 @@ const ViewItems = ({type, currentUser, setSearchPhrase}) => {
     return (
         <>
             {loaded &&
-                <div className="width-body">  
-                    <div className="view-items-body">
-                        {type === "all" &&
-                            <div className="view-items-search">
-                                <input className="view-items-search-input"
-                                        placeholder="Search"
-                                        value={input}
-                                        onChange={e => setInput(e.target.value)}
-                                        onKeyPress={searchFunctionKey} />
-                                <SearchIcon className="view-items-search-icon" onClick={e => searchFunctionButton()} />
-                            </div>
-                        }
+                <div className="main-body">
+                    <div className="sidebar">
+                        <div className="home-search">
+                            <input className="home-search-input" 
+                                    placeholder="Search"
+                                    value={input}
+                                    onChange={e => setInput(e.target.value)}
+                                    onKeyPress={searchFunctionKey} />
+                            <SearchIcon className="home-search-icon" onClick={e => searchFunctionButton()} />
+                        </div>
+                        <div className="sidebar-divided" />
+                        <Link className="home-options-link" to="/public-workspaces">
+                            <p>Public Workspaces</p>
+                            <ArrowForwardIosIcon className="home-options-icon" />
+                        </Link>
+                        <Link className="home-options-link" to="public-datasets">
+                            <p>Public Datasets</p>
+                            <ArrowForwardIosIcon className="home-options-icon" />
+                        </Link>
+                        <div className="sidebar-divided" />
+                        <Shortcut type={"workspaces"} />
+                        <div className="sidebar-divided" />
+                        <Shortcut type={"datasets"} />
+                        <div className="sidebar-divided" />
+                        <Shortcut type={"bookmarks"} />
+                    </div>
+                    <div className="inner">
                         <div className="view-items-top">
                             {displayHeading()}
                             {type === "created-workspaces" && <Link to="/create-workspace" className="blue-button">Create Workspace</Link>}
                             {type === "created-datasets" && <Link to="/create-dataset" className="blue-button">Create Dataset</Link>}
                         </div>
-                        <div className="view-items-middle">
-                            {(type === "created-workspaces" || type === "all-workspaces") ?
+                        <div className="toggle-card-type">
+                            {(type === "created-workspaces" || type === "public-workspaces") ?
                                 <p>{`${items.length} Workspaces`}</p>
-                            : (type === "created-datasets" || type === "all-dataset") ?
+                            : (type === "created-datasets" || type === "public-dataset") ?
                                 <p>{`${items.length} Datasets`}</p>
                             :
                                 <p>{`${items.length} Bookmarks`}</p>
                             }
-                            <img src="http://localhost:3000/List.png" className="view-items-row-icon" onClick={() => {setRowFormat(true)}} />
-                            <img src="http://localhost:3000/Grid.png" className="view-items-grid-icon" onClick={() => {setRowFormat(false)}} />
+                            <span />
+                            <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {setRowFormat(true)}} />
+                            <img src="http://localhost:3000/Grid.png" className="toggle-card-type-grid-icon" onClick={() => {setRowFormat(false)}} />
                         </div>
                         <div className="view-items-list">
                             {items.length > 0 &&
@@ -171,7 +189,7 @@ const ViewItems = ({type, currentUser, setSearchPhrase}) => {
                             }
                         </div>
                         {items.length >= 0 && finishedItems ?
-                            <p className="end-items">No more bookmarks</p>
+                            <p className="end-items">End reached</p>
                             :
                             <p className="load-items" onClick={() => {loadMore()}}>Load more</p>
                         }

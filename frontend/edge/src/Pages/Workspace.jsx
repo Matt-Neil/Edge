@@ -1,167 +1,78 @@
-import React, {useState, useEffect, useContext, useRef} from 'react'
-import {Link, useParams, useHistory} from "react-router-dom"
-import globalAPI from '../API/global'
-import imageAPI from '../API/images'
+import React, {useState, useEffect, useRef} from 'react'
+import {useHistory} from "react-router-dom"
+import usersAPI from '../API/users'
 import itemsAPI from '../API/items'
-import DataTable from '../Components/Data-Table';
-import { OpenItemsContext } from '../Contexts/openItemsContext';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
-import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import imageAPI from '../API/images'
+import trainAPI from '../API/train'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import ExperimentCard from '../Components/Experiment-Card'
+import ModelNode from '../Components/Model-Node';
+import ClearIcon from '@mui/icons-material/Clear';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 
-const Workspace = ({currentUser}) => {
-    const [loaded, setLoaded] = useState(false)
-    const [exist, setExist] = useState()
-    const [noData, setNoData] = useState()
-    const [dataset, setDataset] = useState()
-    const [workspace, setWorkspace] = useState()
-    const [dataTable, setDataTable] = useState()
-    const [dataID, setDataID] = useState("")
-    const [updated, setUpdated] = useState()
-    const [changedData, setChangedData] = useState(false)
-    const [changedSettings, setChangedSettings] = useState(false)
-    const [date, setDate] = useState("");
+const Workspace = ({currentUser, type}) => {
+    const [stage, setStage] = useState("model");
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [visibility, setVisibility] = useState(false);
     const [start, setStart] = useState(0)
-    const [end, setEnd] = useState(30)
-    const [row, setRow] = useState()
-    const [maxRows, setMaxRows] = useState()
+    const [end, setEnd] = useState(20)
     const [page, setPage] = useState(1)
-    const [bookmarked, setBookmarked] = useState()
-    const [upvoted, setUpvoted] = useState()
-    const [upvotes, setUpvotes] = useState()
+    const [image, setImage] = useState();
+    const [datasetID, setDatasetID] = useState("")
+    const [uploadedDataset, setUploadedDataset] = useState()
+    const [workspaces, setWorkspaces] = useState([]);
     const [images, setImages] = useState([])
     const [assignedLabels, setAssignedLabels] = useState([])
-    const [picture, setPicture] = useState()
-    const [visibility, setVisibility] = useState()
-    const [comments, setComments] = useState()
-    const [comment, setComment] = useState("")
-    const [experiments, setExperiments] = useState()
-    const [finishedExperiments, setFinishedExperiments] = useState(false)
-    const [section, setSection] = useState("experiments")
-    const [title, setTitle] = useState("")
-    const [description, setDescription] = useState("")
-    const [image, setImage] = useState();
+    const [viewDataset, setViewDataset] = useState(false)
     const [refreshData, setRefreshData] = useState()
+    const [refreshDiagram, setRefreshDiagram] = useState()
+    const [model, setModel] = useState([])
+    const [selectedNode, setSelectedNode] = useState(0)
+    const [configuration, setConfiguration] = useState({epochs: "", training_split: "", validation_split: "", test_split: "", improvement: "",
+                                                        patience: "", batch: "", lr_scheduler: false, optimiser: "", loss: ""})
+    const [addNode, setAddNode] = useState(false)
+    const [results, setResults] = useState()
+    const [loaded, setLoaded] = useState(false);
+    const [disableCreate, setDisabledCreate] = useState(false)
+    const [disableTrain, setDisabledTrain] = useState(true)
     const [displayPublic, setDisplayPublic] = useState(false)
     const [displayExist, setDisplayExist] = useState(false)
-    const {addOpenItems, removeOpenItems} = useContext(OpenItemsContext);
-    const workspaceID = useParams().id;
+    const modelRef = useRef(null)
     const publicInterval = useRef(0)
     const existInterval = useRef(0)
-    const history = useHistory()
+    const history = useHistory();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const workspace = await itemsAPI.get(`/${workspaceID}?type=workspace`);
-                const comments = await globalAPI.get(`/comment/${workspaceID}`);
-                const experiments = await itemsAPI.get(`/created-experiments/${workspaceID}?date=${new Date().toISOString()}`);
+                const workspaces = await usersAPI.get("/created?type=workspace");
 
-                if (workspace.data.data.creator === currentUser.id) {
-                    addOpenItems(workspace.data.data._id, workspace.data.data.title, workspace.data.data.type)
-                }
-
-                if (experiments.data.data.length < 21) {
-                    setFinishedExperiments(true)
-                }
-
-                setWorkspace(workspace.data.data);
-                setUpdated(workspace.data.data.updated);
-                setBookmarked(workspace.data.data.bookmarked)
-                setUpvoted(workspace.data.data.upvoted)
-                setPicture(workspace.data.data.picture)
-                setUpvotes(workspace.data.data.upvotes)
-                setDataset(workspace.data.data.dataset._id)
-                setVisibility(workspace.data.data.visibility)
-                setTitle(workspace.data.data.title)
-                setDescription(workspace.data.data.description)
-                setComments(comments.data.data)
-                setExperiments(experiments.data.data)
-
-                if (workspace.data.data.dataset.dataType === "value") {
-                    fetch(`http://127.0.0.1:5000/files/${workspace.data.data.dataset.datafile}.csv`)
-                        .then(response => response.text())
-                        .then(text => {
-                            setDataTable(text)
-                            setMaxRows(text.slice(text.indexOf('\n')+1).split('\n').length)
-                            setExist(true)
-                            setNoData(false)
-                            setLoaded(true)
-                        }).catch(() => {
-                            setExist(true)
-                            setNoData(true)
-                            setLoaded(true)
-                        });
-                } else {
-                    fetch(`http://127.0.0.1:5000/files/${workspace.data.data.dataset.datafile}/labels.json`)
-                        .then(response => response.json())
-                        .then(images => {
-                            images.map(image => {
-                                setImages(state => [...state, image.filename])
-                                setAssignedLabels(state => [...state, image.label])
-                            })
-                            setExist(true)
-                            setNoData(false)
-                            setLoaded(true)
-                        }).catch(() => {
-                            setExist(true)
-                            setNoData(true)
-                            setLoaded(true)
-                        });
-                }
-            } catch (err) {
-                setExist(false)
-                setNoData(true)
-                setLoaded(true)
-            }
+                workspaces.data.data.map((workspace) => {
+                    setWorkspaces(previous => [...previous, workspace.title]);
+                })
+                setLoaded(true);
+            } catch (err) {}
         }
         fetchData();
     }, [])
 
     useEffect(() => {
-        if (loaded && exist) {
-            const updatedDate = new Date(updated);
-            const currentDate = new Date();
-    
-            if ((currentDate.getTime() - updatedDate.getTime()) / (1000 * 3600 * 24) >= 365) {
-                setDate(`Updated ${Math.floor(((currentDate.getTime() - updatedDate.getTime()) / (1000 * 3600 * 24) % 365)).toString()} years ago`)
-            } else if ((currentDate.getTime() - updatedDate.getTime()) / (1000 * 3600 * 24) >= 30) {
-                setDate(`Updated ${Math.floor(((currentDate.getTime() - updatedDate.getTime()) / (1000 * 3600 * 24) % 30).toString())} months ago`)
-            } else if ((currentDate.getTime() - updatedDate.getTime()) / (1000 * 3600 * 24) >= 1) {
-                setDate(`Updated ${Math.floor(((currentDate.getTime() - updatedDate.getTime()) / (1000 * 3600 * 24))).toString()} days ago`)
-            } else if ((currentDate.getTime() - updatedDate.getTime()) / (1000 * 3600) >= 1) {
-                setDate(`Updated ${Math.floor(((currentDate.getTime() - updatedDate.getTime()) / (1000 * 3600))).toString()} hours ago`)
-            } else if ((currentDate.getTime() - updatedDate.getTime()) / (1000 * 60) >= 1) {
-                setDate(`Updated ${Math.floor(((currentDate.getTime() - updatedDate.getTime()) / (1000 * 60))).toString()} minutes ago`)
-            } else {
-                setDate("Updated just now")
-            }
+        if (modelRef.current) {
+            modelRef.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'end',
+                inline: 'end'
+            })
         }
-    }, [loaded, updated])
+    }, [model, addNode])
 
-    const fetchDataExperiments = async (date) => {
-        if (!finishedExperiments) {
-            try {
-                const fetchedExperiments = await itemsAPI.get(`/created-experiments/${workspaceID}?date=${date}`);
-    
-                if (fetchedExperiments.data.data.length < 21) {
-                    setFinishedExperiments(true)
-                }
-
-                setExperiments(items => [...items, ...fetchedExperiments.data.data]);
-            } catch (err) {}
+    const searchFunctionKey = (e) => {
+        if (e.key === "Enter" && datasetID !== "") {
+            existingDataset()
         }
     }
-
-    const loadMore = () => {
-        if (experiments.length !== 0) {
-            {fetchDataExperiments(experiments[experiments.length-1].updated)}
-        }
-    };
 
     const displayPublicInterval = () => {
         clearInterval(publicInterval.current)
@@ -181,19 +92,42 @@ const Workspace = ({currentUser}) => {
         return ()=> {clearInterval(existInterval.current)};
     }
 
-    const existingWorkspace = async () => {
+    const previousPage = () => {
+        if (page > 1) {
+            setStart((page-2)*20)
+            setEnd((page-1)*20)
+            setPage(state => state-1)
+            setRefreshData(new Date().getTime())
+        }
+    }
+    
+    const nextPage = () => {
+        if (page*20 < images.length && images.length > 20) {
+            setPage(state => state+1)
+            setStart((page)*20)
+            setEnd((page+1)*20)
+            setRefreshData(new Date().getTime())
+        }
+    }
+
+    const existingDataset = async () => {
         try {
-            const checkPublic = await itemsAPI.get(`/check-public-dataset?datafile=${dataID}`)
+            const checkPublic = await itemsAPI.get(`/check-public-dataset?id=${datasetID}`)
     
             if (checkPublic.data.success && checkPublic.data.data.visibility) {
-                fetch(`http://127.0.0.1:5000/files/${dataID}.csv`)
-                    .then(response => response.text())
-                    .then(text => {
-                        setDataTable(text)
-                        setMaxRows(text.slice(text.indexOf('\n')+1).split('\n').length)
-                        setDataset(checkPublic._id)
-                        setRefreshData(new Date().getTime())
-                    })
+                fetch(`http://127.0.0.1:5000/files/${checkPublic.data.data.imageFile}/labels.json`)
+                        .then(response => response.json())
+                        .then(images => {
+                            images.map(image => {
+                                setImages(state => [...state, image.filename])
+                                setAssignedLabels(state => [...state, image.label])
+                            })
+                            setUploadedDataset(checkPublic.data.data)
+                            setRefreshData(new Date().getTime())
+                            {model.length === 0 &&
+                                setModel([{type: "Input", value: 1, activation: ""}])
+                            }
+                        })
             } else if (checkPublic.data.success && !checkPublic.data.data.visibility) {
                 displayPublicInterval()
             } else {
@@ -202,318 +136,372 @@ const Workspace = ({currentUser}) => {
         } catch (err) {}
     }
 
-    const updateUpvote = async () => {
-        try {
-            await globalAPI.put(`/upvote/${workspaceID}?state=${upvoted}`);
+    const uploadImage = async () => {
+        setDisabledCreate(true)
 
-            if (upvoted) {
-                setUpvotes(state => state-1)
-            } else {
-                setUpvotes(state => state+1)
-            }
-
-            setUpvoted(state => !state)
-        } catch (err) {}
-    }
-
-    const updateBookmark = async () => {
-        try {
-            await globalAPI.put(`/bookmark/${workspaceID}?state=${bookmarked}`);
-            
-            setBookmarked(state => !state)
-        } catch (err) {}
-    }
-
-    const updateVisibility = async () => {
-        try {
-            await globalAPI.put(`/visibility/${workspace._id}`);
-
-            setVisibility(state => !state)
-        } catch (err) {}
-    }
-
-    const addComment = async (e) => {
-        e.preventDefault()
-
-        try {
-            await globalAPI.put(`/comment/${workspaceID}?type=workspace`, {
-                comment: comment
-            });
-
-            setComments([{
-                user: {name: currentUser.name},
-                comment: comment
-            }, ...comments])
-            setComment("")
-        } catch (err) {}
-    }
-
-    const fetchRow = () => {
-        if (!isNaN(row) && row !== "") {
-            setStart(row-1)
-            setEnd(row)
-            setRefreshData(new Date().getTime())
-        } else {
-            if (start === (page-1)*30 && end === page*30) {
-                setRow("")
-            } else {
-                setStart((page-1)*30)
-                setEnd(page*30)
-                setRefreshData(new Date().getTime())
-            }
-        }
-    }
-
-    const cancelRow = () => {
-        if (!(start === (page-1)*30 && end === page*30)) {
-            setStart((page-1)*30)
-            setEnd(page*30)
-            setRefreshData(new Date().getTime())
-        }
-        setRow("")
-    }
-
-    const previousPage = () => {
-        if (page > 1) {
-            setStart((page-2)*30)
-            setEnd((page-1)*30)
-            setPage(state => state-1)
-            setRefreshData(new Date().getTime())
-        }
-    }
-    
-    const nextPage = () => {
-        if ((workspace.dataset.dataType === "value" && page*30 < maxRows && maxRows > 30) ||
-            (workspace.dataset.dataType === "image" && page*30 < images.length && images.length > 30)) {
-            setPage(state => state+1)
-            setStart((page)*30)
-            setEnd((page+1)*30)
-            setRefreshData(new Date().getTime())
-        }
-    }
-
-    const commentDate = (date) => {
-        const updatedDate = new Date(date);
-        const currentDate = new Date();
-
-        if ((currentDate.getTime() - updatedDate.getTime()) / (1000 * 3600 * 24) >= 365) {
-            return `Posted ${Math.floor(((currentDate.getTime() - updatedDate.getTime()) / (1000 * 3600 * 24) % 365)).toString()} years ago`
-        } else if ((currentDate.getTime() - updatedDate.getTime()) / (1000 * 3600 * 24) >= 30) {
-            return `Posted ${Math.floor(((currentDate.getTime() - updatedDate.getTime()) / (1000 * 3600 * 24) % 30).toString())} months ago`
-        } else if ((currentDate.getTime() - updatedDate.getTime()) / (1000 * 3600 * 24) >= 1) {
-            return `Posted ${Math.floor(((currentDate.getTime() - updatedDate.getTime()) / (1000 * 3600 * 24))).toString()} days ago`
-        } else if ((currentDate.getTime() - updatedDate.getTime()) / (1000 * 3600) >= 1) {
-            return `Posted ${Math.floor(((currentDate.getTime() - updatedDate.getTime()) / (1000 * 3600))).toString()} hours ago`
-        } else if ((currentDate.getTime() - updatedDate.getTime()) / (1000 * 60) >= 1) {
-            return `Posted ${Math.floor(((currentDate.getTime() - updatedDate.getTime()) / (1000 * 60))).toString()} minutes ago`
-        } else {
-            return "Posted just now"
-        }
-    }
-
-    const updateWorkspace = async () => {
         if (image) {
             const formImage = new FormData();
             formImage.append('image', image);
-            
+
             try {
-                const tempPicture = picture
                 const imageResponse = await imageAPI.post("/upload", formImage);
 
-                await itemsAPI.put(`/${workspaceID}?type=workspace`, {
-                    title: title,
-                    description: description,
-                    picture: imageResponse.data.data,
-                    dataset: dataset,
-                    updated: new Date().toISOString()
-                })
-
-                setImage(undefined)
-                setPicture(imageResponse.data.data)
-
-                if (tempPicture !== "default.png") {
-                    await imageAPI.put('/remove', {picture: tempPicture});
-                }
+                uploadData(imageResponse.data.data)
             } catch (err) {}
         } else {
-            try {
-                await itemsAPI.put(`/${workspaceID}?type=workspace`, {
-                    title: title,
-                    description: description,
-                    picture: picture,
-                    dataset: dataset,
-                    updated: new Date().toISOString()
-                })
-            } catch (err) {}
+            uploadData("default.png")
         }
-
-        setUpdated(new Date().toISOString())
-        setChangedSettings(false)
     }
 
-    const deleteWorkspace = async () => {
+    const uploadData = async (imageName) => {
         try {
-            await itemsAPI.delete(`/${workspaceID}`)
+            const workspaceResponse = await itemsAPI.post("/", {
+                title: title,
+                dataset: uploadedDataset._id,
+                creator: currentUser.id,
+                description: description,
+                picture: imageName,
+                upvotes: [],
+                bookmarks: [],
+                updated: new Date().toISOString(),
+                visibility: visibility,
+                type: "workspace"
+            });
 
-            removeOpenItems(workspaceID)
-            history.replace("/home")
+            history.push(`/workspace/${workspaceResponse.data.data}`)
+        } catch (err) {}
+    }
+
+    const train = async () => {
+        try {
+            // setDisabledTrain(true)
+            setStage("train")
+    
+            const formData = new FormData();
+        
+            formData.append('epochs', configuration.epochs)
+            formData.append('training_split', configuration.training_split)
+            formData.append('validation_split', configuration.validation_split)
+            formData.append('test_split', configuration.test_split)
+            formData.append('improvement', configuration.improvement)
+            formData.append('patience', configuration.patience)
+            formData.append('batch', configuration.batch)
+            formData.append('lr_scheduler', configuration.lr_scheduler)
+            formData.append('optimiser', configuration.optimiser)
+            formData.append('loss', configuration.loss)
+            formData.append('imageFile', uploadedDataset.imageFile)
+
+            uploadedDataset.labels.map(label => {
+                formData.append('labels[]', label)
+            })
+            model.map(node => {
+                formData.append('activations[]', node.activation)
+                formData.append('units[]', node.value)
+            })
+
+            const response = await trainAPI.post("", formData);
+
+            if (response) {
+                setResults(response)
+                setStage("evaluation")
+            } else {
+                setDisabledTrain(false)
+            }
         } catch (err) {}
     }
 
     return (
         <>
-            {loaded && exist ?
-                <div className="width-body">  
-                    <div className="item-body">
-                        <div className="item-top">
-                            <img className="item-picture" src={`http://localhost:4000/images/${picture}`} />
-                            {workspace.self && 
-                                <input className="item-image-input"
-                                        type="file" 
-                                        name="image" 
-                                        onChange={e => {
-                                            setImage(e.target.files[0])
-                                            {!changedSettings && setChangedSettings(true)}
-                                        }} />
-                            }
-                            <div className="item-heading">
-                                {workspace.self ? 
-                                    <>
-                                        <img src="http://localhost:3000/workspace.png" />
-                                        <input className="item-title-input"
-                                                placeholder="Title" 
-                                                value={title}
-                                                onChange={e => {
-                                                    setTitle(e.target.value)
-                                                    {!changedSettings && setChangedSettings(true)}
-                                                }} /> 
-                                    </>
-                                : 
-                                    <>
-                                        <img src="http://localhost:3000/workspace.png" />
-                                        <h1>{workspace.title}</h1>
-                                    </>
-                                }
-                            </div>
-                            <div>
-                                {!workspace.self && <p className="item-meta">{workspace.creatorName.name}</p>}
-                                <p className="item-meta">{date}</p>
-                                <span />
-                                <Link to={`/dataset/${dataset}`} className="workspace-dataset-link">View Dataset</Link>
-                                {!workspace.self && <BookmarkIcon className={`item-icon ${bookmarked ? "blue" : "grey"}`} onClick={() => {updateBookmark()}} />}
-                                {workspace.self && 
-                                    <>
-                                        {visibility ? 
-                                            <VisibilityIcon className="item-visibility" onClick={() => {updateVisibility()}} />
-                                        :
-                                            <VisibilityOffIcon className="item-visibility" onClick={() => {updateVisibility()}} />
-                                        }
-                                    </>
-                                }
-                                <ThumbUpIcon className={`item-icon ${upvoted ? "blue" : "grey"}`} onClick={() => {updateUpvote()}} />
-                                <p className={`item-upvotes ${upvoted ? "blue" : "grey"}`}>{upvotes}</p>
-                            </div>
-                            {workspace.self ? 
-                                <>
-                                    <textarea className="item-description-input"
-                                                placeholder="Description" 
-                                                value={description}
-                                                onChange={e => {
-                                                    setDescription(e.target.value)
-                                                    {!changedSettings && setChangedSettings(true)}
-                                                }} /> 
-                                    <div className="item-middle">
-                                        <button className="dark-grey-button item-delete"
-                                                onClick={() => {deleteWorkspace()}}>Delete</button>
-                                        <button className={`item-save ${!changedSettings ? "grey-button" : "blue-button"}`}
-                                                disabled={!changedSettings}
-                                                onClick={() => {updateWorkspace()}}>Save Changes</button>
-                                    </div>
-                                </>
-                            : 
-                                <p className="item-description">{workspace.description}</p>
-                            }
-                            <select className="item-select" onChange={e => {setSection(e.target.value)}}>
-                                <option value="experiments">Experiments</option>
-                                <option value="data">Data</option>
-                                <option value="comments">Comments</option>
-                            </select>
+            {loaded &&
+                <div className="main-body">
+                    <div className="sidebar">
+                        <input className="create-item-title"
+                                placeholder="Title"
+                                onChange={e => {setTitle(e.target.value)}}
+                                value={title} />
+                        <textarea className="create-item-description"
+                                    placeholder="Description"
+                                    onChange={e => {setDescription(e.target.value)}}
+                                    value={description} />
+                        <div className="create-item-setup">
+                            <label className="create-item-setup-label">Picture</label>
+                            <input className="create-item-setup-input"
+                                    type="file" 
+                                    name="image" 
+                                    onChange={e => {setImage(e.target.files[0])}} />
                         </div>
-                        <div className="item-bottom">
-                            {section === "experiments" ? 
-                                <div className="item-experiments">
-                                    <div className="item-experiments-middle">
-                                        <p>{`${experiments.length} Experiments`}</p>
-                                        {workspace.self && <Link className="blue-button item-experiments-create" to={`${workspaceID}/create-experiment`}>Create Experiment</Link>}
-                                    </div> 
-                                    <div className="item-experiments-list">
-                                            {experiments.map((experiment, i) => {
-                                                if (currentUser.id === workspace.creator) return <ExperimentCard experiment={experiment.experiments} created={true} workspaceID={workspaceID} key={i} />
-
-                                                return <ExperimentCard experiment={experiment.experiments} created={false} workspaceID={workspaceID} key={i} />
-                                            })}
-                                        </div>
-                                    {experiments.length >= 0 && finishedExperiments ?
-                                        <p className="end-items">No more experiments</p>
-                                        :
-                                        <p className="load-items" onClick={() => {loadMore()}}>Load more</p>
-                                    }
+                        <div className="create-item-setup">
+                            <label className="create-item-setup-label">Public?</label>
+                            <input type="checkbox" 
+                                    onChange={() => {setVisibility(previous => !previous)}}
+                                    checked={visibility} />
+                        </div>
+                        <div className="sidebar-divided" />
+                        <input className="create-workspace-import-existing"
+                                placeholder="Dataset ID"
+                                onChange={e => {setDatasetID(e.target.value)}}
+                                onKeyPress={searchFunctionKey}
+                                value={datasetID} />
+                        <button className="create-item-view-dataset"
+                                onClick={() => {setViewDataset(state => !state)}}>View Dataset</button>
+                        {displayPublic && <p className="create-item-data-notification">Dataset not public</p>}
+                        {displayExist && <p className="create-item-data-notification">Dataset does not exist</p>}
+                    </div>
+                    <div className="inner">
+                        {type === "create" &&
+                            <>
+                                <div className="view-items-top">
+                                    <h1>Create Workspace</h1>
+                                    <span />
+                                    <button className="blue-button"
+                                            disabled={disableTrain}
+                                            onClick={() => {uploadImage()}}>Train</button>
                                 </div>
-                            : section === "data" ?
-                                <>
-                                    {noData ?
-                                        <p className="end-items">Cannot find dataset</p>
-                                    :   
-                                        <>
-                                            {workspace.self && 
-                                                <div className="item-options">
-                                                    <p>Change Dataset</p>
-                                                    <input className="workspace-replace-input"
-                                                            placeholder="Data ID"
-                                                            onChange={e => {setDataID(e.target.value)}}
-                                                            value={dataID} />
-                                                    <button className="white-button item-replace-button"
-                                                            onClick={() => {
-                                                                setDataID(undefined)
-                                                                setChangedData(false)
-                                                            }}
-                                                            disabled={!changedData}>Clear</button>
-                                                    <button className="blue-button item-replace-button"
-                                                            disabled={dataID === ""}
-                                                            onClick={() => {existingWorkspace()}}>Import</button>
-                                                    {displayPublic && <p className="create-item-data-public">Dataset not public</p>}
-                                                    {displayExist && <p className="create-item-data-public">Dataset does not exist</p>}
-                                                </div>
-                                            }
-                                            <div className="item-data-pagination">
-                                                {workspace.dataset.dataType ==="value" &&
-                                                    <>
-                                                        <input placeholder="Row number" value={row} onChange={e => {setRow(e.target.value)}} />
-                                                        <button onClick={() => {cancelRow()}} className="white-button item-data-cancel-find">Cancel</button>
-                                                        <button onClick={() => {fetchRow()}} className="blue-button item-data-find">Find</button>
-                                                    </>
-                                                }
-                                                <span />
-                                                <ArrowBackIosNewIcon className="item-data-pagination-icon" onClick={() => {previousPage()}} />
-                                                {workspace.dataset.dataType ==="value" ?
-                                                    <p>Page {page} / {Math.ceil(maxRows/30)}</p>
-                                                :
-                                                    <p>Page {page} / {Math.ceil(images.length/30)}</p>
-                                                }
-                                                <ArrowForwardIosIcon className="item-data-pagination-icon" onClick={() => {nextPage()}} />
+                                {model.length !== 0 ?
+                                    <div className="create-modelling-body">
+                                        <div className="create-model">
+                                            <div className="create-model-diagram" key={refreshDiagram}>
+                                                {model.map((node, i) => {
+                                                    return (
+                                                        <div key={i}>
+                                                            <div className={"create-model-diagram-node"}>
+                                                                <div onClick={() => {setSelectedNode(i)}}>
+                                                                    <ModelNode setSelectedNode={setSelectedNode} type={node.type} value={node.value} selected={i === selectedNode} last={i === model.length-1} />
+                                                                </div>
+                                                                {node.type !== "Input" &&
+                                                                    <div onClick={() => {{selectedNode === i ?
+                                                                                            setSelectedNode(state => state-1)
+                                                                                        : selectedNode < i ?
+                                                                                            setSelectedNode(state => state)
+                                                                                        : selectedNode > i &&
+                                                                                            <>
+                                                                                                {selectedNode-i === 1 ?
+                                                                                                    setSelectedNode(state => state-1)
+                                                                                                :
+                                                                                                    setSelectedNode(i)
+                                                                                                } 
+                                                                                            </>  
+                                                                                        }
+                                                                                        model.splice(i, 1)
+                                                                                        setRefreshDiagram(new Date().getTime())}}>
+                                                                        <ClearIcon className="create-model-diagram-remove" />
+                                                                    </div>
+                                                                }
+                                                            </div>
+                                                            {i === model.length-1 && node.type !== "Output" &&
+                                                                <>
+                                                                    {addNode ?
+                                                                        <div className="create-model-diagram-add">
+                                                                            <div onClick={() => {setAddNode(false)}}>
+                                                                                <RemoveIcon className="create-model-diagram-add-icon" />
+                                                                            </div>
+                                                                            <div className="create-model-diagram-add-options">
+                                                                                <button onClick={() => {setModel(state => [...state, {
+                                                                                    type: "Dense",
+                                                                                    value: 0,
+                                                                                    activation: ""
+                                                                                }])
+                                                                                setSelectedNode(model.length)
+                                                                                setAddNode(false)
+                                                                                }}>Dense</button>
+                                                                                {model.length > 1 &&
+                                                                                    <button onClick={() => {
+                                                                                        {uploadedDataset.labels.length === 2 ?
+                                                                                            setModel(state => [...state, {
+                                                                                                type: "Output",
+                                                                                                value: 1,
+                                                                                                activation: ""
+                                                                                            }])
+                                                                                        :
+                                                                                            setModel(state => [...state, {
+                                                                                                type: "Output",
+                                                                                                value: uploadedDataset.labels.length,
+                                                                                                activation: ""
+                                                                                            }])
+                                                                                        }
+                                                                                    setSelectedNode(model.length)
+                                                                                    setAddNode(false)
+                                                                                    }}>Output</button>
+                                                                                }
+                                                                            </div>
+                                                                        </div>
+                                                                    :
+                                                                        <div onClick={() => {setAddNode(true)}}>
+                                                                            <AddIcon className="create-model-diagram-add-icon" />
+                                                                        </div>
+                                                                    }
+                                                                </>
+                                                            }
+                                                        </div>
+                                                    )
+                                                })}
+                                                <div ref={modelRef} />
                                             </div>
-                                            {workspace.dataset.dataType ==="value" ?
-                                                <div className="item-data-table">
-                                                    <DataTable dataTable={dataTable} start={start} end={end} key={refreshData} />
+                                        </div>
+                                        <div>
+                                            <div className="create-model-selected">
+                                                <p>{model[selectedNode].type}</p>
+                                                <label>Units</label>
+                                                <input value={model[selectedNode].value} 
+                                                        disabled={model[selectedNode].type === "Input" || model[selectedNode].type === "Output"}
+                                                        onChange={e => {setModel(state => {
+                                                                            const stateCopy = [...state]
+                                                                        
+                                                                            stateCopy[selectedNode] = {
+                                                                                ...stateCopy[selectedNode],
+                                                                                value: Number(e.target.value)
+                                                                            }
+                                                                        
+                                                                            return stateCopy
+                                                                        })
+                                                                        setRefreshDiagram(new Date().getTime())}} />
+                                                {model[selectedNode].type !== "Input" &&
+                                                    <>
+                                                        <label>Activation</label>
+                                                        <select value={model[selectedNode].activation} 
+                                                                onChange={e => {setModel(state => {
+                                                                                    const stateCopy = [...state]
+                                                                                
+                                                                                    stateCopy[selectedNode] = {
+                                                                                        ...stateCopy[selectedNode],
+                                                                                        activation: e.target.value
+                                                                                    }
+                                                                                
+                                                                                    return stateCopy
+                                                                                })
+                                                                                setRefreshDiagram(new Date().getTime())}}>
+                                                                <option disabled defaultValue value=""></option>
+                                                                <option value="sigmoid">Sigmoid</option>
+                                                                <option value="softmax">Softmax</option>
+                                                                <option value="softplus">Softplus</option>
+                                                                <option value="softsign">Softsign</option>
+                                                                <option value="swish">Swish</option>
+                                                                <option value="selu">Selu</option>
+                                                                <option value="tanh">Tanh</option>
+                                                                <option value="elu">Elu</option>
+                                                                <option value="exponential">Exponential</option>
+                                                                <option value="gelu">Gelu</option>
+                                                                <option value="hard_sigmoid">Hard Sigmoid</option>
+                                                                <option value="linear">Linear</option>
+                                                                <option value="relu">Relu</option>
+                                                        </select>
+                                                    </>
+                                                }  
+                                            </div>
+                                            <div className="create-model-configuration">
+                                                <div className="create-model-configuration-option">
+                                                    <div>
+                                                        <label>Epochs</label>
+                                                        <input value={configuration.epochs} onChange={e => {setConfiguration(state => ({
+                                                                                                                ...state,
+                                                                                                                epochs: e.target.value
+                                                                                                            }))}} />
+                                                    </div>
+                                                    <div>
+                                                        <label>Training Split</label>
+                                                        <input value={configuration.training_split} onChange={e => {setConfiguration(state => ({
+                                                                                                                ...state,
+                                                                                                                training_split: e.target.value
+                                                                                                            }))}} />
+                                                    </div>
+                                                    <div>
+                                                        <label>Validation Split</label>
+                                                        <input value={configuration.validation_split} onChange={e => {setConfiguration(state => ({
+                                                                                                                ...state,
+                                                                                                                validation_split: e.target.value
+                                                                                                            }))}} />
+                                                    </div>
+                                                    <div>
+                                                        <label>Test Split</label>
+                                                        <input value={configuration.test_split} onChange={e => {setConfiguration(state => ({
+                                                                                                                ...state,
+                                                                                                                test_split: e.target.value
+                                                                                                            }))}} />
+                                                    </div>
+                                                    <div>
+                                                        <label>Minimum Improvement</label>
+                                                        <input value={configuration.improvement} onChange={e => {setConfiguration(state => ({
+                                                                                                                ...state,
+                                                                                                                improvement: e.target.value
+                                                                                                            }))}} />
+                                                    </div>
+                                                    <div>
+                                                        <label>Patience</label>
+                                                        <input value={configuration.patience} onChange={e => {setConfiguration(state => ({
+                                                                                                                ...state,
+                                                                                                                patience: e.target.value
+                                                                                                            }))}} />
+                                                    </div>
+                                                    <div>
+                                                        <label>Batch Size</label>
+                                                        <input value={configuration.batch} onChange={e => {setConfiguration(state => ({
+                                                                                                                ...state,
+                                                                                                                batch: e.target.value
+                                                                                                            }))}} />
+                                                    </div>
+                                                    <div>
+                                                        <label>Learning Rate Scheduler</label>
+                                                        <input className="create-model-configuration-option-checkbox"
+                                                                type="checkbox" 
+                                                                onChange={e => {setConfiguration(state => ({
+                                                                    ...state,
+                                                                    lr_scheduler: !configuration.lr_scheduler
+                                                                }))}}
+                                                                checked={configuration.lr_scheduler} />
+                                                    </div>
+                                                    <div>
+                                                        <label>Optimiser</label>
+                                                        <select value={configuration.optimiser} onChange={e => {setConfiguration(state => ({
+                                                                                                                ...state,
+                                                                                                                optimiser: e.target.value
+                                                                                                            }))}}>
+                                                            <option disabled defaultValue value=""></option>
+                                                            <option value="Adadelta">Adadelta</option>
+                                                            <option value="Adagrad">Adagrad</option>
+                                                            <option value="Adam">Adam</option>
+                                                            <option value="Adamax">Adamax</option>
+                                                            <option value="Ftrl">Ftrl</option>
+                                                            <option value="Nadam">Nadam</option>
+                                                            <option value="RMSprop">RMSprop</option>
+                                                            <option value="SGD">SGD</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label>Loss</label>
+                                                        <select value={configuration.loss} onChange={e => {setConfiguration(state => ({
+                                                                                                                ...state,
+                                                                                                                loss: e.target.value
+                                                                                                            }))}}>
+                                                            <option disabled defaultValue value=""></option>
+                                                            {uploadedDataset.labels.length === 2 &&
+                                                                <>
+                                                                    <option value="binary_crossentropy">Binary Crossentropy</option>
+                                                                    <option value="hinge">Hinge</option>
+                                                                    <option value="squared_hinge">Squared Hinge</option>
+                                                                </>
+                                                            }
+                                                            {uploadedDataset.labels.length > 2 &&
+                                                                <>
+                                                                    <option value="categorical_crossentropy">Categorical Crossentropy</option>
+                                                                    <option value="sparse_categorical_crossentropy">Sparse Categorical Crossentropy</option>
+                                                                    <option value="kl_divergence">Kullback Leibler Divergence</option>
+                                                                </>
+                                                            }
+                                                        </select>
+                                                    </div>
                                                 </div>
-                                            :
-                                                <div className="item-data-images" key={refreshData}>
+                                            </div>
+                                        </div>
+                                        {viewDataset && uploadedDataset &&
+                                            <div className="create-model-data">
+                                                <p className="create-item-data-header-file">Dataset: {uploadedDataset._id}</p>
+                                                <div className="create-model-data-images-list" key={refreshData}>
                                                     {images.map((image, i) => {
                                                         if (i >= start && i < end) {
                                                             return (
-                                                                <div className="item-data-images-list" key={i}>
+                                                                <div className="create-model-data-image" key={i}>
                                                                     <div>
-                                                                        <img src={`http://127.0.0.1:5000/files/${workspace.dataset.datafile}/${image}.jpg`} />
+                                                                        <img src={`http://127.0.0.1:5000/files/${uploadedDataset.imageFile}/${image}.jpg`} />
                                                                         <p>{assignedLabels[i]}</p>
                                                                     </div>
                                                                 </div>
@@ -521,46 +509,22 @@ const Workspace = ({currentUser}) => {
                                                         }
                                                     })}
                                                 </div>
-                                            }
-                                        </>
-                                    }
-                                </>
-                            : 
-                                <>
-                                    <form className="item-comment-form" method="PUT" onSubmit={addComment}>
-                                        <p className="item-comment">Leave a Comment</p>
-                                        <textarea className="item-comment-input" placeholder="Write here" value={comment} onChange={e => {setComment(e.target.value)}} />
-                                        <button className="blue-button">Comment</button>
-                                    </form>
-                                    <div className="item-comments">
-                                        {comments.length === 0 ?
-                                            <p className="end-items">No comments</p>
-                                            :
-                                            <>
-                                                {comments.map((comment, i) => {
-                                                    return (
-                                                        <div className="comment-card" key={i}>
-                                                            <div>
-                                                                <p className="comment-card-user">{comment.user}</p>
-                                                                <p className="comment-card-date">{commentDate(comment.createdAt)}</p>
-                                                            </div>
-                                                            <p className="comment-card-comment">{comment.comment}</p>
-                                                        </div>
-                                                    )
-                                                })}
-                                            </>
+                                                <div className="create-model-data-pagination">
+                                                    <ArrowBackIosNewIcon className="create-model-data-pagination-icon" onClick={() => {previousPage()}} />
+                                                    <p>Page {page} / {Math.ceil(images.length/20)}</p>
+                                                    <ArrowForwardIosIcon className="create-model-data-pagination-icon" onClick={() => {nextPage()}} />
+                                                </div>
+                                            </div>
                                         }
                                     </div>
-                                </>
-                            }
-                        </div>
+                                :
+                                    <p className="end-items">Upload a dataset...</p>
+                                }
+                            </>
+                        }
                     </div>
                 </div>
-            : loaded && !exist &&
-                <div className="width-body">  
-                    <p className="item-exist">Cannot find workspace</p>
-                </div>
-            }   
+            }
         </>
     )
 }

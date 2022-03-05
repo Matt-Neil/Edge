@@ -25,7 +25,7 @@
             .experiment-back-icon {
                 font-size: 25px;
                 margin: 0 12px 0 0;
-                color: $dark-grey1;
+                color: $grey1;
                 cursor: pointer;
             }
             .item-title-input {
@@ -51,19 +51,19 @@
                 font-weight: 500;
                 font-size: 14px;
                 text-decoration: none;
-                color: $dark-grey1;
+                color: $grey1;
                 font-family: 'Poppins', sans-serif;
                 cursor: pointer;
             }
             .item-visibility {
-                color: $dark-grey1;
+                color: $grey1;
                 font-size: 26px;
                 margin: 0 5px 0 0;
                 cursor: pointer;
             }
             .item-meta {
                 margin: 0 20px 0 0;
-                color: $dark-grey2;
+                color: $grey2;
                 font-size: 12px;
             }
             span {
@@ -107,13 +107,13 @@
             font-size: 13px;
             margin: 25px 0 40px 0;
             letter-spacing: 0.05mm;
-            color: $dark-grey1;
+            color: $grey1;
         }
         .item-select {
             width: fit-content;
             padding: 5px 10px 5px 5px;
             border-radius: 5px;
-            border: 1px solid $mid-grey2;
+            border: 1px solid $grey2;
             background-color: white;
             margin: 40px 0 0 0;
         }
@@ -204,7 +204,7 @@
                 margin: 0 20px 0 0;
                 font-weight: 500;
                 font-size: 14px;
-                color: $dark-grey1;
+                color: $grey1;
             }
             .workspace-replace-input {
                 margin: 0 15px 0 0;
@@ -228,14 +228,14 @@
                 height: 30px;
                 width: 110px;
                 border-radius: 7px;
-                border: 1px solid $mid-grey2;
+                border: 1px solid $grey2;
                 background-color: white;
                 margin: 0 20px 0 auto;
 
                 p {
                     margin: 0 auto 0 7px;
                     font-size: 12px;
-                    color: $dark-grey1;
+                    color: $grey1;
                     @include not-selectable();
                 }
                 button {
@@ -243,8 +243,8 @@
                     align-items: center;
                     height: 30px;
                     width: 30px;
-                    background-color: $light-grey1;
-                    border-left: 1px solid $mid-grey2;
+                    background-color: $grey1;
+                    border-left: 1px solid $grey2;
                     border-top: none;
                     border-right: none;
                     border-bottom: none;
@@ -255,7 +255,7 @@
                     .dataset-copy-icon {
                         margin: 0 0 0 4px;
                         font-size: 14px;
-                        color: $dark-grey1;
+                        color: $grey1;
                     }
                 }
             }
@@ -311,14 +311,14 @@
                     height: 30px;
                     margin: 0 10px 0 0;
                     padding: 0 7px;
-                    background-color: $light-grey2;
-                    border: 1px $mid-grey2 solid;
+                    background-color: $grey2;
+                    border: 1px $grey2 solid;
                     border-radius: 10px;
 
                     p {
                         margin: 0 8px 0 0;
                         font-size: 12px;
-                        color: $dark-grey1;
+                        color: $grey1;
                     }
                     div {
                         display: flex;
@@ -335,7 +335,7 @@
                     }
                     .item-created-label-close {
                         font-size: 14px;
-                        color: $dark-grey1;
+                        color: $grey1;
                     }
                     .item-created-label-close:hover {
                         color: $blue2;
@@ -347,7 +347,7 @@
             margin: 0 0 30px 0;
             overflow-y: auto;
             min-height: 100vh;
-            border: 1px solid $mid-grey2;
+            border: 1px solid $grey2;
         }.create-dataset-labels-row {
             display: flex;
             align-items: center;
@@ -386,14 +386,14 @@
                     height: 30px;
                     margin: 0 10px 0 0;
                     padding: 0 7px;
-                    background-color: $light-grey2;
-                    border: 1px $mid-grey2 solid;
+                    background-color: $grey2;
+                    border: 1px $grey2 solid;
                     border-radius: 10px;
 
                     p {
                         margin: 0 8px 0 0;
                         font-size: 12px;
-                        color: $dark-grey1;
+                        color: $grey1;
                     }
                     div {
                         display: flex;
@@ -410,7 +410,7 @@
                     }
                     .create-dataset-created-label-close {
                         font-size: 14px;
-                        color: $dark-grey1;
+                        color: $grey1;
                     }
                     .create-dataset-created-label-close:hover {
                         color: $blue2;
@@ -437,8 +437,8 @@
                     height: 250px;
                     width: 200px;
                     border-radius: 10px;
-                    background-color: $light-grey2;
-                    border: 1px $mid-grey2 solid;
+                    background-color: $grey2;
+                    border: 1px $grey2 solid;
 
                     img {
                         height: auto;
@@ -455,7 +455,7 @@
                         padding: 0 5px;
                         border-radius: 10px;
                         background-color: white;
-                        border: 1px solid $mid-grey2;
+                        border: 1px solid $grey2;
                     }
                     p {
                         width: calc(100% - 28px);
@@ -466,7 +466,7 @@
                         line-height: 30px;
                         border-radius: 10px;
                         background-color: white;
-                        border: 1px solid $mid-grey2;
+                        border: 1px solid $grey2;
                     }
                 }
             }
@@ -478,7 +478,7 @@
            
             .item-data-pagination-icon {
                 font-size: 14px;
-                border: 1px solid $mid-grey2;
+                border: 1px solid $grey2;
                 background-color: white;
                 padding: 5px;
                 border-radius: 15px;
@@ -486,16 +486,16 @@
             }
             p {
                 font-size: 12px;
-                color: $dark-grey1; 
+                color: $grey1; 
                 margin: 0 20px;
             }
             input {
                 margin: 0 15px 0 0;
                 height: 30px;
                 padding: 0 10px;
-                border: 1px solid $mid-grey2;
+                border: 1px solid $grey2;
                 border-radius: 10px;
-                background-color: $light-grey2;
+                background-color: $grey2;
             }
             .item-data-find {
                 height: 30px;
@@ -510,7 +510,7 @@
             }
             .item-data-information-label {
                 font-size: 14px;
-                color: $dark-grey1;
+                color: $grey1;
                 margin: 0 25px 0 0;
             }
             select {
@@ -519,7 +519,7 @@
                 width: 150px;
                 border-radius: 10px;
                 background-color: white;
-                border: 1px solid $mid-grey2;
+                border: 1px solid $grey2;
             }
             span {
                 flex: 1;

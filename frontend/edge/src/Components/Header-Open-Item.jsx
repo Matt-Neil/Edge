@@ -23,13 +23,12 @@ const HeaderOpenItems = ({item}) => {
     }
 
     return (
-        <div className="item-header">
+        <div  className={`item-header ${checkCurrent() && "item-header-selected"}`}>
             {item.type === "workspace" ? <img src="http://localhost:3000/workspace.png" /> : <img src="http://localhost:3000/dataset.png" />}
             <Link to={item.type === "workspace" ? `/workspace/${item.id}` : `/dataset/${item.id}`} className="item-header-link">
-                <p className={`item-header-title ${checkCurrent() ? "item-header-title-selected" : "item-header-title-unselected"}`}>{item.title}</p>
+                <p className="item-header-title">{item.title}</p>
             </Link>
-            <CloseIcon className={`item-header-close ${checkCurrent() && "blue"}`}
-                        onClick={() => {closeItem()}} />
+            <CloseIcon className="item-header-close" onClick={() => {closeItem()}} />
         </div>
     )
 }

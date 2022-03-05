@@ -107,7 +107,7 @@ exports.getBookmarked = async (req, res, next) => {
                     'creator': 1,
                     'title': 1,
                     'picture': 1,
-                    'bookmarks': { $in: [res.locals.currentUser._id, '$bookmarks'] },
+                    'bookmarked': { $in: [res.locals.currentUser._id, '$bookmarks'] },
                     'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
                     'upvotes': { $size: '$upvotes' },
                     'updated': 1,
@@ -122,7 +122,7 @@ exports.getBookmarked = async (req, res, next) => {
                             page: true
                         },
                         {
-                            bookmarks: true
+                            bookmarked: true
                         }
                     ]
                 }
@@ -158,13 +158,13 @@ exports.getBookmarkedShortcut = async (req, res, next) => {
                     '_id': 1,
                     'title': 1,
                     'picture': 1,
-                    'bookmarks': { $in: [res.locals.currentUser._id, '$bookmarks'] },
+                    'bookmarked': { $in: [res.locals.currentUser._id, '$bookmarks'] },
                     'updated': 1,
                     'type': 1
                 }
             }, {
                 $match: {
-                    bookmarks: true
+                    bookmarked: true
                 }
             }, { 
                 $sort: { 

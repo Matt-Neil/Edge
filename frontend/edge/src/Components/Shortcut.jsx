@@ -18,8 +18,8 @@ const Shortcut = ({type, currentUserID}) => {
                     items = await usersAPI.get(`/created-shortcut?type=workspace`);
                 } else if (type === "datasets") {
                     items = await usersAPI.get(`/created-shortcut?type=dataset`);
-                } else if (type === "bookmarked") {
-                    items = await usersAPI.get(`/bookmarked`);
+                } else {
+                    items = await usersAPI.get(`/bookmarked-shortcut`);
                 }
 
                 setItems(items.data.data)
@@ -38,29 +38,33 @@ const Shortcut = ({type, currentUserID}) => {
     return (
         <>
             {loaded &&
-                <div className="shortcut-items-container">
-                    <div className="shortcut-items-heading">
-                        <p>{type === "workspaces" ? "Created Workspaces" : (type === "datasets") ? "Created Datasets" : "Bookmarked"}</p>
+                <div className="shortcut">
+                    <div className="shortcut-header">
+                        <Link className="shortcut-link"
+                                to={type === "workspaces" ? "/created-workspaces" : (type === "datasets") ? "/created-datasets" : "/bookmarked"}>
+                            {type === "workspaces" ? "Your Workspaces" : (type === "datasets") ? "Your Datasets" : "Your Bookmarked"}
+                        </Link>
+                        <span />
                         {type === "workspaces" && 
                             <Link to="/create-workspace">
-                                <AddIcon className="shortcut-items-create-item-icon" />
+                                <AddIcon className="shortcut-icon" />
                             </Link>
                         }
                         {type === "datasets" && 
                             <Link to="/create-dataset">
-                                <AddIcon className="shortcut-items-create-item-icon" />
+                                <AddIcon className="shortcut-icon" />
                             </Link>
                         }
                     </div>
-                    <div className="shortcut-items-list">
+                    <div className="shortcut-body">
                         {items.length === 0 ?
-                            <p className="shortcut-items-list-none">Empty</p>
+                            <p className="shortcut-none">Empty</p>
                         :
                             <>
                                 {items.map((item, i) => {
                                     return (
                                         <Link to={item.type === "workspace" ? `/workspace/${item._id}` : `/dataset/${item._id}`}
-                                                className="shortcut-list-item" 
+                                                className="shortcut-item" 
                                                 onClick={() => {addHeader(item)}}
                                                 key={i}>
                                             <img src={`http://localhost:4000/images/${item.picture}`} />
@@ -68,8 +72,6 @@ const Shortcut = ({type, currentUserID}) => {
                                         </Link>
                                     )
                                 })}
-                                <Link to={type === "workspaces" ? "/created-workspaces" : (type === "datasets") ? "/created-datasets" : "/bookmarked"}
-                                        className="shortcut-items-all">See All</Link>
                             </>
                         }
                     </div>

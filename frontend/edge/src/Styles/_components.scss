@@ -1,49 +1,8 @@
-.data-table {
-    border-collapse: collapse;
-    font-family: 'Poppins', sans-serif;
-    width: 100%;
-
-    td, th {
-        min-width: 70px;
-        text-align: left;
-        overflow-x: auto;
-    }
-    td:not(:last-child) {
-        border-right: 1px $mid-grey2 solid;
-        border-top: 1px $mid-grey2 solid;
-    }
-    th:not(:last-child) {
-        border-right: 1px $mid-grey2 solid;
-        border-bottom: 1px $mid-grey2 solid;
-    }
-    td:last-child {
-        border-left: 1px $mid-grey2 solid;
-        border-top: 1px $mid-grey2 solid;
-    }
-    th:last-child {
-        border-left: 1px $mid-grey2 solid;
-        border-bottom: 1px $mid-grey2 solid;
-    }
-    th {
-        font-size: 12px;
-        height: 20px;
-        padding: 8px;
-    }
-    td {
-        font-size: 10px;
-        height: 15px;
-        padding: 5px;
-    }
-    tr:nth-child(even) {
-        background-color: #F4F4F4;
-    }
-}
-
 .item-header {
     display: flex;
     align-items: center;
-    min-width: 140px;
-    margin: 5px 10px 5px 0;
+    min-width: 170px;
+    margin: 5px 5px 5px 0;
     height: 30px;
     border-radius: 5px;
     cursor: pointer;
@@ -55,26 +14,26 @@
     }
     .item-header-link {
         text-decoration: none;
-        width: 80px;
+        width: 110px;
         margin: 0 20px 0 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        line-clamp: 1; 
+        -webkit-box-orient: vertical;
 
         .item-header-title {
             padding: 0 0 0 8px;
             font-size: 12px;
-            width: 80px;
-            overflow: hidden;
-            white-space: nowrap;
+            width: 110px;
+            color: $grey6;
             cursor: pointer;
-        }
-        .item-header-title-selected {
-            color: $blue1;
-        }
-        .item-header-title-unselected {
-            color: $dark-grey1;
         }
     }
     .item-header-close {
         font-size: 14px;
+        color: $grey1;
         cursor: pointer;
     }
     .item-header-close:hover {
@@ -82,11 +41,12 @@
         border-radius: 10px;
     }
 }
-
-.item-header:hover {
-    background-color: $light-grey1;
+.item-header-selected {
+    background-color: $grey4;
 }
-
+.item-header:hover {
+    background-color: $grey4;
+}
 .model {
     div {
         display: flex;
@@ -95,56 +55,87 @@
         .model-configuration {
             width: 200px;
             font-size: 12px;
-            color: $dark-grey1;
+            color: $grey1;
         }
         .model-value {
             width: 50px;
             height: 30px;
             border-radius: 10px;
-            border: 1px $mid-grey2 solid;
-            background-color: $light-grey1;
+            border: 1px $grey2 solid;
+            background-color: $grey1;
             text-align: center;
             line-height: 35px;
             font-size: 12px;
         }
     }
 }
-
-.item-feed-card-card {
+.create-item-data-header-file {
+    color: $grey5;
+    font-size: 14px;
+}
+.create-item-data-pagination {
     display: flex;
-    
-    .item-feed-card-bar {
-        height: 405px;
-        margin: 0 20px 0 0; 
-        @include not-selectable();
-    }
-    .item-feed-card-body {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        margin: 15px 0;
-        border-radius: 10px;
+    align-items: center;
+    justify-content: flex-end;
 
-        .item-feed-card-picture {
-            height: 200px;
-            width: 100%;
-            border-radius: 10px;
-            object-fit: cover;
+    p {
+        color: $grey7;
+        font-size: 12px;
+        margin: 0 10px;
+    }
+    .create-item-data-pagination-icon {
+        color: $grey7;
+        font-size: 14px;
+        cursor: pointer;
+    }
+}
+.shortcut {
+    display: flex;
+    flex-direction: column;
+    margin: 0 15px;
+    height: fit-content;
+    text-decoration: none;
+    color: $grey7;
+    font-family: 'Poppins', sans-serif;
+    padding: 20px 15px 15px 15px;
+    border-radius: 10px;
+
+    .shortcut-header {
+        display: flex;
+        align-items: center;
+
+        .shortcut-link {
+            text-decoration: none;
+            color: $grey7;
+            font-size: 14px;
         }
-        .item-feed-card-heading {
+        span {
+            flex: 1;
+        }
+        .shortcut-icon {
+            font-size: 18px;
+            color: $blue2;
+        }
+    }
+    .shortcut-body {
+        margin: 15px 0 0 0;
+
+        .shortcut-item {
             display: flex;
             align-items: center;
+            text-decoration: none;
+            margin: 10px 0;
 
             img {
-                height: 20px;
-                width: 20px;
+                width: 30px;
+                height: 30px;
+                object-fit: cover;
+                border-radius: 8px;
             }
-            .item-feed-card-title {
-                font-size: 24px;
-                width: fit-content;
-                margin: 10px 15px;
-                text-decoration: none;
-                color: $dark-grey1;
+            p {
+                font-size: 13px;
+                margin: 0 15px;
+                color: $grey6;
                 font-family: 'Poppins', sans-serif;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -154,136 +145,21 @@
                 -webkit-box-orient: vertical;
             }
         }
-        .item-feed-card-title:hover {
-            color: $blue1;
-        }
-        .item-feed-card-description {
-            font-size: 13px;
-            margin: 25px 15px 40px 15px;
-            letter-spacing: 0.05mm;
-            color: $dark-grey1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            line-clamp: 2; 
-            -webkit-box-orient: vertical;
-        }
-        div {
-            display: flex;
-            align-items: center;
-            margin: 0 0 0 15px;
-    
-            .item-feed-card-meta {
-                margin: 0 15px 0 0;
-                color: $dark-grey2;
-                font-size: 12px;
-            }
-            .item-feed-card-meta:nth-child(2) {
-                flex: 1;
-            }
-            .item-feed-card-upvotes {
-                margin: 0 15px 0 8px;
-                font-size: 14px;
-                cursor: default;
-                @include not-selectable()
-            }
-            .item-feed-card-icon {
-                margin: 0 0 0 15px;
-                font-size: 22px;
-                cursor: pointer;
-            }
-        }
-    }
-    .item-feed-card-body:hover {
-        background-color: $light-grey2;
     }
 }
-
-.shortcut-items-container {
-    height: fit-content;
-    background-color: $light-grey2;
-    border: 1px solid $mid-grey2;
-    border-radius: 10px;
-    margin: 0 0 20px 0;
-
-    .shortcut-items-heading {
-        display: flex;
-        align-items: center;
-        margin: 0 15px;
-        
-        p {
-            font-weight: 500;
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 1;
-            line-clamp: 1; 
-            -webkit-box-orient: vertical;
-            @include not-selectable()
-        }
-        .shortcut-items-create-item-icon {
-            font-size: 20px;
-            color: $blue1;
-        }
-    }
-    .shortcut-items-list {
-        display: flex;
-        flex-direction: column;
-        padding: 15px 0;
-        border-top: 1px solid $mid-grey2;
-
-        .shortcut-items-list-none {
-            margin: 0 0 0 15px;
-            font-size: 12px;
-        }
-        .shortcut-list-item {
-            display: flex;
-            align-items: center;
-            height: 36px;
-            margin: 7px 15px;
-            text-decoration: none;
-            
-            img {
-                height: 36px;
-                width: 36px;
-                border-radius: 5px;
-                margin: 0 15px 0 0;
-                object-fit: cover;
-            }
-            p {
-                font-size: 14px;
-                color: $dark-grey1;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                display: -webkit-box;
-                -webkit-line-clamp: 1;
-                line-clamp: 1; 
-                -webkit-box-orient: vertical;
-            }
-        }
-        .shortcut-items-all {
-            margin: 15px auto 0 auto;
-            color: $blue2;
-            text-decoration: none;
-            font-size: 14px;
-            font-family: 'Poppins', sans-serif;
-            cursor: pointer;
-        }
-    }
+.shortcut:hover {
+    background-color: $grey2;
 }
-
 .item-square-card {
     width: 300px;
     display: flex;
     flex-direction: column;
-    margin: 0 15px 30px 15px;
+    margin: 0 30px 30px 0;
     padding: 0 0 15px 0;
     border-radius: 10px;
 
     .item-square-card-picture {
-        height: 200px;
+        height: 150px;
         width: 100%;
         border-radius: 10px;
         object-fit: cover;
@@ -303,7 +179,7 @@
         .item-square-card-title {
             font-size: 18px;
             margin: 15px 0 10px 15px;
-            color: $dark-grey1;
+            color: $grey7;
             text-decoration: none;
             font-family: 'Poppins', sans-serif;
             width: fit-content;
@@ -316,7 +192,7 @@
         }
     }
     .item-square-card-title:hover {
-        color: $blue1;
+        color: $blue2;
     }
     div {
         display: flex;
@@ -325,7 +201,7 @@
 
         .item-square-card-meta {
             margin: 0 15px 0 0;
-            color: $dark-grey2;
+            color: $grey5;
             font-size: 12px;
         }
         .item-square-card-meta:nth-child(2) {
@@ -344,7 +220,7 @@
         cursor: pointer;
     }
     .item-square-card-visibility {
-        color: $dark-grey1;
+        color: $grey7;
         font-size: 20px;
         cursor: pointer;
     }
@@ -356,16 +232,14 @@
     }
 }
 .item-square-card:hover {
-    background-color: $light-grey2;
+    background-color: $grey4;
 }
-
 .item-row-card {
     width: 100%;
     height: 100px;
     display: flex;
     text-decoration: none;
     align-items: center;
-    margin: 0 15px;
     padding: 10px 15px;
     border-radius: 10px;
 
@@ -395,7 +269,7 @@
             .item-row-card-title {
                 font-size: 18px;
                 margin: 0 15px 10px 15px;
-                color: $dark-grey1;
+                color: $grey7;
                 font-family: 'Poppins', sans-serif;
                 text-decoration: none;
                 width: fit-content;
@@ -408,12 +282,12 @@
             }
         }
         .item-row-card-title:hover {
-            color: $blue1;
+            color: $blue2;
         }
         div {
             .item-row-card-meta {
                 margin: 0 20px 0 0;
-                color: $dark-grey2;
+                color: $grey5;
                 font-size: 12px;
             }
         }
@@ -435,7 +309,7 @@
             cursor: pointer;
         }
         .item-row-card-visibility {
-            color: $dark-grey1;
+            color: $grey7;
             font-size: 20px;
             margin: 0 15px 0 20px;
             cursor: pointer;
@@ -443,188 +317,7 @@
     }
 }
 .item-row-card:hover {
-    background-color: $light-grey2;
-}
-
-.experiment-modelling-body {
-    display: flex;
-    height: 640px;
-
-    .experiment-model {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        width: 70%;
-        height: calc(100% - 75px);
-        align-items: center;
-        overflow-x: hidden;
-        white-space: nowrap;
-    }
-}
-.model-diagram {
-    position: absolute;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    -ms-overflow-style: none; 
-    scrollbar-width: none;
-
-    .model-diagram-node {
-        display: flex;
-        align-items: flex-start;
-
-        .model-diagram-remove {
-            margin: 10px 0 0 8px;
-            color: $dark-grey1;
-            font-size: 12px;
-            cursor: pointer;
-        }
-    }
-    .model-diagram-add {
-        display: flex;
-        flex-direction: column;
-
-        .model-diagram-add-options {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 90px;
-            height: 90px;
-            margin: 5px 0 0 0;
-            border-radius: 10px;
-            background-color: $light-grey2;
-            border: 1px solid $mid-grey2;
-            position: relative;
-            left: 50%;
-            transform: translateX(-60%);
-
-            button {
-                width: 70px;
-                height: 30px;
-                margin: 10px 0 0 0;
-                border-radius: 10px;
-                background-color: white;
-                border: 1px solid $mid-grey2;
-                cursor: pointer;
-            }
-        }
-    }
-    .model-diagram-add-icon {
-        margin: 5px 0 0 0;
-        position: relative;
-        left: 50%;
-        transform: translateX(-105%);
-        color: white;
-        font-size: 14px;
-        border: none;
-        padding: 2px;
-        border-radius: 11px;
-        background-color: $blue1;
-        cursor: pointer;
-    }
-}
-.model-diagram::-webkit-scrollbar {
-    display: none;
-}
-.model-configuration {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    width: 30%;
-    height: fit-content;
-
-    button {
-        margin: 0 0 20px 0;
-    }
-    button:disabled {
-        cursor: not-allowed;
-    }
-    .model-configuration-option {
-        display: flex;
-        flex-direction: column;
-        max-width: 350px;
-        margin: 0 0 20px 0;
-        width: 100%;
-        height: 100%;
-        border-radius: 10px;
-        background-color: $light-grey2;
-        border: 1px solid $mid-grey2;
-
-        div {
-            display: flex;
-            align-items: center;
-
-            label {
-                font-size: 12px;
-                margin: 0 10px 0 0;
-                min-width: 125px;
-            }
-            input, select {
-                height: 30px;
-                width: 100%;
-                border-radius: 10px;
-                background-color: white;
-                border: 1px solid $mid-grey2;
-            }
-            input {
-                font-size: 12px;
-                padding: 0 10px;
-            }
-            select {
-                padding: 0 5px;
-            }
-        }
-        div:not(:last-child) {
-            margin: 15px 15px 0 15px;
-        }
-        div:last-child {
-            margin: 15px;
-        }
-    }
-    .model-selected {
-        display: flex;
-        align-items: center;
-        padding: 0 15px;
-        width: calc(100% - 30px);
-        height: 100px;
-        border-radius: 10px;
-        background-color: $light-grey2;
-        border: 1px solid $mid-grey2;
-        font-size: 14px;
-        
-        p {
-            font-weight: 500;
-            height: 100%;
-            line-height: 100px;
-            padding: 0 20px 0 0;
-            max-width: 40px;
-            min-width: 40px;
-            border-right: 1px $mid-grey2 solid;
-        }
-        div {
-            label {
-                margin: 0 10px 0 20px;
-            }
-            input, select {
-                height: 30px;
-                border-radius: 10px;
-                background-color: white;
-                border: 1px solid $mid-grey2;
-            }
-            input {
-                width: 40px;
-                padding: 0 10px;
-            }
-            select {
-                width: 100px;
-                padding: 0 5px;
-                margin: 15px 0 0 0;
-            }
-        }
-    }
+    background-color: $grey4;
 }
 .model-node {
     display: flex;
@@ -650,13 +343,14 @@
         color: white;
     }
     .model-node-unselected {
-        background-color: $light-grey2;
-        border: 1px solid $mid-grey2;
-        color: $dark-grey1;
+        background-color: $grey7;
+        border: 1px solid $grey7;
+        color: $grey1;
     }
     .model-node-value {
         font-size: 11px;
         margin: 2px 0;
+        color: $grey7;
     }
     .model-node-connector {
         height: 35px;
@@ -667,46 +361,52 @@
 .model-node-input {
     margin: 0 20px 0 0;
 }
-
-.experiment-card {
-    width: calc(100% - 30px);
-    height: 70px;
+.home-search {
     display: flex;
-    text-decoration: none;
     align-items: center;
-    padding: 10px 15px;
+    margin: 30px 15px 20px 15px;
+    height: 40px;
     border-radius: 10px;
-    
-    .experiment-card-title {
-        font-size: 18px;
-        margin: 0 25px 0 10px;
-        color: $dark-grey1;
-        font-family: 'Poppins', sans-serif;
-        text-decoration: none;
-        width: fit-content;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: -webkit-box;
-        -webkit-line-clamp: 1;
-        line-clamp: 1; 
-        -webkit-box-orient: vertical;
-        cursor: pointer;
-    }
-    .experiment-card-title:hover {
-        color: $blue1;
-    }
-    .experiment-card-date {
-        color: $dark-grey2;
+    background-color: $grey4;
+
+    .home-search-input {
+        height: 40px;
+        width: 100%;
+        border: none;
+        background: none;
+        padding: 0 10px;
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+        color: $grey7;
         font-size: 12px;
-        flex: 1;
     }
-    .experiment-card-icon {
-        color: $dark-grey1;
+    .home-search-icon {
         font-size: 20px;
-        margin: 0 10px;
+        color: $grey5;
         cursor: pointer;
+        margin: 0 10px;
     }
 }
-.experiment-card:hover {
-    background-color: $light-grey2;
+.home-options-link {
+    display: flex;
+    align-items: center;
+    margin: 0 15px;
+    min-height: 60px;
+    text-decoration: none;
+    color: $grey7;
+    font-family: 'Poppins', sans-serif;
+    padding: 0 15px;
+    border-radius: 10px;
+
+    p {
+        font-size: 14px;
+        flex: 1;
+    }
+    .home-options-icon {
+        font-size: 14px;
+        color: $blue2;
+    }
+}
+.home-options-link:hover {
+    background-color: $grey2;
 }

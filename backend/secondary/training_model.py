@@ -22,16 +22,10 @@ def model(body):
                 body['target']: target
             }
         )
-        # if len(body.getlist('labels[]')) == 2:
-        #     y = dataFrame[body['target']].apply(lambda x: 1 if x == body.getlist('labels[]')[1] else 0)
-        # else:
-        #     y = dataFrame[body['target']].apply(lambda x: body.getlist('labels[]')[x])
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=float(body['test_split'])) 
     else:
-        data = pd.read_csv('files/training_data.csv')
-
-        X = pd.get_dummies(data.drop(['Index Flood'], axis=1))
+        X = ""
         y = body.getlist('labels[]')
 
         #y_train and y_test are labels
@@ -45,7 +39,11 @@ def model(body):
     
     for i in range(1, len(body.getlist("activations[]"))):
         if i == 1:
-            model.add(Dense(units=int(body.getlist("units[]")[i]), activation=body.getlist("activations[]")[i], input_dim=len(X_train.columns)))
+            if body['dataType'] == "value":
+                model.add(Dense(units=int(body.getlist("units[]")[i]), activation=body.getlist("activations[]")[i], input_dim=len(X_train.columns)))
+            else:
+                model.add(Flatten(input_shape(28, 28))) 
+                model.add(Dense(units=int(body.getlist("units[]")[i]), activation=body.getlist("activations[]")[i]))
         else:
             model.add(Dense(units=int(body.getlist("units[]")[i]), activation=body.getlist("activations[]")[i]))
 
