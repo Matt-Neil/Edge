@@ -1,20 +1,17 @@
 .create-item-title {
-    margin: 30px 15px 15px 15px;
     min-height: 40px;
     border: none;
-    background-color: $grey4;
-    padding: 0 10px;
-    border-radius: 10px;
+    background: none;
     color: $grey7;
-    font-size: 12px;
+    font-size: 18px;
+    overflow-x: auto;
+    margin: 5px 15px 0 15px;
 }
 .create-item-description {
     margin: 15px;
-    min-height: 150px;
+    min-height: fit-content;
     border: none;
-    background-color: $grey4;
-    padding: 10px;
-    border-radius: 10px;
+    background: none;
     color: $grey7;
     font-size: 12px;
     resize: none;
@@ -39,18 +36,17 @@
     margin: 15px;
     min-height: 40px;
     border: none;
-    background-color: $grey4;
-    padding: 0 10px;
-    border-radius: 10px;
+    background: none;
     color: $grey7;
-    font-size: 12px;
+    font-size: 14px;
 }
 .create-item-view-dataset {
     border: none;
     background: none;
+    width: fit-content;
     color: $grey5;
-    text-align: start;
-    margin: 0 15px;
+    margin: 0 15px 15px 15px;
+    padding: 0;
     font-size: 14px;
     cursor: pointer;
 }
@@ -59,8 +55,8 @@
 }
 .create-modelling-body {
     display: flex;
+    width: 100%;
     height: 100%;
-    margin: 20px 0 0 0;
 
     .create-model {
         position: relative;
@@ -93,6 +89,9 @@
                     font-size: 12px;
                     cursor: pointer;
                 }
+                .create-model-diagram-remove:hover {
+                    color: $grey7
+                }
             }
             .create-model-diagram-add {
                 display: flex;
@@ -104,7 +103,7 @@
                     align-items: center;
                     width: 90px;
                     height: 90px;
-                    margin: 5px 0 0 0;
+                    margin: 5px 0 20px 0;
                     border-radius: 10px;
                     background-color: $grey1;
                     border: 1px solid $grey1;
@@ -146,9 +145,9 @@
         display: flex;
         align-items: center;
         padding: 0 15px;
-        max-width: 400px;
-        min-width: 400px;
-        height: 50px;
+        max-width: 295px;
+        min-width: 295px;
+        height: 100px;
         border-radius: 10px;
         background-color: $grey8;
         font-size: 14px;
@@ -164,41 +163,61 @@
             border-right: 1px $grey4 solid;
             color: $grey7;
         }
-        label {
-            margin: 0 10px 0 20px;
-            color: $grey6;
-        }
-        input, select {
-            height: 30px;
-            border-radius: 10px;
-            background-color: $grey4;
-            border: 1px solid $grey2;
-            color: $grey7;
-        }
-        input {
-            width: 40px;
-            padding: 0 10px;
-        }
-        select {
-            width: 100px;
-            padding: 0 5px;
+        .create-model-selected-input {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+
+            div {
+                display: flex;
+                align-items: center;
+                margin: 10px 0 5px 0;
+
+                label {
+                    margin: 0 10px 0 20px;
+                    color: $grey6;
+                }
+                input, select, p {
+                    height: 30px;
+                    border-radius: 10px;
+                    background-color: $grey4;
+                    border: 1px solid $grey2;
+                    color: $grey7;
+                }
+                p {
+                    margin: 0;
+                    padding: 0 10px;
+                    font-weight: 400;
+                    font-size: 13px;
+                    line-height: 30px;
+                }
+                input {
+                    width: 40px;
+                    padding: 0 10px;
+                }
+                select {
+                    height: 32px;
+                    width: 100px;
+                    padding: 0 5px;
+                }
+            }
         }
     }
     .create-model-configuration {
         display: flex;
         justify-content: center;
-        min-width: 430px;
-        max-width: 430px;
+        min-width: 325px;
+        max-width: 325px;
         height: fit-content;
 
         .create-model-configuration-option {
             display: flex;
             flex-direction: column;
             height: 100%;
-            min-width: 430px;
-            max-width: 430px;
+            min-width: 325px;
+            max-width: 325px;
             border-radius: 10px;
-            background-color: $grey8;
+            background-color: $grey3;
 
             div {
                 display: flex;
@@ -215,7 +234,7 @@
                     height: 30px;
                     width: 100%;
                     border-radius: 10px;
-                    border: none;
+                    border: 1px $grey3 solid;
                     background-color: $grey4;
                     color: $grey7;
                 }
@@ -240,43 +259,57 @@
         }
     }
 }
-.create-model-data {
-    min-width: 230px;
-    max-width: 230px;
-    background-color: $grey8;
-    padding: 0 15px;
-    margin: 0 0 0 15px;
-    border-radius: 10px;
-    height: calc(100vh - 152px);
+.create-workspace-data {
+    position: sticky;
+    top: 40px;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    min-width: 300px;
+    max-width: 300px;
+    background-color: $grey3;
+    max-height: calc(100vh - 40px);
+    min-height: calc(100vh - 40px);
+    border-left: 1px $grey1 solid;
 
-    .create-model-data-images-list {
+    .create-workspace-data-header {
+        margin: 25px 15px 0 15px;
+        color: $grey7;
+        font-size: 16px;
+    }
+    .create-workspace-data-header-dataset {
+        margin: 0 15px;
+        color: $grey5;
+        font-size: 14px;
+    }
+    .create-workspace-data-images-list {
         display: flex;
-        flex-wrap: wrap;
-        margin: 20px 0 0 0;
+        flex-direction: column;
+        margin: 10px 15px;
         overflow-y: auto;
         -ms-overflow-style: none;
         scrollbar-width: none;
+        flex: 1;
 
-        .create-model-data-image {
-            height: 145px;
-            width: 100px;
-            margin: 0 15px 15px 0;
-            background-color: $grey4;
-            border-radius: 9px;
+        .create-workspace-data-image {
+            display: flex;
+            align-items: center;
+            height: 85px;
+            width: 100%;
+            margin: 0 0 10px 0;
+            border-radius: 10px;
 
             img {
-                height: auto;
-                max-height: 100px;
-                width: 100px;
-                border-top-left-radius: 9px;
-                border-top-right-radius: 9px;
+                height: 75px;
+                min-width: 75px;
                 object-fit: contain;
-                margin: 0 0 2px 0;
+                object-position: left;
+                margin: 0 10px;
             }
             p {
-                width: calc(100% - 30px);
-                margin: auto;
+                width: 100%;
                 height: 30px;
+                margin: 0 10px 0 0;
                 padding: 0 8px;
                 font-size: 12px;
                 line-height: 30px;
@@ -285,24 +318,165 @@
                 background-color: $grey3;
             }
         }
+        .create-workspace-data-image:hover {
+            background-color: $grey4;
+        }
     }
-    .create-model-data-images-list::-webkit-scrollbar {
+    .create-workspace-data-images-list::-webkit-scrollbar {
         display: none;
     }
-    .create-model-data-pagination {
+    .create-workspace-pagination {
         display: flex;
         align-items: center;
         justify-content: flex-end;
+        margin: 0 15px 15px 15px;
     
         p {
-            color: $grey7;  
+            color: $grey5;  
             font-size: 12px;
             margin: 0 10px;
         }
-        .create-model-data-pagination-icon {
+        .create-workspace-pagination-icon {
             color: $grey7;
             font-size: 14px;
             cursor: pointer;
         }
     }
+    .create-dataset-label-input {
+        background-color: $grey4;
+        height: 40px;
+        padding: 0 10px;
+        border-radius: 10px;
+        font-size: 12px;
+        margin: 15px;
+        color: $grey7;
+        border: 1px $grey2 solid;
+    }
+    .create-dataset-labels-list {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 15px;
+
+        .create-dataset-label {
+            display: flex;
+            align-items: center;
+            height: 30px;
+            width: fit-content;
+            background-color: $grey5;
+            border-radius: 8px;
+            margin: 8px 8px 0 0;
+            padding: 0 8px 0 10px;
+
+            p {
+                font-size: 12px;
+                color: $grey7;
+                margin: 0 2px 0 0;
+            }
+            div {
+                display: flex;
+
+                .create-dataset-label-icon {
+                    color: $grey6;
+                    font-size: 14px;
+                    margin: 0 0 0 8px;
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+}
+.create-dataset-upload {
+    position: sticky;
+    top: 110px;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 60px;
+    padding: 0 0 20px 0;
+    z-index: 4000;
+    background-color: $grey2;
+
+    input {
+        background: none;
+        color: $grey5;
+    }
+    button {
+        margin: 0 20px 0 0;
+    }
+    .create-dataset-pagination {
+        display: flex;
+        align-items: center;
+        margin: 0 0 0 auto;
+    
+        p {
+            color: $grey5;  
+            font-size: 12px;
+            margin: 0 10px;
+        }
+        .create-dataset-pagination-icon {
+            color: $grey7;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    }
+}
+.create-dataset-images-list {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 10px 0 0 0;
+
+    .create-dataset-image {
+        width: 170px;
+        height: 225px;
+        object-fit: cover;
+        margin: 20px 20px 0 0;
+        background-color: $grey4;
+        border-radius: 10px;
+
+        img {
+            width: 170px;
+            height: 170px;
+            object-fit: contain;
+            margin: 0 0 10px 0;
+        }
+        p, select {
+            width: calc(100% - 20px);
+            height: 30px;
+            margin: 0 10px;
+            background-color: $grey2;
+            padding: 0 5px;
+            color: $grey7;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 30px;
+        }
+        div {
+            display: flex;
+            align-items: center;
+
+            .create-dataset-image-delete {
+                margin: 0 5px 0 -5px;
+                color: $grey5;
+                cursor: pointer;
+            }
+        }
+    }
+}
+.create-item-edit-input {
+    background-color: $grey4;
+    padding: 0 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin: 15px;
+    border: 1px $grey2 solid;
+}
+.create-item-edit-textarea {
+    background-color: $grey4;
+    min-height: 150px;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin: 0 15px 15px 15px;
+    border: 1px $grey2 solid;
 }

@@ -3,6 +3,58 @@ const Items = require('../models/Items');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
+exports.getRecent = async (req, res, next) => {
+    try {
+        const recent = await Items.aggregate([
+            { 
+                $match: {
+                    visibility: true,
+                    creator: mongoose.Types.ObjectId(res.locals.currentUser._id)
+                }
+            }, { 
+                $lookup: { 
+                    from: 'users', 
+                    localField: 'creator', 
+                    foreignField: '_id', 
+                    as: 'creatorName' 
+                }
+            }, {
+                $unwind: '$creatorName'
+            }, { 
+                $project: {
+                    _id: 0,
+                    '_id': 1,
+                    'creator': 1,
+                    'title': 1,
+                    'picture': 1,
+                    'bookmarked': { $in: [res.locals.currentUser._id, '$bookmarks'] },
+                    'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
+                    'upvotes': { $size: '$upvotes' },
+                    'updated': 1,
+                    'creatorName.name': 1,
+                    'type': 1
+                }
+            }, { 
+                $sort: { 
+                    'updated': -1
+                } 
+            }, { 
+                $limit : 20 
+            }
+        ]);
+    
+        res.status(201).json({
+            success: true,
+            data: recent
+        })
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            error: 'Server Error'
+        })
+    }
+}
+
 exports.getCreated = async (req, res, next) => {
     try {
         const items = await Items.aggregate([
@@ -61,6 +113,7 @@ exports.getCreatedShortcut = async (req, res, next) => {
                     _id: 0,
                     '_id': 1,
                     'title': 1,
+                    'creator': 1,
                     'picture': 1,
                     'updated': 1,
                     'type': 1
@@ -157,6 +210,7 @@ exports.getBookmarkedShortcut = async (req, res, next) => {
                     _id: 0,
                     '_id': 1,
                     'title': 1,
+                    'creator': 1,
                     'picture': 1,
                     'bookmarked': { $in: [res.locals.currentUser._id, '$bookmarks'] },
                     'updated': 1,

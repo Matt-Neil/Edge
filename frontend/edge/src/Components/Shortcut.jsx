@@ -1,10 +1,11 @@
 import React, {useState, useEffect, useContext} from 'react'
 import { Link } from 'react-router-dom';
 import usersAPI from '../API/users'
+import itemsAPI from '../API/items'
 import { OpenItemsContext } from '../Contexts/openItemsContext';
 import AddIcon from '@mui/icons-material/Add';
 
-const Shortcut = ({type, currentUserID}) => {
+const Shortcut = ({type, currentUserID, datasetID}) => {
     const {addOpenItems} = useContext(OpenItemsContext);
     const [items, setItems] = useState();
     const [loaded, setLoaded] = useState(false);
@@ -18,8 +19,10 @@ const Shortcut = ({type, currentUserID}) => {
                     items = await usersAPI.get(`/created-shortcut?type=workspace`);
                 } else if (type === "datasets") {
                     items = await usersAPI.get(`/created-shortcut?type=dataset`);
-                } else {
+                } else if (type === "bookmarked") {
                     items = await usersAPI.get(`/bookmarked-shortcut`);
+                } else {
+                    items = await itemsAPI.get(`/associated-workspaces?id=${datasetID}`);
                 }
 
                 setItems(items.data.data)
@@ -40,10 +43,14 @@ const Shortcut = ({type, currentUserID}) => {
             {loaded &&
                 <div className="shortcut">
                     <div className="shortcut-header">
-                        <Link className="shortcut-link"
-                                to={type === "workspaces" ? "/created-workspaces" : (type === "datasets") ? "/created-datasets" : "/bookmarked"}>
-                            {type === "workspaces" ? "Your Workspaces" : (type === "datasets") ? "Your Datasets" : "Your Bookmarked"}
-                        </Link>
+                        {type === "related" ?
+                            <p className="shortcut-link">Related Workspaces</p>
+                        :
+                            <Link className="shortcut-link"
+                                    to={type === "workspaces" ? "/created-workspaces" : (type === "datasets") ? "/created-datasets" : "/bookmarked"}>
+                                {type === "workspaces" ? "Your Workspaces" : (type === "datasets") ? "Your Datasets" : "Your Bookmarked"}
+                            </Link>
+                        }
                         <span />
                         {type === "workspaces" && 
                             <Link to="/create-workspace">

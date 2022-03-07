@@ -1,4 +1,72 @@
 .view-items-top {
+    position: sticky;
+    top: 40px;
+    height: 70px;
+    width: 100%;
+    z-index: 4000;
+    background-color: $grey2;
     display: flex;
     align-items: center;
+
+    h1 {
+        font-family: 'Poppins', sans-serif;
+        font-size: 20px;
+        font-weight: 400;
+        color: $grey7;
+        margin: 5px 0 0 0;
+        flex: 1;
+    }
+    button {
+        margin: 5px 0 0 0;  
+    }
+    p {
+        color: $grey7;
+        margin: 10px 0 0 0;
+    }
+    .item-header-button-selected {
+        margin: 15px 40px auto 0;
+        text-decoration: underline;
+        text-underline-offset: 5px;
+    }
+    .item-header-button-unselected {
+        margin: 15px 40px auto 0;
+    }
+}
+.item-save {
+    margin: 20px 15px 60px 15px;
+}
+.item-delete {
+    margin: auto 15px 0 15px;
+}
+.item-creator {
+    margin: 0 15px;
+    color: $grey7;
+    font-size: 14px;
+}
+.item-information {
+    display: flex;
+    align-items: center;
+    margin: 0 15px;
+
+    .item-date {
+        color: $grey5;
+        font-size: 12px;
+    }
+    span {
+        flex: 1;
+    }
+    .item-icon {
+        margin: 0 7px;
+        font-size: 20px;
+        cursor: pointer;
+    }
+    .item-visibility {
+        margin: 0 8px;
+        font-size: 24px;
+        color: $grey7;
+        cursor: pointer;
+    }
+}
+.item-dataset-page {
+    margin: 30px 15px 0 15px;
 }

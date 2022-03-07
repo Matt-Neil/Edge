@@ -109,30 +109,34 @@ const AccountWorkspaces = ({searchPhrase, setSearchPhrase, currentUser}) => {
                         <Shortcut type={"bookmarked"} />
                     </div>
                     <div className="inner">
-                        <h1>Search Results: {urlPhrase}</h1>
-                        <div className="toggle-card-type">
-                            <p>{`${items.length} Results`}</p>
-                            <span />
-                            <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {setRowFormat(true)}} />
-                            <img src="http://localhost:3000/Grid.png" className="toggle-card-type-grid-icon" onClick={() => {setRowFormat(false)}} />
-                        </div>
-                        <div className="view-items-list">
-                            {items.length > 0 &&
-                                <>
-                                    {items.map((item, i) => {
-                                        return rowFormat ? 
-                                            <ItemRowCard item={item} creator={item.creatorName.name} currentUserID={currentUser.id} created={false} key={i} /> 
-                                            : 
-                                            <ItemSquareCard item={item} creator={item.creatorName.name} currentUserID={currentUser.id} created={false} key={i} />
-                                    })}
-                                </>
+                        <div className="home-inner">
+                            <div className="view-items-top">
+                                <h1>Search Results: {urlPhrase}</h1>
+                            </div>
+                            <div className="toggle-card-type">
+                                <p>{`${items.length} Results`}</p>
+                                <span />
+                                <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {setRowFormat(true)}} />
+                                <img src="http://localhost:3000/Grid.png" className="toggle-card-type-grid-icon" onClick={() => {setRowFormat(false)}} />
+                            </div>
+                            <div className="view-items-list">
+                                {items.length > 0 &&
+                                    <>
+                                        {items.map((item, i) => {
+                                            return rowFormat ? 
+                                                <ItemRowCard item={item} creator={item.creatorName.name} currentUserID={currentUser.id} created={false} key={i} /> 
+                                                : 
+                                                <ItemSquareCard item={item} creator={item.creatorName.name} currentUserID={currentUser.id} created={false} key={i} />
+                                        })}
+                                    </>
+                                }
+                            </div>
+                            {items.length >= 0 && finishedItems ?
+                                <p className="end-items">End reached</p>
+                                :
+                                <p className="load-items" onClick={() => {loadMore()}}>Load more</p>
                             }
                         </div>
-                        {items.length >= 0 && finishedItems ?
-                            <p className="end-items">End reached</p>
-                            :
-                            <p className="load-items" onClick={() => {loadMore()}}>Load more</p>
-                        }
                     </div>
                 </div>
             }

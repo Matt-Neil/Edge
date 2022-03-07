@@ -4,6 +4,7 @@
 @import "components";
 @import "createItem";
 @import "item";
+@import "home";
 @import "signin";
 @import "account";
 @import "viewItems";
@@ -18,12 +19,8 @@ p {
 label {
     font-family: 'Poppins', sans-serif;
 }
-h1 {
+a {
     font-family: 'Poppins', sans-serif;
-    font-size: 20px;
-    font-weight: 400;
-    color: $grey7;
-    flex: 1;
 }
 input, textarea {
     font-family: 'Poppins', sans-serif;
@@ -38,9 +35,12 @@ input, textarea {
         margin: 40px 0 0 0;
 
         .sidebar {
+            position: sticky;
+            top: 40px;
+            left: 0;
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 70px);
+            max-height: calc(100vh - 70px);
             min-width: 300px;
             max-width: 300px;
             padding: 0 0 30px 0;
@@ -48,23 +48,96 @@ input, textarea {
             background-color: $grey3;
             -ms-overflow-style: none;
             scrollbar-width: none;
+            border-right: 1px $grey1 solid;
 
-            .sidebar-divided {
-                margin: 15px;
-                border-top: 1px $grey4 solid;
+            .sidebar-header {
+                display: flex;
+                align-items: center;
+                margin: 15px 0 15px 15px;
+
+                img {
+                    width: 20px;
+                    height: 20px;
+                    margin: 5px 0 0 0;
+                }
+                .create-item-edit-image {
+                    margin: 0;
+                }
+            }
+            .sidebar-dataset-copy {
+                display: flex;
+                align-items: center;
+
+                div {
+                    height: 30px;
+                    width: 95px;
+                    display: flex;
+                    align-items: center;
+                    background-color: $grey4;
+                    margin: 15px;
+                    border-radius: 8px;
+                    border: 1px solid $grey8;
+                
+                    p {
+                        width: 70px;
+                        color: $grey7;
+                        font-size: 12px;
+                        margin: 0 8px;
+                    }
+                    button {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        width: 35px;
+                        height: 30px;
+                        border: none;
+                        background: $grey2;
+                        border-top-right-radius: 8px;
+                        border-bottom-right-radius: 8px;
+                        border-left: 1px solid $grey4;
+                        cursor: pointer;
+                        
+                        .dataset-copy-icon {
+                            margin: 0 3px;
+                            font-size: 16px;
+                            color: $grey7;
+                        }
+                    }
+                }
+                a {
+                    display: flex;
+                    text-decoration: none;
+                    color: $grey7;
+                    font-size: 14px;
+                    margin: 0;
+                }
+            }
+            .sidebar-associated {
+                display: flex;
+                flex-direction: column;
             }
         }
         .sidebar::-webkit-scrollbar {
             display: none;
         }
         .inner {
-            position: relative;
             display: flex;
             flex-direction: column;
             width: 100%;
             background-color: $grey2;
-            padding: 15px 40px;
 
+            .workspace-body {
+                display: flex;
+                align-items: flex-start;
+
+                .workspace-inner {
+                    display: flex;
+                    flex-direction: column;
+                    flex: 1;
+                    align-items: flex-start;
+                    margin: 0 40px 30px 40px;
+                }
+            }
             .toggle-card-type {
                 display: flex;
                 align-items: center;
@@ -133,15 +206,27 @@ input, textarea {
     width: fit-content;
     height: 36px;
     padding: 0 15px;
-    background-color: $grey2;
+    background-color: $grey7;
     border-radius: 10px;
     border: none;
-    color: $grey7;
+    color: $grey2;
     text-decoration: none;
     font-family: 'Poppins', sans-serif;
     font-weight: 400;
     font-size: 13px;
     line-height: 36px;
+    cursor: pointer;
+}
+.text-button {
+    width: fit-content;
+    height: 36px;
+    background: none;
+    border: none;
+    color: $grey7;
+    text-decoration: none;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 15px;
     cursor: pointer;
 }
 .header {

@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import { Link, useHistory } from 'react-router-dom'
-import itemsAPI from '../API/items'
+import usersAPI from '../API/users'
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ItemRowCard from '../Components/Item-Row-Card'
@@ -17,7 +17,7 @@ const Home = ({setSearchPhrase}) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const recent = await itemsAPI.get("/recent");
+                const recent = await usersAPI.get("/recent");
 
                 setRecent(recent.data.data);
                 setLoaded(true);
@@ -54,11 +54,11 @@ const Home = ({setSearchPhrase}) => {
                             <SearchIcon className="home-search-icon" onClick={e => searchFunctionButton()} />
                         </div>
                         <div className="sidebar-divided" />
-                        <Link className="home-options-link" to="/all-workspaces">
+                        <Link className="home-options-link" to="/public-workspaces">
                             <p>Public Workspaces</p>
                             <ArrowForwardIosIcon className="home-options-icon" />
                         </Link>
-                        <Link className="home-options-link" to="all-datasets">
+                        <Link className="home-options-link" to="public-datasets">
                             <p>Public Datasets</p>
                             <ArrowForwardIosIcon className="home-options-icon" />
                         </Link>
@@ -70,22 +70,24 @@ const Home = ({setSearchPhrase}) => {
                         <Shortcut type={"bookmarked"} />
                     </div>
                     <div className="inner">
-                        <div className="view-items-top">
-                            <h1>Recently Updated</h1>
-                        </div>
-                        <div className="toggle-card-type">
-                            <span />
-                            <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {setRowFormat(true)}} />
-                            <img src="http://localhost:3000/Grid.png" className="toggle-card-type-grid-icon" onClick={() => {setRowFormat(false)}} />
-                        </div>
-                        <div className="view-items-list">
-                            {recent.length > 0 &&
-                                <>
-                                    {recent.map((item, i) => {
-                                        return rowFormat ? <ItemRowCard item={item} created={true} key={i} /> : <ItemSquareCard item={item} created={true} key={i} />
-                                    })}
-                                </>
-                            }
+                        <div className="home-inner">
+                            <div className="view-items-top">
+                                <h1>Recently Updated</h1>
+                            </div>
+                            <div className="toggle-card-type">
+                                <span />
+                                <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {setRowFormat(true)}} />
+                                <img src="http://localhost:3000/Grid.png" className="toggle-card-type-grid-icon" onClick={() => {setRowFormat(false)}} />
+                            </div>
+                            <div className="view-items-list">
+                                {recent.length > 0 &&
+                                    <>
+                                        {recent.map((item, i) => {
+                                            return rowFormat ? <ItemRowCard item={item} created={true} key={i} /> : <ItemSquareCard item={item} created={true} key={i} />
+                                        })}
+                                    </>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>

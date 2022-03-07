@@ -113,13 +113,15 @@ const Account = ({setSearchPhrase}) => {
                                         setPassword(e.target.value)
                                         setChanged(true)
                                     }} />
-                            <button className={`account-save ${password === "" || !changed ? "grey-button" : "blue-button"}`}
+                            <button className={"account-save blue-button"}
                                     disabled={password === "" || !changed}
                                     onClick={() => {updateAccount()}}>Save Changes</button>
-                            <button className="grey-button account-signout" 
-                                    onClick={() => {signout()}}>Sign Out</button>
-                            <button className="dark-grey-button account-delete"
-                                    onClick={() => {deleteAccount()}}>Delete Account</button>
+                            <div>
+                                <button className="text-button account-signout" 
+                                        onClick={() => {signout()}}>Sign Out</button>
+                                <button className="text-button account-delete"
+                                        onClick={() => {deleteAccount()}}>Delete Account</button>
+                            </div>
                         </div>
                     </div>
                 </div>

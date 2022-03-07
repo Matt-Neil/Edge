@@ -1,7 +1,7 @@
 .item-header {
     display: flex;
     align-items: center;
-    min-width: 170px;
+    max-width: 170px;
     margin: 5px 5px 5px 0;
     height: 30px;
     border-radius: 5px;
@@ -14,8 +14,9 @@
     }
     .item-header-link {
         text-decoration: none;
-        width: 110px;
-        margin: 0 20px 0 0;
+        max-width: 110px;
+        width: fit-content;
+        margin: 0 10px 0 0;
         overflow: hidden;
         text-overflow: ellipsis;
         display: -webkit-box;
@@ -26,14 +27,19 @@
         .item-header-title {
             padding: 0 0 0 8px;
             font-size: 12px;
-            width: 110px;
-            color: $grey6;
+            max-width: 110px;
+            width: fit-content;
+            color: $grey5;
             cursor: pointer;
+        }
+        .item-header-title-selected {
+            color: $grey7;
         }
     }
     .item-header-close {
         font-size: 14px;
         color: $grey1;
+        margin: 0 5px 0 0;
         cursor: pointer;
     }
     .item-header-close:hover {
@@ -69,25 +75,10 @@
         }
     }
 }
-.create-item-data-header-file {
-    color: $grey5;
-    font-size: 14px;
-}
-.create-item-data-pagination {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-
-    p {
-        color: $grey7;
-        font-size: 12px;
-        margin: 0 10px;
-    }
-    .create-item-data-pagination-icon {
-        color: $grey7;
-        font-size: 14px;
-        cursor: pointer;
-    }
+.create-item-data-header {
+    margin: 25px 0 -8px 0;
+    color: $grey7;
+    font-size: 16px;
 }
 .shortcut {
     display: flex;
@@ -108,6 +99,7 @@
             text-decoration: none;
             color: $grey7;
             font-size: 14px;
+            margin: 0;
         }
         span {
             flex: 1;
@@ -120,6 +112,10 @@
     .shortcut-body {
         margin: 15px 0 0 0;
 
+        .shortcut-none {
+            font-size: 14px;
+            color: $grey5;
+        }
         .shortcut-item {
             display: flex;
             align-items: center;
@@ -409,4 +405,8 @@
 }
 .home-options-link:hover {
     background-color: $grey2;
+}
+.sidebar-divided {
+    margin: 15px;
+    border-top: 1px $grey4 solid;
 }

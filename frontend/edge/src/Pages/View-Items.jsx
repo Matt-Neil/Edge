@@ -160,39 +160,41 @@ const ViewItems = ({type, currentUser, setSearchPhrase}) => {
                         <Shortcut type={"bookmarks"} />
                     </div>
                     <div className="inner">
-                        <div className="view-items-top">
-                            {displayHeading()}
-                            {type === "created-workspaces" && <Link to="/create-workspace" className="blue-button">Create Workspace</Link>}
-                            {type === "created-datasets" && <Link to="/create-dataset" className="blue-button">Create Dataset</Link>}
-                        </div>
-                        <div className="toggle-card-type">
-                            {(type === "created-workspaces" || type === "public-workspaces") ?
-                                <p>{`${items.length} Workspaces`}</p>
-                            : (type === "created-datasets" || type === "public-dataset") ?
-                                <p>{`${items.length} Datasets`}</p>
-                            :
-                                <p>{`${items.length} Bookmarks`}</p>
-                            }
-                            <span />
-                            <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {setRowFormat(true)}} />
-                            <img src="http://localhost:3000/Grid.png" className="toggle-card-type-grid-icon" onClick={() => {setRowFormat(false)}} />
-                        </div>
-                        <div className="view-items-list">
-                            {items.length > 0 &&
-                                <>
-                                    {items.map((item, i) => {
-                                        if (type === "created-workspaces" || type === "created-datasets") return rowFormat ? <ItemRowCard item={item} created={true} key={i} /> : <ItemSquareCard item={item} created={true} key={i} />
+                        <div className="home-inner">
+                            <div className="view-items-top">
+                                {displayHeading()}
+                                {type === "created-workspaces" && <Link to="/create-workspace" className="blue-button">Create Workspace</Link>}
+                                {type === "created-datasets" && <Link to="/create-dataset" className="blue-button">Create Dataset</Link>}
+                            </div>
+                            <div className="toggle-card-type">
+                                {(type === "created-workspaces" || type === "public-workspaces") ?
+                                    <p>{`${items.length} Workspaces`}</p>
+                                : (type === "created-datasets" || type === "public-dataset") ?
+                                    <p>{`${items.length} Datasets`}</p>
+                                :
+                                    <p>{`${items.length} Bookmarks`}</p>
+                                }
+                                <span />
+                                <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {setRowFormat(true)}} />
+                                <img src="http://localhost:3000/Grid.png" className="toggle-card-type-grid-icon" onClick={() => {setRowFormat(false)}} />
+                            </div>
+                            <div className="view-items-list">
+                                {items.length > 0 &&
+                                    <>
+                                        {items.map((item, i) => {
+                                            if (type === "created-workspaces" || type === "created-datasets") return rowFormat ? <ItemRowCard item={item} created={true} key={i} /> : <ItemSquareCard item={item} created={true} key={i} />
 
-                                        return rowFormat ? <ItemRowCard item={item} creator={item.creatorName.name} currentUserID={currentUser.id} created={type === "created"} key={i} /> : <ItemSquareCard item={item} creator={item.creatorName.name} currentUserID={currentUser.id} created={type === "created"} key={i} />
-                                    })}
-                                </>
+                                            return rowFormat ? <ItemRowCard item={item} creator={item.creatorName.name} currentUserID={currentUser.id} created={type === "created"} key={i} /> : <ItemSquareCard item={item} creator={item.creatorName.name} currentUserID={currentUser.id} created={type === "created"} key={i} />
+                                        })}
+                                    </>
+                                }
+                            </div>
+                            {items.length >= 0 && finishedItems ?
+                                <p className="end-items">End reached</p>
+                                :
+                                <p className="load-items" onClick={() => {loadMore()}}>Load more</p>
                             }
                         </div>
-                        {items.length >= 0 && finishedItems ?
-                            <p className="end-items">End reached</p>
-                            :
-                            <p className="load-items" onClick={() => {loadMore()}}>Load more</p>
-                        }
                     </div>
                 </div>
             }

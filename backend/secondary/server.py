@@ -34,34 +34,64 @@ def test_model():
 
 @app.route('/api/file/upload', methods = ['POST'])
 def upload_file():
-    if request.form['type'] == "image":
-        images = request.files.getlist("data[]")
-        assignedLabels = request.form.getlist("labels[]")
-        os.makedirs('files/' + request.form['id'])
-        labels = []
+    images = request.files.getlist("data[]")
+    assignedLabels = request.form.getlist("labels[]")
+    os.makedirs('files/' + request.form['id'])
+    labels = []
 
-        for i in range(len(images)):
-            labels.append({
-                'filename': i,
-                'label': assignedLabels[i]
-            })
-            images[i].save('files/{}/{}.jpg'.format(request.form['id'], i))
-        
-        with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
-            json.dump(labels, outfile)
-    else:
-        file = request.files['data']
-        filename = request.form['id'] + ".csv"
-        file.save('files/' + filename)
+    for i in range(len(images)):
+        labels.append({
+            'filename': i,
+            'label': assignedLabels[i]
+        })
+        images[i].save('files/{}/{}.jpg'.format(request.form['id'], i))
+    
+    with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
+        json.dump(labels, outfile)
+
+    return "OK"
+
+@app.route('/api/file/replace', methods = ['POST'])
+def replace_file():
+    images = request.files.getlist("data[]")
+    assignedLabels = request.form.getlist("labels[]")
+    os.remove('files/{}'.format(request.form['id']))
+    os.makedirs('files/' + request.form['id'])
+    labels = []
+
+    for i in range(len(images)):
+        labels.append({
+            'filename': i,
+            'label': assignedLabels[i]
+        })
+        images[i].save('files/{}/{}.jpg'.format(request.form['id'], i))
+    
+    with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
+        json.dump(labels, outfile)
+
+    return "OK"
+
+@app.route('/api/file/append', methods = ['POST'])
+def append_file():
+    images = request.files.getlist("data[]")
+    assignedLabels = request.form.getlist("labels[]")
+    labels = []
+
+    for i in range(int(request.form.getlist("labels[]"))+1, int(request.form.getlist("labels[]"))+len(images)+1):
+        labels.append({
+            'filename': i,
+            'label': assignedLabels[i]
+        })
+        images[i].save('files/{}/{}.jpg'.format(request.form['id'], i))
+    
+    with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
+        json.dump(labels, outfile)
 
     return "OK"
 
 @app.route('/api/file/remove', methods = ['POST'])
 def remove_file():
-    if request.form['type'] == "image":
-        os.remove('files/{}'.format(request.form['id']))
-    else:
-        os.remove('files/{}.csv'.format(request.form['id']))
+    os.remove('files/{}'.format(request.form['id']))
     
     return "OK"
 

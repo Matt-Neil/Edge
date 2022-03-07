@@ -1,7 +1,7 @@
 .account-information {
     display: flex;
     flex-direction: column;
-    margin: 20px 0 0 0;
+    margin: 20px 0 0 40px;
     width: 420px;
 
     label {
@@ -45,23 +45,16 @@
     .account-save:disabled {
         cursor: not-allowed;
     }
-    .account-signout {
-        align-self: flex-start;
-        height: 36px;
-        color: $grey5;
-        margin: 0 25px 0 0;
-        font-size: 16px;
-        border: none;
-        background: none;
-        cursor: pointer;
-    }
-    .account-delete {
-        align-self: flex-start;
-        height: 36px;
-        color: $grey7;
-        font-size: 16px;
-        border: none;
-        background: none;
-        cursor: pointer;
+    div {
+        display: flex;
+        align-items: center;
+        
+        .account-signout {
+            align-self: flex-start;
+            margin: 0 25px 0 0;
+        }
+        .account-delete {
+            align-self: flex-start;
+        }
     }
 }
