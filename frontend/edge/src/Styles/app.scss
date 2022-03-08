@@ -353,7 +353,10 @@ input, textarea {
     text-align: center;
 }
 .item-exist {
-    margin: 30vh auto 0 auto;
+    display: flex;
+    justify-content: center;
+    color: $grey7;
+    margin: 30vh 0 0 0;
 }
 ::placeholder {
     font-family: 'Poppins', sans-serif;

@@ -2810,7 +2810,14 @@ input, textarea {
 }
 
 .item-exist {
-  margin: 30vh auto 0 auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  color: #FBFBFB;
+  margin: 30vh 0 0 0;
 }
 
 ::-webkit-input-placeholder {

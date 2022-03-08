@@ -446,15 +446,17 @@ const Dataset = ({currentUser, type}) => {
                                                 setChangedSettings(true)
                                             }} />
                                 </div>
-                                <div className="create-item-setup">
-                                    <label className="create-item-setup-label">Public?</label>
-                                    <input type="checkbox" 
-                                            onChange={() => {
-                                                setVisibility(previous => !previous)
-                                                setChangedSettings(true)
-                                            }}
-                                            checked={visibility} />
-                                </div>
+                                {type === "create" &&
+                                    <div className="create-item-setup">
+                                        <label className="create-item-setup-label">Public?</label>
+                                        <input type="checkbox" 
+                                                onChange={() => {
+                                                    setVisibility(previous => !previous)
+                                                    setChangedSettings(true)
+                                                }}
+                                                checked={visibility} />
+                                    </div>
+                                }
                                 <div className="create-item-setup">
                                     <label className="create-item-setup-label">RGB Images?</label>
                                     <input type="checkbox" 

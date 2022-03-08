@@ -236,7 +236,7 @@ const Workspace = ({currentUser, type}) => {
                             setUploadedDataset(checkPublic.data.data)
                             setRefreshData(new Date().getTime())
                             {model.length === 0 &&
-                                setModel([{type: "Input", value: 1, activation: ""}])
+                                setModel([{type: "Input", value: 1, activation: "none"}])
                             }
                             setChangedSettings(true)
                         })
@@ -414,15 +414,17 @@ const Workspace = ({currentUser, type}) => {
                                                 setChangedSettings(true)
                                             }} />
                                 </div>
-                                <div className="create-item-setup">
-                                    <label className="create-item-setup-label">Public?</label>
-                                    <input type="checkbox" 
-                                            onChange={() => {
-                                                setVisibility(previous => !previous)
-                                                setChangedSettings(true)
-                                            }}
-                                            checked={visibility} />
-                                </div>
+                                {type === "create" &&
+                                    <div className="create-item-setup">
+                                        <label className="create-item-setup-label">Public?</label>
+                                        <input type="checkbox" 
+                                                onChange={() => {
+                                                    setVisibility(previous => !previous)
+                                                    setChangedSettings(true)
+                                                }}
+                                                checked={visibility} />
+                                    </div>
+                                }
                             </>
                         }
                         {!workspace.self && type !== "create" && <p className="item-creator">{workspace.creatorName.name}</p>}

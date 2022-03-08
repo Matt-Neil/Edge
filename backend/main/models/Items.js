@@ -1,5 +1,20 @@
 const mongoose = require('mongoose');
 
+const NodesSchema = new mongoose.Schema({
+    type: {
+        type: String,
+        required: true
+    },
+    value: {
+        type: Number, 
+        required: true
+    }, 
+    activation: {
+        type: String,
+        required: true
+    }
+}, { _id : false })
+
 const ItemsSchema = new mongoose.Schema({
     creator: {
         type: mongoose.Schema.Types.ObjectId,
@@ -34,7 +49,7 @@ const ItemsSchema = new mongoose.Schema({
         required: true
     },
     model: {
-        type: [],
+        type: [NodesSchema],
         required: false
     },
     configuration: {
@@ -58,7 +73,7 @@ const ItemsSchema = new mongoose.Schema({
         required: false
     },
     labels: {
-        type: [],
+        type: [String],
         required: false
     },
     type: {
