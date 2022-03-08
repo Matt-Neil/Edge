@@ -32,26 +32,67 @@
         color: $grey7;
     }
 }
-.create-workspace-import-existing {
+.create-workspace-uploaded-dataset {
     margin: 15px;
-    min-height: 40px;
-    border: none;
-    background: none;
-    color: $grey7;
-    font-size: 14px;
-}
-.create-item-view-dataset {
-    border: none;
-    background: none;
-    width: fit-content;
-    color: $grey5;
-    margin: 0 15px 15px 15px;
-    padding: 0;
-    font-size: 14px;
-    cursor: pointer;
-}
-.create-item-view-dataset:hover {
-    color: $grey7;
+    display: flex;
+    align-items: center;
+
+    .create-workspace-import-existing {
+        margin: 0;
+        min-height: 40px;
+        width: 100%;
+        border: none;
+        background: none;
+        color: $grey7;
+        font-size: 14px;
+    }
+    .create-item-view-dataset {
+        margin: 0 0 0 10px;
+        display: flex;
+        color: $grey5;
+        text-decoration: none;
+        font-size: 13px;
+        cursor: pointer;
+    }
+    .create-item-view-dataset:hover {
+        color: $grey7;
+    }
+    .create-workspace-uploaded-dataset-link {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        padding: 15px;
+        border-radius: 10px;
+
+        img {
+            width: 30px;
+            height: 30px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        p {
+            font-size: 13px;
+            margin: 0 15px;
+            color: $grey6;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            line-clamp: 1; 
+            -webkit-box-orient: vertical;
+        }
+    }
+    .create-workspace-uploaded-dataset-link:hover {
+        background-color: $grey2;
+    }
+    .create-item-edit-input {
+        background-color: $grey4;
+        padding: 0 10px;
+        border-radius: 10px;
+        font-size: 12px;
+        border: 1px $grey2 solid;
+    }
 }
 .create-modelling-body {
     display: flex;
@@ -185,6 +226,7 @@
                     color: $grey7;
                 }
                 p {
+                    width: 78px;
                     margin: 0;
                     padding: 0 10px;
                     font-weight: 400;
@@ -273,14 +315,17 @@
     border-left: 1px $grey1 solid;
 
     .create-workspace-data-header {
-        margin: 25px 15px 0 15px;
+        margin: 25px 15px 5px 15px;
         color: $grey7;
         font-size: 16px;
     }
     .create-workspace-data-header-dataset {
         margin: 0 15px;
+        height: 30px;
         color: $grey5;
         font-size: 14px;
+        overflow-y: hidden;
+        overflow-x: auto;
     }
     .create-workspace-data-images-list {
         display: flex;
@@ -294,7 +339,7 @@
         .create-workspace-data-image {
             display: flex;
             align-items: center;
-            height: 85px;
+            height: 75px;
             width: 100%;
             margin: 0 0 10px 0;
             border-radius: 10px;
@@ -315,11 +360,11 @@
                 line-height: 30px;
                 border-radius: 10px;
                 color: $grey7;
-                background-color: $grey3;
+                background-color: $grey4;
             }
         }
         .create-workspace-data-image:hover {
-            background-color: $grey4;
+            background-color: $grey2;
         }
     }
     .create-workspace-data-images-list::-webkit-scrollbar {
@@ -362,9 +407,8 @@
             align-items: center;
             height: 30px;
             width: fit-content;
-            background-color: $grey5;
             border-radius: 8px;
-            margin: 8px 8px 0 0;
+            margin: 10px 10px 0 0;
             padding: 0 8px 0 10px;
 
             p {
@@ -376,7 +420,7 @@
                 display: flex;
 
                 .create-dataset-label-icon {
-                    color: $grey6;
+                    color: $grey7;
                     font-size: 14px;
                     margin: 0 0 0 8px;
                     cursor: pointer;
@@ -430,7 +474,8 @@
         height: 225px;
         object-fit: cover;
         margin: 20px 20px 0 0;
-        background-color: $grey4;
+        background-color: $grey3;
+        border: 1px $grey4 solid;
         border-radius: 10px;
 
         img {
@@ -438,12 +483,13 @@
             height: 170px;
             object-fit: contain;
             margin: 0 0 10px 0;
+            border-bottom: 1px $grey4 solid;
         }
         p, select {
             width: calc(100% - 20px);
             height: 30px;
             margin: 0 10px;
-            background-color: $grey2;
+            background-color: $grey4;
             padding: 0 5px;
             color: $grey7;
             border: none;

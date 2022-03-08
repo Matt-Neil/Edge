@@ -73,11 +73,11 @@ const Home = ({setSearchPhrase}) => {
                         <div className="home-inner">
                             <div className="view-items-top">
                                 <h1>Recently Updated</h1>
-                            </div>
-                            <div className="toggle-card-type">
-                                <span />
-                                <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {setRowFormat(true)}} />
-                                <img src="http://localhost:3000/Grid.png" className="toggle-card-type-grid-icon" onClick={() => {setRowFormat(false)}} />
+                                <div className="toggle-card-type">
+                                    <span />
+                                    <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {setRowFormat(true)}} />
+                                    <img src="http://localhost:3000/Grid.png" className="toggle-card-type-grid-icon" onClick={() => {setRowFormat(false)}} />
+                                </div>
                             </div>
                             <div className="view-items-list">
                                 {recent.length > 0 &&

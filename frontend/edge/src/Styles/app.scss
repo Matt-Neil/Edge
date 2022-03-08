@@ -141,7 +141,6 @@ input, textarea {
             .toggle-card-type {
                 display: flex;
                 align-items: center;
-                margin: 0 0 25px 0;
                 
                 p {
                     color: $grey5;
@@ -164,6 +163,7 @@ input, textarea {
             .view-items-list {
                 display: flex;
                 flex-wrap: wrap;
+                margin: 25px 0;
             }
         }
     }
@@ -291,12 +291,12 @@ input, textarea {
 }
 .end-items {
     color: $grey5;
-    margin: 25px 0 0 0;
+    margin: 25px 0;
     @include not-selectable()
 }
 .load-items {
     color: $grey5;
-    margin: 25px 0 0 0;
+    margin: 25px 0;
     cursor: pointer;
     @include not-selectable()
 }
@@ -308,6 +308,36 @@ input, textarea {
 }
 .white {
     color: $grey7;
+}
+.label-blue1 {
+    background-color: #153787;
+}
+.label-blue2 {
+    background-color: #3E92CC;
+}
+.label-red {
+    background-color: #E15554;
+}
+.label-green1 {
+    background-color: #3BB273;
+}
+.label-green2 {
+    background-color: #3EC300;
+}
+.label-orange1 {
+    background-color: #E24E1B;
+}
+.label-orange2 {
+    background-color: #DB5375;
+}
+.label-yellow1 {
+    background-color: #F3CA40;
+}
+.label-yellow2 {
+    background-color: #FC9F5B;
+}
+.label-pink {
+    background-color: #D8315B;
 }
 .page-not-found {
     position: absolute;

@@ -71,7 +71,8 @@ const SignIn = () => {
                     <input type="text" value={email} onChange={e => {setEmail(e.target.value)}} />
                     <label>Password</label>
                     <input type="password" value={password} onChange={e => {setPassword(e.target.value)}} />
-                    <button type="submit">Sign In</button>
+                    <button type="submit"
+                            disabled={email === "" || password === ""}>Sign In</button>
                     <div>
                         <p>Don't Have an Account?</p>
                         <span className="signup-button"
@@ -88,7 +89,8 @@ const SignIn = () => {
                     <input type="text" value={createEmail} onChange={e => {setCreateEmail(e.target.value)}} />
                     <label>Password</label>
                     <input type="password" value={createPassword} onChange={e => {setCreatePassword(e.target.value)}} />
-                    <button type="submit">Create</button>
+                    <button type="submit"
+                            disabled={createName === "" || createEmail === "" || createPassword === ""}>Create</button>
                     <div>
                         <p>Already Have an Account?</p>
                         <span className="signup-button"

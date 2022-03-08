@@ -152,6 +152,8 @@ exports.getItem = async (req, res, next) => {
                         'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
                         'upvotes': { $size: '$upvotes' },
                         'updated': 1,
+                        'dataset.picture': 1,
+                        'dataset.title': 1,
                         'dataset.imageFile': 1,
                         'dataset.labels': 1,
                         'dataset._id': 1,
@@ -244,7 +246,7 @@ exports.putItem = async (req, res, next) => {
 
 exports.getCheckPublicDataset = async (req, res, next) => {
     try {
-        const check = await Items.findById(req.query.id, '_id visibility imageFile labels')
+        const check = await Items.findById(req.query.id, '_id visibility imageFile labels title')
         
         if (check) {
             res.status(201).json({

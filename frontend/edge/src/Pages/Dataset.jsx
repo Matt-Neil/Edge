@@ -48,7 +48,8 @@ const Dataset = ({currentUser, type}) => {
     const [addLabel, setAddLabel] = useState("")
     const [disableCreate, setDisabledCreate] = useState(false)
     const {addOpenItems, removeOpenItems} = useContext(OpenItemsContext);
-    const modelRef = useRef(null)
+    const colours = ["label-blue1", "label-red", "label-green1", "label-orange1", "label-pink", 
+        "label-orange2", "label-blue2", "label-yellow1", "label-green2", "label-yellow2"]
     const datasetID = useParams().id;
     const copyInterval = useRef(0)
     const history = useHistory();
@@ -139,6 +140,7 @@ const Dataset = ({currentUser, type}) => {
     const addFunctionKey = (e) => {
         if (e.key === "Enter" && addLabel !== "") {
             setLabels(state => [...state, addLabel])
+            setChangedSettings(true)
             setAddLabel("")
         }
     }
@@ -608,7 +610,7 @@ const Dataset = ({currentUser, type}) => {
                                 <div className="create-dataset-labels-list">
                                     {labels.map((label, i) => {
                                         return (
-                                            <div className="create-dataset-label" key={i}>
+                                            <div className={`create-dataset-label ${colours[i % colours.length]}`} key={i}>
                                                 <p>{label}</p>
                                                 {(type === "create" || dataset.self) &&
                                                     <div onClick={() => {

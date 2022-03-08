@@ -16,6 +16,7 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 const Workspace = ({currentUser, type}) => {
     const [stage, setStage] = useState("model");
@@ -37,7 +38,6 @@ const Workspace = ({currentUser, type}) => {
     const [workspace, setWorkspace] = useState([]);
     const [images, setImages] = useState([])
     const [assignedLabels, setAssignedLabels] = useState([])
-    const [viewDataset, setViewDataset] = useState(false)
     const [refreshData, setRefreshData] = useState()
     const [refreshDiagram, setRefreshDiagram] = useState()
     const [changedSettings, setChangedSettings] = useState(false)
@@ -447,14 +447,24 @@ const Workspace = ({currentUser, type}) => {
                             }
                         </div>
                         <div className="sidebar-divided" />
-                        <input className={`create-workspace-import-existing ${!(type === "view" && !workspace.self) && "create-item-edit-input"}`}
-                                placeholder="Dataset ID"
-                                onChange={e => {setDatasetID(e.target.value)}}
-                                onKeyPress={searchFunctionKey}
-                                disabled={!(workspace.self || type === "create")}
-                                value={datasetID} />
-                        <button className="create-item-view-dataset"
-                                onClick={() => {setViewDataset(state => !state)}}>{viewDataset ? "Hide Dataset" : "Show Dataset"}</button>
+                        <div className="create-workspace-uploaded-dataset">
+                            {(type === "create" || workspace.self) ?
+                                <>
+                                    <input className={`create-workspace-import-existing ${!(type === "view" && !workspace.self) && "create-item-edit-input"}`}
+                                            placeholder="Dataset ID"
+                                            onChange={e => {setDatasetID(e.target.value)}}
+                                            onKeyPress={searchFunctionKey}
+                                            value={datasetID} />
+                                    {type === "view" && <Link className="create-item-view-dataset" to={`/dataset/${datasetID}`}><OpenInNewIcon /></Link>}
+                                </>
+                            :
+                                <Link to={`/dataset/${datasetID}`}className="create-workspace-uploaded-dataset-link">
+                                    <img src={`http://localhost:4000/images/${uploadedDataset.picture}`} />
+                                    <p>{uploadedDataset.title}</p>
+                                </Link>
+                            }
+                        </div>
+                        
                         {type === "view" &&
                             <>
                                 {workspace.self &&
@@ -806,14 +816,14 @@ const Workspace = ({currentUser, type}) => {
                                     <></>
                                 }
                             </div>
-                            {viewDataset && uploadedDataset && 
+                            {uploadedDataset && 
                                 <>
                                     {noData ?
                                         <p className="end-items">Cannot find dataset</p>
                                     :
                                         <div className="create-workspace-data">
                                             <p className="create-workspace-data-header">Selected Dataset:</p>
-                                            <p className="create-workspace-data-header-dataset">{uploadedDataset._id}</p>
+                                            <p className="create-workspace-data-header-dataset">{uploadedDataset.title}</p>
                                             <div className="sidebar-divided" />
                                             <div className="create-workspace-data-images-list" key={refreshData}>
                                                 {images.map((image, i) => {

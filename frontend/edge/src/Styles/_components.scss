@@ -200,7 +200,7 @@
             color: $grey5;
             font-size: 12px;
         }
-        .item-square-card-meta:nth-child(2) {
+        .item-square-card-meta:nth-child(1) {
             flex: 1;
         }
     }
@@ -221,9 +221,6 @@
         cursor: pointer;
     }
     .item-square-card-bottom {
-        margin: 0 15px 0 auto;
-    }
-    .item-square-card-other {
         margin: 20px -10px 0 0;
     }
 }
