@@ -87,6 +87,7 @@ exports.getItem = async (req, res, next) => {
                         'imageFile': 1,
                         'visibility': 1,
                         'labels': 1,
+                        'rgb': 1,
                         'self': { $eq: [mongoose.Types.ObjectId(res.locals.currentUser._id), '$creator']},
                         'bookmarked': { $in: [res.locals.currentUser._id, '$bookmarks'] },
                         'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
@@ -152,6 +153,7 @@ exports.getItem = async (req, res, next) => {
                         'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
                         'upvotes': { $size: '$upvotes' },
                         'updated': 1,
+                        'dataset.rgb': 1,
                         'dataset.picture': 1,
                         'dataset.title': 1,
                         'dataset.imageFile': 1,
@@ -225,8 +227,10 @@ exports.putItem = async (req, res, next) => {
 
             if (item.type === "dataset") {
                 item.labels = req.body.labels
-                item.imageFile = req.body.imageFile
+                item.rgb = req.body.rgb
             } else {
+                item.model = req.body.model
+                item.configuration = req.body.configuration
                 item.dataset = req.body.dataset
             }
             

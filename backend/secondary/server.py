@@ -51,6 +51,15 @@ def upload_file():
 
     return "OK"
 
+@app.route('/api/file/delete', methods = ['POST'])
+def delete_file():
+    os.remove('files/{}/{}.jpg'.format(request.form['id'], request.form['filename']))
+    
+    with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
+        json.dump(labels, outfile)
+
+    return "OK"
+
 @app.route('/api/file/replace', methods = ['POST'])
 def replace_file():
     images = request.files.getlist("data[]")

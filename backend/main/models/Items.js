@@ -53,6 +53,10 @@ const ItemsSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
+    rgb: {
+        type: Boolean,
+        required: false
+    },
     labels: {
         type: [],
         required: false

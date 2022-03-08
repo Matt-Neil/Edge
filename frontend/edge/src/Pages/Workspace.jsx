@@ -251,7 +251,7 @@ const Workspace = ({currentUser, type}) => {
     const uploadImage = async () => {
         setDisabledCreate(true)
 
-        if (image) {
+        if (uploadedDataset && title !== "" && description !== "") {
             const formImage = new FormData();
             formImage.append('image', image);
 

@@ -18,6 +18,7 @@ exports.uploadImage = async (req, res, next) => {
             data: req.file.filename
         })
     } catch (err) {
+        console.log(err)
         res.status(500).json({
             success: false,
             error: 'Server Error'

@@ -410,6 +410,7 @@
             border-radius: 8px;
             margin: 10px 10px 0 0;
             padding: 0 8px 0 10px;
+            @include not-selectable();
 
             p {
                 font-size: 12px;

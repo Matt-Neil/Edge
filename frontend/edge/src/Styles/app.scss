@@ -92,8 +92,8 @@ input, textarea {
                         height: 30px;
                         border: none;
                         background: $grey2;
-                        border-top-right-radius: 8px;
-                        border-bottom-right-radius: 8px;
+                        border-top-right-radius: 7px;
+                        border-bottom-right-radius: 7px;
                         border-left: 1px solid $grey4;
                         cursor: pointer;
                         
@@ -110,6 +110,11 @@ input, textarea {
                     color: $grey7;
                     font-size: 14px;
                     margin: 0;
+
+                    .dataset-download-icon {
+                        font-size: 22px;
+                        color: $grey7;
+                    }
                 }
             }
             .sidebar-associated {

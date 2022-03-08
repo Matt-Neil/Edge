@@ -22,6 +22,7 @@ const Dataset = ({currentUser, type}) => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [visibility, setVisibility] = useState(false);
+    const [rgb, setRgb] = useState(false)
     const [bookmarked, setBookmarked] = useState()
     const [upvoted, setUpvoted] = useState()
     const [upvotes, setUpvotes] = useState()
@@ -44,7 +45,6 @@ const Dataset = ({currentUser, type}) => {
     const [refreshLabels, setRefreshLabels] = useState()
     const [loaded, setLoaded] = useState(false);
     const [exist, setExist] = useState()
-    const [noData, setNoData] = useState()
     const [addLabel, setAddLabel] = useState("")
     const [disableCreate, setDisabledCreate] = useState(false)
     const {addOpenItems, removeOpenItems} = useContext(OpenItemsContext);
@@ -83,6 +83,7 @@ const Dataset = ({currentUser, type}) => {
                     setTitle(dataset.data.data.title)
                     setDescription(dataset.data.data.description)
                     setLabels(dataset.data.data.labels)
+                    setRgb(dataset.data.data.rgb)
 
                     fetch(`http://127.0.0.1:5000/files/${dataset.data.data.imageFile}/labels.json`)
                         .then(response => response.json())
@@ -193,9 +194,18 @@ const Dataset = ({currentUser, type}) => {
         }
     }
 
-    const deleteImage = async (index) => {
-        // if (type === "view") {
-        // }
+    const deleteImage = async (filename, index) => {
+        if (type === "view") {
+            const formData = new FormData();
+
+            formData.append('id', dataset.imageFile)
+            formData.append('filename', filename)
+
+            try {
+                await fileAPI.post("/delete", formData);
+            } catch (err) {}
+        }
+
         uploadedImages.splice(index, 1)
         assignedLabels.splice(index, 1)
         setRefreshData(new Date().getTime())
@@ -332,6 +342,7 @@ const Dataset = ({currentUser, type}) => {
                 upvotes: [],
                 bookmarks: [],
                 labels: labels,
+                rgb: rgb,
                 updated: new Date().toISOString(),
                 visibility: visibility,
                 type: "dataset"
@@ -342,28 +353,42 @@ const Dataset = ({currentUser, type}) => {
     }
 
     const updateDataset = async () => {
-        const formImage = new FormData();
-        formImage.append('image', image);
-            
-        try {
-            const tempPicture = picture
-            const imageResponse = await imageAPI.post("/upload", formImage);
+        if (image) {
+            try {
+                const formImage = new FormData();
+                formImage.append('image', image);
+    
+                const tempPicture = picture
+                const imageResponse = await imageAPI.post("/upload", formImage);
 
-            await itemsAPI.put(`/${datasetID}?type=dataset`, {
-                title: title,
-                description: description,
-                picture: imageResponse.data.data,
-                labels: labels,
-                updated: new Date().toISOString()
-            })
+                await itemsAPI.put(`/${datasetID}?type=dataset`, {
+                    title: title,
+                    description: description,
+                    picture: imageResponse.data.data,
+                    labels: labels,
+                    rgb: rgb,
+                    updated: new Date().toISOString()
+                })
 
-            setImage(undefined)
-            setPicture(imageResponse.data.data)
-
-            if (tempPicture !== "default.png") {
-                await imageAPI.put('/remove', {picture: tempPicture});
-            }
-        } catch (err) {}
+                setImage(undefined)
+                setPicture(imageResponse.data.data)
+    
+                if (tempPicture !== "default.png") {
+                    await imageAPI.put('/remove', {picture: tempPicture});
+                }
+            } catch (err) {}
+        } else {
+            try {
+                await itemsAPI.put(`/${datasetID}?type=dataset`, {
+                    title: title,
+                    description: description,
+                    picture: picture,
+                    labels: labels,
+                    rgb: rgb,
+                    updated: new Date().toISOString()
+                })
+            } catch (err) {}
+        }
 
         setUpdated(new Date().toISOString())
         setChangedData(false)
@@ -430,6 +455,15 @@ const Dataset = ({currentUser, type}) => {
                                             }}
                                             checked={visibility} />
                                 </div>
+                                <div className="create-item-setup">
+                                    <label className="create-item-setup-label">RGB Images?</label>
+                                    <input type="checkbox" 
+                                            onChange={() => {
+                                                setRgb(previous => !previous)
+                                                setChangedSettings(true)
+                                            }}
+                                            checked={rgb} />
+                                </div>
                             </>
                         }
                         {!dataset.self && type !== "create" && <p className="item-creator">{dataset.creatorName.name}</p>}
@@ -464,7 +498,7 @@ const Dataset = ({currentUser, type}) => {
                                         </button>
                                     </div>
                                     <a href={`http://127.0.0.1:5000/files/${dataset.imageFile}`} download>
-                                        <DownloadIcon />
+                                        <DownloadIcon className="dataset-download-icon" />
                                     </a>
                                 </div>
                             </>
@@ -565,7 +599,7 @@ const Dataset = ({currentUser, type}) => {
                                                                         <option value={label} key={j}>{label}</option>
                                                                     )}
                                                                 </select>
-                                                                <div onClick={() => {deleteImage(i)}}>
+                                                                <div onClick={() => {deleteImage(image, i)}}>
                                                                     <DeleteIcon className="create-dataset-image-delete" />
                                                                 </div>
                                                             </div>
@@ -607,7 +641,7 @@ const Dataset = ({currentUser, type}) => {
                                             onKeyPress={addFunctionKey}
                                             value={addLabel} />
                                 }
-                                <div className="create-dataset-labels-list">
+                                <div className="create-dataset-labels-list" key={refreshLabels}>
                                     {labels.map((label, i) => {
                                         return (
                                             <div className={`create-dataset-label ${colours[i % colours.length]}`} key={i}>

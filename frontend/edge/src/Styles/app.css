@@ -1136,6 +1136,11 @@
   border-radius: 8px;
   margin: 10px 10px 0 0;
   padding: 0 8px 0 10px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .create-workspace-data .create-dataset-labels-list .create-dataset-label p {
@@ -2439,8 +2444,8 @@ input, textarea {
   height: 30px;
   border: none;
   background: #1D1D1D;
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
+  border-top-right-radius: 7px;
+  border-bottom-right-radius: 7px;
   border-left: 1px solid #292929;
   cursor: pointer;
 }
@@ -2459,6 +2464,11 @@ input, textarea {
   color: #FBFBFB;
   font-size: 14px;
   margin: 0;
+}
+
+.whole-body .main-body .sidebar .sidebar-dataset-copy a .dataset-download-icon {
+  font-size: 22px;
+  color: #FBFBFB;
 }
 
 .whole-body .main-body .sidebar .sidebar-associated {
