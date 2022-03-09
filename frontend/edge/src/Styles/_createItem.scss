@@ -57,34 +57,43 @@
     .create-item-view-dataset:hover {
         color: $grey7;
     }
-    .create-workspace-uploaded-dataset-link {
-        display: flex;
-        align-items: center;
-        text-decoration: none;
-        padding: 15px;
-        border-radius: 10px;
-
-        img {
-            width: 30px;
-            height: 30px;
-            object-fit: cover;
-            border-radius: 8px;
+    div {
+        .create-workspace-uploaded-dataset-header {
+            margin: 0 0 15px 0;
+            color: $grey7;
         }
-        p {
-            font-size: 13px;
-            margin: 0 15px;
-            color: $grey6;
-            font-family: 'Poppins', sans-serif;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 1;
-            line-clamp: 1; 
-            -webkit-box-orient: vertical;
+        .create-workspace-uploaded-dataset-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            padding: 15px;
+            border-radius: 10px;
+    
+            img {
+                width: 30px;
+                height: 30px;
+                object-fit: cover;
+                border-radius: 8px;
+            }
+            p {
+                font-size: 13px;
+                margin: 0 15px;
+                color: $grey5;
+                font-family: 'Poppins', sans-serif;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                line-clamp: 1; 
+                -webkit-box-orient: vertical;
+            }
+            p:hover {
+                color: $grey7;
+            }
         }
-    }
-    .create-workspace-uploaded-dataset-link:hover {
-        background-color: $grey2;
+        .create-workspace-uploaded-dataset-link:hover {
+            background-color: $grey2;
+        }
     }
     .create-item-edit-input {
         background-color: $grey4;
@@ -331,7 +340,7 @@
     .create-workspace-data-images-list {
         display: flex;
         flex-direction: column;
-        margin: 10px 15px;
+        margin: -15px 15px;
         overflow-y: auto;
         -ms-overflow-style: none;
         scrollbar-width: none;

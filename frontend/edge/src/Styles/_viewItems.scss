@@ -24,11 +24,13 @@
         margin: 10px 0 0 0;
     }
     .item-header-button-selected {
+        color: $grey7;
         margin: 15px 40px auto 0;
         text-decoration: underline;
         text-underline-offset: 5px;
     }
     .item-header-button-unselected {
+        color: $grey5;
         margin: 15px 40px auto 0;
     }
 }
@@ -60,9 +62,12 @@
         font-size: 20px;
         cursor: pointer;
     }
+    .item-icon:last-child {
+        margin: 0 7px 0 15px;
+    }
     .item-visibility {
-        margin: 0 8px;
-        font-size: 24px;
+        margin: 0 8px 0 15px;
+        font-size: 20px;
         color: $grey7;
         cursor: pointer;
     }

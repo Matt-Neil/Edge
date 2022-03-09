@@ -499,6 +499,12 @@ const Dataset = ({currentUser, type}) => {
                         <div className="item-information">
                             {type !== "create" && <p className="item-date">{date}</p>}
                             <span />
+                            {type !== "create" &&
+                                <>
+                                    <ThumbUpIcon className={`item-icon ${upvoted ? "blue2" : "white"}`} onClick={() => {updateUpvote()}} />
+                                    <p className={upvoted ? "blue2" : "white"}>{upvotes}</p>
+                                </>
+                            }
                             {!dataset.self && type !== "create" && <BookmarkIcon className={`item-icon ${bookmarked ? "blue2" : "white"}`} onClick={() => {updateBookmark()}} />}
                             {dataset.self && type !== "create" && 
                                 <>
@@ -507,12 +513,6 @@ const Dataset = ({currentUser, type}) => {
                                     :
                                         <VisibilityOffIcon className="item-visibility" onClick={() => {updateVisibility()}} />
                                     }
-                                </>
-                            }
-                            {type !== "create" &&
-                                <>
-                                    <ThumbUpIcon className={`item-icon ${upvoted ? "blue2" : "white"}`} onClick={() => {updateUpvote()}} />
-                                    <p className={upvoted ? "blue2" : "white"}>{upvotes}</p>
                                 </>
                             }
                         </div>

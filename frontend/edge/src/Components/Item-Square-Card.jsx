@@ -86,9 +86,9 @@ const WorkspaceSquareCard = ({item, created, creator, currentUserID}) => {
             <div className="item-square-card-bottom">
                 {!created ?
                     <>
-                        {item.creator !== currentUserID && <BookmarkIcon className={`item-square-card-icon ${bookmarked ? "blue2" : "white"}`} onClick={() => {updateBookmark()}} />}
                         <ThumbUpIcon className={`item-square-card-icon ${upvoted ? "blue2" : "white"}`} onClick={() => {updateUpvote()}} />
                         <p className={`item-square-card-upvotes ${upvoted ? "blue2" : "white"}`}>{upvotes}</p>
+                        {item.creator !== currentUserID && <BookmarkIcon className={`item-square-card-icon ${bookmarked ? "blue2" : "white"}`} onClick={() => {updateBookmark()}} />}
                     </>
                     :
                     <>

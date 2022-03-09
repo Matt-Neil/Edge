@@ -431,6 +431,12 @@ const Workspace = ({currentUser, type}) => {
                         <div className="item-information">
                             {type !== "create" && <p className="item-date">{date}</p>}
                             <span />
+                            {type !== "create" &&
+                                <>
+                                    <ThumbUpIcon className={`item-icon ${upvoted ? "blue2" : "white"}`} onClick={() => {updateUpvote()}} />
+                                    <p className={upvoted ? "blue2" : "white"}>{upvotes}</p>
+                                </>
+                            }
                             {!workspace.self && type !== "create" && <BookmarkIcon className={`item-icon ${bookmarked ? "blue2" : "white"}`} onClick={() => {updateBookmark()}} />}
                             {workspace.self && type !== "create" && 
                                 <>
@@ -439,12 +445,6 @@ const Workspace = ({currentUser, type}) => {
                                     :
                                         <VisibilityOffIcon className="item-visibility" onClick={() => {updateVisibility()}} />
                                     }
-                                </>
-                            }
-                            {type !== "create" &&
-                                <>
-                                    <ThumbUpIcon className={`item-icon ${upvoted ? "blue2" : "white"}`} onClick={() => {updateUpvote()}} />
-                                    <p className={upvoted ? "blue2" : "white"}>{upvotes}</p>
                                 </>
                             }
                         </div>
@@ -460,10 +460,13 @@ const Workspace = ({currentUser, type}) => {
                                     {type === "view" && <Link className="create-item-view-dataset" to={`/dataset/${datasetID}`}><OpenInNewIcon /></Link>}
                                 </>
                             :
-                                <Link to={`/dataset/${datasetID}`}className="create-workspace-uploaded-dataset-link">
-                                    <img src={`http://localhost:4000/images/${uploadedDataset.picture}`} />
-                                    <p>{uploadedDataset.title}</p>
-                                </Link>
+                                <div>
+                                    <p className="create-workspace-uploaded-dataset-header">Selected Dataset:</p>
+                                    <Link to={`/dataset/${datasetID}`} className="create-workspace-uploaded-dataset-link">
+                                        <img src={`http://localhost:4000/images/${uploadedDataset.picture}`} />
+                                        <p>{uploadedDataset.title}</p>
+                                    </Link>
+                                </div>
                             }
                         </div>
                         

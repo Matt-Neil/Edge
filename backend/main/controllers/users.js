@@ -8,7 +8,6 @@ exports.getRecent = async (req, res, next) => {
         const recent = await Items.aggregate([
             { 
                 $match: {
-                    visibility: true,
                     creator: mongoose.Types.ObjectId(res.locals.currentUser._id)
                 }
             }, { 
@@ -27,6 +26,7 @@ exports.getRecent = async (req, res, next) => {
                     'creator': 1,
                     'title': 1,
                     'picture': 1,
+                    'visibility': 1,
                     'bookmarked': { $in: [res.locals.currentUser._id, '$bookmarks'] },
                     'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
                     'upvotes': { $size: '$upvotes' },

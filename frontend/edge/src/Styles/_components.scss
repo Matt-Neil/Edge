@@ -211,9 +211,11 @@
         @include not-selectable()
     }
     .item-square-card-icon {
-        margin: 0 0 0 15px;
         font-size: 22px;
         cursor: pointer;
+    }
+    .item-square-card-icon:first-child {
+        margin: 0 0 0 15px;
     }
     .item-square-card-visibility {
         color: $grey7;
@@ -297,14 +299,14 @@
             @include not-selectable()
         }
         .item-row-card-icon {
-            margin: 0 0 0 10px;
+            margin: 0 0 0 20px;
             font-size: 22px;
             cursor: pointer;
         }
         .item-row-card-visibility {
             color: $grey7;
             font-size: 20px;
-            margin: 0 15px 0 20px;
+            margin: 0 0 0 20px;
             cursor: pointer;
         }
     }
