@@ -54,7 +54,12 @@ def upload_file():
 @app.route('/api/file/delete', methods = ['POST'])
 def delete_file():
     os.remove('files/{}/{}.jpg'.format(request.form['id'], request.form['filename']))
-    
+
+    with open('files/{}/labels.json'.format(request.form['id'])) as infile:
+        labels = json.load(infile)
+
+    labels.pop(int(request.form['index']))
+
     with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
         json.dump(labels, outfile)
 
@@ -68,7 +73,7 @@ def replace_file():
     os.makedirs('files/' + request.form['id'])
     labels = []
 
-    for i in range(len(images)):
+    for i in range(len(assignedLabels)):
         labels.append({
             'filename': i,
             'label': assignedLabels[i]
@@ -83,18 +88,24 @@ def replace_file():
 @app.route('/api/file/append', methods = ['POST'])
 def append_file():
     images = request.files.getlist("data[]")
+    filenames = request.form.getlist("filenames[]")
     assignedLabels = request.form.getlist("labels[]")
     labels = []
 
-    for i in range(int(request.form.getlist("labels[]"))+1, int(request.form.getlist("labels[]"))+len(images)+1):
+    with open('files/{}/labels.json'.format(request.form['id'])) as infile:
+        previous = json.load(infile)
+    
+    for i in range(len(filenames)):
         labels.append({
-            'filename': i,
+            'filename': filenames[i],
             'label': assignedLabels[i]
         })
-        images[i].save('files/{}/{}.jpg'.format(request.form['id'], i))
+        images[i].save('files/{}/{}.jpg'.format(request.form['id'], filenames[i]))
+
+    previous.extend(labels)
     
     with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
-        json.dump(labels, outfile)
+        json.dump(previous, outfile)
 
     return "OK"
 

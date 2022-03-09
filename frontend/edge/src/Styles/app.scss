@@ -222,6 +222,10 @@ input, textarea {
     line-height: 36px;
     cursor: pointer;
 }
+.white-button:disabled {
+    background-color: $grey5;
+    cursor: not-allowed;
+}
 .text-button {
     width: fit-content;
     height: 36px;

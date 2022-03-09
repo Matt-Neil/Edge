@@ -854,7 +854,7 @@ const Workspace = ({currentUser, type}) => {
                 </div>
             : loaded && !exist &&
                 <div className="inner">  
-                    <p className="item-exist">Cannot find dataset</p>
+                    <p className="item-exist">Cannot find workspace</p>
                 </div>
             }
         </>

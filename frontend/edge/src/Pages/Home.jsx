@@ -1,5 +1,6 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useContext} from 'react'
 import { Link, useHistory } from 'react-router-dom'
+import { CardFormatContext } from '../Contexts/cardFormatContext';
 import usersAPI from '../API/users'
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -11,7 +12,7 @@ const Home = ({setSearchPhrase}) => {
     const [recent, setRecent] = useState()
     const [loaded, setLoaded] = useState(false)
     const [input, setInput] = useState("");
-    const [rowFormat, setRowFormat] = useState(false)
+    const {cardFormat, changeCardFormat} = useContext(CardFormatContext);
     const history = useHistory();
 
     useEffect(() => {
@@ -75,15 +76,15 @@ const Home = ({setSearchPhrase}) => {
                                 <h1>Recently Updated</h1>
                                 <div className="toggle-card-type">
                                     <span />
-                                    <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {setRowFormat(true)}} />
-                                    <img src="http://localhost:3000/Grid.png" className="toggle-card-type-grid-icon" onClick={() => {setRowFormat(false)}} />
+                                    <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {changeCardFormat()}} />
+                                    <img src="http://localhost:3000/Grid.png" className="toggle-card-type-grid-icon" onClick={() => {changeCardFormat()}} />
                                 </div>
                             </div>
                             <div className="view-items-list">
                                 {recent.length > 0 &&
                                     <>
                                         {recent.map((item, i) => {
-                                            return rowFormat ? <ItemRowCard item={item} created={true} key={i} /> : <ItemSquareCard item={item} created={true} key={i} />
+                                            return cardFormat ? <ItemRowCard item={item} created={true} key={i} /> : <ItemSquareCard item={item} created={true} key={i} />
                                         })}
                                     </>
                                 }

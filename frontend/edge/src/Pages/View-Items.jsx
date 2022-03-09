@@ -1,5 +1,6 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useContext} from 'react'
 import {useHistory, Link} from "react-router-dom"
+import { CardFormatContext } from '../Contexts/cardFormatContext';
 import ItemRowCard from '../Components/Item-Row-Card'
 import ItemSquareCard from '../Components/Item-Square-Card'
 import Shortcut from '../Components/Shortcut'
@@ -11,9 +12,9 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 const ViewItems = ({type, currentUser, setSearchPhrase}) => {
     const [items, setItems] = useState();
     const [loaded, setLoaded] = useState(false);
-    const [rowFormat, setRowFormat] = useState(false)
     const [input, setInput] = useState("");
     const [finishedItems, setFinishedItems] = useState(false);
+    const {cardFormat, changeCardFormat} = useContext(CardFormatContext);
     const history = useHistory();
 
     useEffect(() => {
@@ -167,8 +168,8 @@ const ViewItems = ({type, currentUser, setSearchPhrase}) => {
                                 {type === "created-datasets" && <Link to="/create-dataset" className="blue-button">Create Dataset</Link>}
                                 <div className="toggle-card-type">
                                     <span />
-                                    <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {setRowFormat(true)}} />
-                                    <img src="http://localhost:3000/Grid.png" className="toggle-card-type-grid-icon" onClick={() => {setRowFormat(false)}} />
+                                    <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {changeCardFormat()}} />
+                                    <img src="http://localhost:3000/Grid.png" className="toggle-card-type-grid-icon" onClick={() => {changeCardFormat()}} />
                                 </div>
                             </div>
                             {(type === "created-workspaces" || type === "public-workspaces") ?
@@ -182,9 +183,9 @@ const ViewItems = ({type, currentUser, setSearchPhrase}) => {
                                 {items.length > 0 &&
                                     <>
                                         {items.map((item, i) => {
-                                            if (type === "created-workspaces" || type === "created-datasets") return rowFormat ? <ItemRowCard item={item} created={true} key={i} /> : <ItemSquareCard item={item} created={true} key={i} />
+                                            if (type === "created-workspaces" || type === "created-datasets") return cardFormat ? <ItemRowCard item={item} created={true} key={i} /> : <ItemSquareCard item={item} created={true} key={i} />
 
-                                            return rowFormat ?
+                                            return cardFormat ?
                                                 <ItemRowCard item={item} creator={item.creatorName.name} currentUserID={currentUser.id} created={currentUser.id === item.creator} key={i} /> 
                                                 : 
                                                 <ItemSquareCard item={item} creator={item.creatorName.name} currentUserID={currentUser.id} created={currentUser.id === item.creator} key={i} />

@@ -1,5 +1,6 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useContext} from 'react'
 import {Link, useHistory, useParams} from "react-router-dom"
+import { CardFormatContext } from '../Contexts/cardFormatContext';
 import ItemRowCard from '../Components/Item-Row-Card'
 import ItemSquareCard from '../Components/Item-Square-Card'
 import globalAPI from '../API/global'
@@ -10,9 +11,9 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 const AccountWorkspaces = ({searchPhrase, setSearchPhrase, currentUser}) => {
     const [items, setItems] = useState();
     const [loaded, setLoaded] = useState(false);
-    const [rowFormat, setRowFormat] = useState(false)
     const [input, setInput] = useState("");
     const [finishedItems, setFinishedItems] = useState(false);
+    const {cardFormat, changeCardFormat} = useContext(CardFormatContext);
     const urlPhrase = useParams().id;
     const history = useHistory();
 
@@ -114,8 +115,8 @@ const AccountWorkspaces = ({searchPhrase, setSearchPhrase, currentUser}) => {
                                 <h1>Search Results: {urlPhrase}</h1>
                                 <div className="toggle-card-type">
                                     <span />
-                                    <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {setRowFormat(true)}} />
-                                    <img src="http://localhost:3000/Grid.png" className="toggle-card-type-grid-icon" onClick={() => {setRowFormat(false)}} />
+                                    <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {changeCardFormat()}} />
+                                    <img src="http://localhost:3000/Grid.png" className="toggle-card-type-grid-icon" onClick={() => {changeCardFormat()}} />
                                 </div>
                             </div>
                             <p className="view-items-results">{`${items.length} Results`}</p>
@@ -123,7 +124,7 @@ const AccountWorkspaces = ({searchPhrase, setSearchPhrase, currentUser}) => {
                                 {items.length > 0 &&
                                     <>
                                         {items.map((item, i) => {
-                                            return rowFormat ? 
+                                            return cardFormat ? 
                                                 <ItemRowCard item={item} creator={item.creatorName.name} currentUserID={currentUser.id} created={currentUser.id === item.creator} key={i} /> 
                                                 : 
                                                 <ItemSquareCard item={item} creator={item.creatorName.name} currentUserID={currentUser.id} created={currentUser.id === item.creator} key={i} />

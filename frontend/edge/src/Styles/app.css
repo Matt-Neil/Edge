@@ -892,6 +892,11 @@
   font-weight: 400;
   font-size: 13px;
   line-height: 30px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .create-modelling-body .create-model-selected .create-model-selected-input div input {
@@ -1104,7 +1109,7 @@
 
 .create-workspace-data .create-dataset-label-input {
   background-color: #292929;
-  height: 40px;
+  min-height: 40px;
   padding: 0 10px;
   border-radius: 10px;
   font-size: 12px;
@@ -1119,7 +1124,12 @@
   display: flex;
   -ms-flex-wrap: wrap;
       flex-wrap: wrap;
+  max-height: calc(100vh - 65px);
+  overflow-y: auto;
   margin: 0 15px;
+  padding: 0 0 25px 0;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .create-workspace-data .create-dataset-labels-list .create-dataset-label {
@@ -1162,6 +1172,10 @@
   cursor: pointer;
 }
 
+.create-workspace-data .create-dataset-labels-list::-webkit-scrollbar {
+  display: none;
+}
+
 .create-dataset-upload {
   position: -webkit-sticky;
   position: sticky;
@@ -1182,6 +1196,9 @@
 .create-dataset-upload input {
   background: none;
   color: #92919A;
+  max-width: 250px;
+  width: 100%;
+  margin: 0 20px 0 0;
 }
 
 .create-dataset-upload button {
@@ -1219,7 +1236,60 @@
   margin: 10px 0 0 0;
 }
 
-.create-dataset-images-list .create-dataset-image {
+.create-dataset-appended {
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+  width: calc(100% - 40px);
+  margin: 10px 0;
+  padding: 0 20px 20px 20px;
+  border-radius: 10px;
+  background-color: #191919;
+}
+
+.create-dataset-appended .create-dataset-appended-header {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.create-dataset-appended .create-dataset-appended-header p {
+  color: #FBFBFB;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+
+.create-dataset-appended .create-dataset-appended-header button {
+  color: #92919A;
+}
+
+.create-dataset-appended .create-dataset-appended-header button:hover {
+  color: #FBFBFB;
+}
+
+.create-dataset-appended .create-dataset-appended-list {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+
+.create-dataset-appended .create-dataset-appended-footer {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+  margin: 20px 0 0 auto;
+}
+
+.create-dataset-image {
   width: 170px;
   height: 225px;
   -o-object-fit: cover;
@@ -1230,7 +1300,7 @@
   border-radius: 10px;
 }
 
-.create-dataset-images-list .create-dataset-image img {
+.create-dataset-image img {
   width: 170px;
   height: 170px;
   -o-object-fit: contain;
@@ -1239,7 +1309,7 @@
   border-bottom: 1px #292929 solid;
 }
 
-.create-dataset-images-list .create-dataset-image p, .create-dataset-images-list .create-dataset-image select {
+.create-dataset-image p, .create-dataset-image select {
   width: calc(100% - 20px);
   height: 30px;
   margin: 0 10px;
@@ -1252,7 +1322,7 @@
   line-height: 30px;
 }
 
-.create-dataset-images-list .create-dataset-image div {
+.create-dataset-image div {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1261,7 +1331,7 @@
           align-items: center;
 }
 
-.create-dataset-images-list .create-dataset-image div .create-dataset-image-delete {
+.create-dataset-image div .create-dataset-image-delete {
   margin: 0 5px 0 -5px;
   color: #92919A;
   cursor: pointer;
@@ -2621,6 +2691,11 @@ input, textarea {
   font-size: 13px;
   line-height: 36px;
   cursor: pointer;
+}
+
+.white-button:disabled {
+  background-color: #92919A;
+  cursor: not-allowed;
 }
 
 .text-button {
