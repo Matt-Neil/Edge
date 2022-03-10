@@ -2233,6 +2233,14 @@
   width: 420px;
 }
 
+.account-information h1 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: #FBFBFB;
+  margin: 5px 0 20px 0;
+}
+
 .account-information label {
   font-size: 14px;
   color: #FBFBFB;
