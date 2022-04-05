@@ -87,6 +87,14 @@ const ConfigurationSchema = new mongoose.Schema({
     loss: {
         type: String,
         required: true
+    }, 
+    decay_rate: {
+        type: Number,
+        required: false
+    }, 
+    decay_steps: {
+        type: Number,
+        required: false
     }
 }, { _id : false })
 

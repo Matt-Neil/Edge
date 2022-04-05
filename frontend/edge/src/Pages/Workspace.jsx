@@ -47,8 +47,8 @@ const Workspace = ({currentUser, type}) => {
     const [model, setModel] = useState([{type: "Input"}])
     const [evaluation, setEvaluation] = useState()
     const [selectedNode, setSelectedNode] = useState(0)
-    const [configuration, setConfiguration] = useState({epochs: 0, training_split: 0, validation_split: 0, improvement: 0, early_stopping: false,
-                                                        patience: 0, batch: 32, lr_scheduler: false, initial_lr: 0.01, optimiser: "", loss: ""})
+    const [configuration, setConfiguration] = useState({epochs: 0, training_split: 0, validation_split: 0, improvement: 0, early_stopping: false, decay_rate: 0,
+                                                        decay_steps: 1, patience: 0, batch: 32, lr_scheduler: false, initial_lr: 0.01, optimiser: "", loss: ""})
     const [addNode, setAddNode] = useState(false)
     const [loaded, setLoaded] = useState(false);
     const [exist, setExist] = useState()
@@ -270,7 +270,7 @@ const Workspace = ({currentUser, type}) => {
     const uploadImage = async () => {
         setDisabledCreate(true)
 
-        if (uploadedDataset && title !== "" && description !== "") {
+        if (uploadedDataset && title !== "" && description !== "" && image) {
             const formImage = new FormData();
             formImage.append('image', image);
 
@@ -331,6 +331,8 @@ const Workspace = ({currentUser, type}) => {
             formData.append('improvement', configuration.improvement)
             formData.append('patience', configuration.patience)
             formData.append('batch', configuration.batch)
+            formData.append('decay_rate', configuration.decay_rate)
+            formData.append('decay_steps', configuration.decay_steps)
             formData.append('early_stopping', configuration.early_stopping ? "true" : "false")
             formData.append('lr_scheduler', configuration.lr_scheduler ? "true" : "false")
             formData.append('initial_lr', configuration.initial_lr)
@@ -567,9 +569,12 @@ const Workspace = ({currentUser, type}) => {
                                                 <button className={`text-button ${stage === "evaluation" ? "item-header-button-selected" : "item-header-button-unselected"}`}
                                                         onClick={() => {setStage("evaluation")}}>Evaluation</button>
                                                 <span />
-                                                <button className="blue-button"
+                                                <button className="workspace-train blue-button"
                                                         disabled={disabledTrain || model[model.length-1].type !== "Output" || model.length === 0}
                                                         onClick={() => {train()}}>Train</button>
+                                                <button className="blue-button"
+                                                        disabled={!evaluation || title === "" || description === "" || model[model.length-1].type !== "Output"}
+                                                        onClick={() => {uploadImage()}}>Create</button>
                                             </div>
                                         </>
                                     }
@@ -1064,30 +1069,6 @@ const Workspace = ({currentUser, type}) => {
                                                                         }} />
                                                             </div>
                                                             <div>
-                                                                <label>Minimum Improvement</label>
-                                                                <input value={configuration.improvement} 
-                                                                        disabled={!(workspace.self || type === "create")}
-                                                                        onChange={e => {
-                                                                            setConfiguration(state => ({
-                                                                                ...state,
-                                                                                improvement: e.target.value
-                                                                            }))
-                                                                            setChangedSettings(true)
-                                                                        }} />
-                                                            </div>
-                                                            <div>
-                                                                <label>Patience</label>
-                                                                <input value={configuration.patience} 
-                                                                        disabled={!(workspace.self || type === "create")}
-                                                                        onChange={e => {
-                                                                            setConfiguration(state => ({
-                                                                                ...state,
-                                                                                patience: e.target.value
-                                                                            }))
-                                                                            setChangedSettings(true)
-                                                                        }} />
-                                                            </div>
-                                                            <div>
                                                                 <label>Batch Size</label>
                                                                 <input value={configuration.batch} 
                                                                         disabled={!(workspace.self || type === "create")}
@@ -1125,6 +1106,34 @@ const Workspace = ({currentUser, type}) => {
                                                                         }}
                                                                         checked={configuration.lr_scheduler} />
                                                             </div>
+                                                            {configuration.lr_scheduler &&
+                                                                <>
+                                                                    <div>
+                                                                        <label>Decay Rate</label>
+                                                                        <input value={configuration.decay_rate} 
+                                                                                disabled={!(workspace.self || type === "create")}
+                                                                                onChange={e => {
+                                                                                    setConfiguration(state => ({
+                                                                                        ...state,
+                                                                                        decay_rate: e.target.value
+                                                                                    }))
+                                                                                    setChangedSettings(true)
+                                                                                }} />
+                                                                    </div>
+                                                                    <div>
+                                                                        <label>Decay Steps</label>
+                                                                        <input value={configuration.decay_steps} 
+                                                                                disabled={!(workspace.self || type === "create")}
+                                                                                onChange={e => {
+                                                                                    setConfiguration(state => ({
+                                                                                        ...state,
+                                                                                        decay_steps: e.target.value
+                                                                                    }))
+                                                                                    setChangedSettings(true)
+                                                                                }} />
+                                                                    </div>
+                                                                </>
+                                                            }
                                                             <div>
                                                                 <label>Early Stopping</label>
                                                                 <input className="create-model-configuration-option-checkbox"
@@ -1139,6 +1148,34 @@ const Workspace = ({currentUser, type}) => {
                                                                         }}
                                                                         checked={configuration.early_stopping} />
                                                             </div>
+                                                            {configuration.early_stopping &&
+                                                                <>
+                                                                    <div>
+                                                                        <label>Minimum Improvement</label>
+                                                                        <input value={configuration.improvement} 
+                                                                                disabled={!(workspace.self || type === "create")}
+                                                                                onChange={e => {
+                                                                                    setConfiguration(state => ({
+                                                                                        ...state,
+                                                                                        improvement: e.target.value
+                                                                                    }))
+                                                                                    setChangedSettings(true)
+                                                                                }} />
+                                                                    </div>
+                                                                    <div>
+                                                                        <label>Patience</label>
+                                                                        <input value={configuration.patience} 
+                                                                                disabled={!(workspace.self || type === "create")}
+                                                                                onChange={e => {
+                                                                                    setConfiguration(state => ({
+                                                                                        ...state,
+                                                                                        patience: e.target.value
+                                                                                    }))
+                                                                                    setChangedSettings(true)
+                                                                                }} />
+                                                                    </div>
+                                                                </>
+                                                            }
                                                             <div>
                                                                 <label>Optimiser</label>
                                                                 <select value={configuration.optimiser} 

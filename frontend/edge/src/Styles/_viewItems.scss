@@ -16,6 +16,10 @@
     div {
         display: flex;
         align-items: center;
+
+        .workspace-train {
+            margin: 5px 15px 0 0;
+        }
     }
     button {
         margin: 5px 0 0 0;  

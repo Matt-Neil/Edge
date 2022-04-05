@@ -662,9 +662,12 @@ const Dataset = ({currentUser, type}) => {
                                             {type === "create" ?
                                                 <>
                                                     <h1>Create Dataset</h1>
-                                                    <button className="blue-button"
-                                                            disabled={disableCreate}
-                                                            onClick={() => {uploadImage()}}>Create</button>
+                                                    <div>
+                                                        <span />
+                                                        <button className="blue-button"
+                                                                disabled={disableCreate}
+                                                                onClick={() => {uploadImage()}}>Create</button>
+                                                    </div>
                                                 </>
                                             :
                                                 <>

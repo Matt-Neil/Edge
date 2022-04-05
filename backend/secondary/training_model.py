@@ -1,8 +1,9 @@
-from flask import jsonify
 import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.callbacks import LearningRateScheduler, EarlyStopping
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.optimizers.schedules import ExponentialDecay
+from tensorflow.keras.optimizers import Adadelta, Adagrad, Adam, Adamax, Ftrl, Nadam, RMSprop, SGD
 import json
 import sys
 
@@ -77,23 +78,31 @@ def model(body):
                                         activation=node['activation']))
             else:
                 model.add(layers.Flatten())
+    print(training_set, sys.stdout)
+    print(int(len(training_set)/int(body['batch'])), sys.stdout)
+    if body['lr_scheduler'] == "true":
+        lr_scheduler = ExponentialDecay(initial_learning_rate=float(body['initial_lr']), 
+                                        decay_steps=int(body['decay_steps']), 
+                                        decay_rate=float(body['decay_rate']))
+    else:
+        lr_scheduler = float(body['initial_lr'])
 
     if body['optimiser'] == "Adadelta":
-        optimiser = tf.keras.optimizers.Adadelta(learning_rate=float(body['initial_lr']))
+        optimiser = Adadelta(learning_rate=lr_scheduler)
     elif body['optimiser'] == "Adagrad":
-        optimiser = tf.keras.optimizers.Adagrad(learning_rate=float(body['initial_lr']))
+        optimiser = Adagrad(learning_rate=lr_scheduler)
     elif body['optimiser'] == "Adam":
-        optimiser = tf.keras.optimizers.Adam(learning_rate=float(body['initial_lr']))
+        optimiser = Adam(learning_rate=lr_scheduler)
     elif body['optimiser'] == "Adamax":
-        optimiser = tf.keras.optimizers.Adamax(learning_rate=float(body['initial_lr']))
+        optimiser = Adamax(learning_rate=lr_scheduler)
     elif body['optimiser'] == "Ftrl":  
-        optimiser = tf.keras.optimizers.Ftrl(learning_rate=float(body['initial_lr']))
+        optimiser = Ftrl(learning_rate=lr_scheduler)
     elif body['optimiser'] == "Nadam":
-        optimiser = tf.keras.optimizers.Nadam(learning_rate=float(body['initial_lr']))
+        optimiser = Nadam(learning_rate=lr_scheduler)
     elif body['optimiser'] == "RMSprop":
-        optimiser = tf.keras.optimizers.RMSprop(learning_rate=float(body['initial_lr']))
+        optimiser = RMSprop(learning_rate=lr_scheduler)
     else:
-        optimiser = tf.keras.optimizers.SGD(learning_rate=float(body['initial_lr']))
+        optimiser = SGD(learning_rate=lr_scheduler)
 
     model.compile(loss=body['loss'], optimizer=optimiser, metrics=['accuracy'])
 
@@ -102,10 +111,7 @@ def model(body):
     if body['early_stopping'] == "true":
         callbacks.append(EarlyStopping(monitor='loss', patience=int(body['patience']), min_delta=float(body['improvement']), mode='auto'))
 
-    if body['lr_scheduler'] == "true":
-        callbacks.append(LearningRateScheduler(lambda epoch: 1e-4 * 10**(epoch/20)))
-
-    history = model.fit(training_set, validation_data=validation_set, epochs=int(body['epochs']), callbacks=callbacks)
+    history = model.fit(training_set, validation_data=validation_set, epochs=int(body['epochs']), batch_size=int(body['batch']), callbacks=callbacks, verbose=0)
 
     test_loss, test_acc = model.evaluate(validation_set, verbose=0)
 

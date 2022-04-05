@@ -2479,6 +2479,10 @@
           align-items: center;
 }
 
+.view-items-top div .workspace-train {
+  margin: 5px 15px 0 0;
+}
+
 .view-items-top button {
   margin: 5px 0 0 0;
 }
