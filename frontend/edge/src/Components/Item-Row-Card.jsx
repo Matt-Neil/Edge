@@ -7,7 +7,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-const WorkspaceRowCard = ({item, created, creator, currentUserID}) => {
+const ItemRowCard = ({item, created, creator, currentUserID}) => {
     const [bookmarked, setBookmarked] = useState(item.bookmarked)
     const [upvoted, setUpvoted] = useState(item.upvoted)
     const [upvotes, setUpvotes] = useState(item.upvotes)
@@ -103,4 +103,4 @@ const WorkspaceRowCard = ({item, created, creator, currentUserID}) => {
     )
 }
 
-export default WorkspaceRowCard
+export default ItemRowCard

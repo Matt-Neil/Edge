@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef, useContext} from 'react'
-import {useHistory, useParams, Link} from "react-router-dom"
+import {useHistory, useParams} from "react-router-dom"
 import usersAPI from '../API/users'
 import itemsAPI from '../API/items'
 import globalAPI from '../API/global'
@@ -28,6 +28,8 @@ const Dataset = ({currentUser, type}) => {
     const [upvotes, setUpvotes] = useState()
     const [updated, setUpdated] = useState()
     const [picture, setPicture] = useState()
+    const [width, setWidth] = useState()
+    const [height, setHeight] = useState()
     const [date, setDate] = useState("")
     const [start, setStart] = useState(0)
     const [end, setEnd] = useState(30)
@@ -54,6 +56,7 @@ const Dataset = ({currentUser, type}) => {
         "label-orange2", "label-blue2", "label-yellow1", "label-green2", "label-yellow2"]
     const datasetID = useParams().id;
     const copyInterval = useRef(0)
+    const firstRender = useRef(true);
     const history = useHistory();
 
     useEffect(() => {
@@ -86,6 +89,8 @@ const Dataset = ({currentUser, type}) => {
                     setDescription(dataset.data.data.description)
                     setLabels(dataset.data.data.labels)
                     setRgb(dataset.data.data.rgb)
+                    setHeight(dataset.data.data.height)
+                    setWidth(dataset.data.data.width)
 
                     fetch(`http://127.0.0.1:5000/files/${dataset.data.data.imageFile}/labels.json`)
                         .then(response => response.json())
@@ -130,6 +135,14 @@ const Dataset = ({currentUser, type}) => {
         }
     }, [loaded, updated])
 
+    useEffect(() => {
+        if (!firstRender.current && loaded) {
+            updateDataset()
+        } else {
+            firstRender.current = false
+        }
+    }, [labels])
+
     const copiedInterval = () => {
         clearInterval(copyInterval.current)
         navigator.clipboard.writeText(dataset.datafile);
@@ -140,12 +153,74 @@ const Dataset = ({currentUser, type}) => {
         return ()=> {clearInterval(copyInterval.current)};
     }
 
-    const addFunctionKey = (e) => {
-        if (e.key === "Enter" && addLabel !== "") {
+    const addFunctionKey = async (e) => {
+        if (e.key === "Enter" && addLabel !== "" && !labels.includes(addLabel)) {
             setLabels(state => [...state, addLabel])
             setChangedSettings(true)
             setAddLabel("")
+            
+            const formData = new FormData();
+
+            formData.append('id', dataset.imageFile)
+            formData.append('label', addLabel)
+
+            await fileAPI.post("/add-label", formData)
         }
+    }
+
+    const deleteLabel = async (index) => {
+        try {
+            assignedLabels.map((assignedLabel, j) => {
+                if (assignedLabel === labels[index]) {
+                    setAssignedLabels(state => {
+                        const stateCopy = [...state]
+                    
+                        stateCopy[j] = "No label"
+                    
+                        return stateCopy
+                    })
+                }
+            })
+
+            const formData = new FormData();
+
+            formData.append('id', dataset.imageFile)
+            formData.append('label', labels[index])
+
+            labels.splice(index, 1)
+
+            await fileAPI.post("/delete-label", formData).then(() => {
+                updateDataset()
+            });
+
+            setRefreshLabels(new Date().getTime())
+            setRefreshData(new Date().getTime())
+        } catch (err) {}
+    }
+
+    const updateLabel = async (e, index) => {
+        try {
+            const formData = new FormData();
+
+            formData.append('id', dataset.imageFile)
+            formData.append('filename', uploadedImages[index])
+            formData.append('oldLabel', assignedLabels[index])
+            formData.append('newLabel', e.target.value)
+            formData.append('index', index)
+
+            setAssignedLabels(state => {
+                const stateCopy = [...state]
+            
+                stateCopy[index] = e.target.value
+            
+                return stateCopy
+            })
+
+            await fileAPI.post("/update-image", formData);
+
+            setChangedData(true)
+            setRefreshLabels(new Date().getTime())
+        } catch (err) {}
     }
 
     const updateUpvote = async () => {
@@ -186,19 +261,6 @@ const Dataset = ({currentUser, type}) => {
             setRefreshData(new Date().getTime())
         }
     }
-
-    const fetchImages = () => {
-        try {
-            fetch(`http://127.0.0.1:5000/files/${dataset.imageFile}/labels.json`)
-            .then(response => response.json())
-            .then(images => {
-                images.map(image => {
-                    setUploadedImages(state => [...state, image.filename])
-                    setAssignedLabels(state => [...state, image.label])
-                })
-            }).catch();
-        } catch (err) {}
-    }
     
     const nextPage = () => {
         if (page*30 < uploadedImages.length && uploadedImages.length > 30) {
@@ -209,7 +271,7 @@ const Dataset = ({currentUser, type}) => {
         }
     }
 
-    const deleteImage = async (filename, index) => {
+    const deleteImage = async (filename, index, label) => {
         uploadedImages.splice(index, 1)
         assignedLabels.splice(index, 1)
 
@@ -218,12 +280,13 @@ const Dataset = ({currentUser, type}) => {
 
             formData.append('id', dataset.imageFile)
             formData.append('index', index)
+            formData.append('label', label)
             formData.append('filename', filename)
 
-            try {
-                updateDataset()
+            updateDataset()
 
-                await fileAPI.post("/delete", formData);
+            try {
+                await fileAPI.post("/delete-image", formData);
             } catch (err) {}
         }
 
@@ -256,10 +319,10 @@ const Dataset = ({currentUser, type}) => {
                 formData.append('labels[]', assignedLabels[i]);
             }
 
-            try {
-                updateDataset()
+            updateDataset()
 
-                await fileAPI.post("/replace", formData);
+            try {
+                await fileAPI.post("/replace-image", formData);
 
                 for (let i = 0; i < imageFiles.length; i++) {
                     setUploadedImages(state => [...state, i])
@@ -308,13 +371,12 @@ const Dataset = ({currentUser, type}) => {
                 filenames.push((parseInt(uploadedImages[uploadedImages.length-1])+i+1).toString())
             }
 
+            setUploadedImages(state => [...state, ...filenames])
+            setAssignedLabels(state => [...state, ...appendedLabels])
+            updateDataset()
+
             try {
-                setUploadedImages(state => [...state, ...filenames])
-                setAssignedLabels(state => [...state, ...appendedLabels])
-                updateDataset()
-
-                await fileAPI.post("/append", formData)
-
+                await fileAPI.post("/append-image", formData)
             } catch (err) {}
         }
 
@@ -346,7 +408,7 @@ const Dataset = ({currentUser, type}) => {
                 formImage.append('image', image);
                 
                 try {
-                    const imageResponse = await imageAPI.post("/upload", formImage);
+                    const imageResponse = await imageAPI.post("/upload-image", formImage);
     
                     uploadDataset(imageResponse.data.data, id)
                 } catch (err) {}
@@ -370,6 +432,8 @@ const Dataset = ({currentUser, type}) => {
                 bookmarks: [],
                 labels: labels,
                 rgb: rgb,
+                width: width,
+                height: height,
                 updated: new Date().toISOString(),
                 visibility: visibility,
                 type: "dataset"
@@ -394,6 +458,8 @@ const Dataset = ({currentUser, type}) => {
                     picture: imageResponse.data.data,
                     labels: labels,
                     rgb: rgb,
+                    width: width,
+                    height: height,
                     updated: new Date().toISOString()
                 })
 
@@ -412,6 +478,8 @@ const Dataset = ({currentUser, type}) => {
                     picture: picture,
                     labels: labels,
                     rgb: rgb,
+                    width: width,
+                    height: height,
                     updated: new Date().toISOString()
                 })
             } catch (err) {}
@@ -425,11 +493,10 @@ const Dataset = ({currentUser, type}) => {
     const deleteDataset = async () => {
         try {
             const formData = new formData()
-
             formData.append('id', dataset.imageFile)
 
             await itemsAPI.delete(`/${datasetID}`)
-            await fileAPI.post("/remove", formData);
+            await fileAPI.post("/remove-dataset", formData);
 
             removeOpenItems(datasetID)
             history.replace("/home")
@@ -493,6 +560,26 @@ const Dataset = ({currentUser, type}) => {
                                             }}
                                             checked={rgb} />
                                 </div>
+                                <div className="create-item-setup">
+                                    <label className="create-item-setup-label">Image Height</label>
+                                    <input className="create-item-setup-dimension"
+                                            disabled={!(dataset.self || type === "create")}
+                                            value={height}
+                                            onChange={e => {
+                                                setHeight(e.target.value)
+                                                setChangedSettings(true)
+                                            }} />
+                                </div>
+                                <div className="create-item-setup">
+                                    <label className="create-item-setup-label">Image Width</label>
+                                    <input className="create-item-setup-dimension"
+                                            disabled={!(dataset.self || type === "create")}
+                                            value={width}
+                                            onChange={e => {
+                                                setWidth(e.target.value)
+                                                setChangedSettings(true)
+                                            }} />
+                                </div>
                             </>
                         }
                         {!dataset.self && type !== "create" && <p className="item-creator">{dataset.creatorName.name}</p>}
@@ -516,6 +603,19 @@ const Dataset = ({currentUser, type}) => {
                                 </>
                             }
                         </div>
+                        {!dataset.self && type !== "create" &&
+                            <>
+                                <div className="sidebar-divided" />
+                                <div className="create-item-setup">
+                                    <label className="create-item-setup-label">Image Height</label>
+                                    <p className="dataset-dimension">{height}</p>
+                                </div>
+                                <div className="create-item-setup">
+                                    <label className="create-item-setup-label">Image Width</label>
+                                    <p className="dataset-dimension">{width}</p>
+                                </div>
+                            </>
+                        }
                         {type === "view" && !dataset.self &&
                             <>
                                 <div className="sidebar-divided" />
@@ -545,7 +645,7 @@ const Dataset = ({currentUser, type}) => {
                                         <div className="sidebar-divided" />
                                         <button className="blue-button item-save"
                                                 disabled={!changedSettings && !changedData}
-                                                onClick={() => {updateDataset()}}>Save Changes</button>
+                                                onClick={() => {updateDataset()}}>Save Dataset</button>
                                         <button className="text-button item-delete"
                                                 onClick={() => {deleteDataset()}}>Delete</button>
                                     </>
@@ -567,50 +667,52 @@ const Dataset = ({currentUser, type}) => {
                                                             onClick={() => {uploadImage()}}>Create</button>
                                                 </>
                                             :
-                                                <p>Dataset</p>
-                                            }
-                                        </div>
-                                        <div className="create-dataset-upload">
-                                            <input type="file" 
-                                                    name="data"
-                                                    accept="image/*"
-                                                    multiple
-                                                    onChange={e => {setImageFiles(e.target.files)}} />
-                                            {type === "create" && uploadedImages.length === 0 && 
-                                                <button className="white-button"
-                                                        disabled={imageFiles.length === 0}
-                                                        onClick={() => {
-                                                            addImages()
-                                                            setChangedData(true)
-                                                        }}>Add</button>
-                                            }
-                                            {(dataset.self || type === "create") && uploadedImages.length !== 0 && 
                                                 <>
-                                                    <button className="white-button"
-                                                            disabled={imageFiles.length === 0}
-                                                            onClick={() => {
-                                                                setUploadedImages([])
-                                                                replaceImages()
-                                                                setChangedData(true)
-                                                            }}>Replace</button>
-                                                    <button className="white-button"
-                                                            disabled={imageFiles.length === 0}
-                                                            onClick={() => {
-                                                                if (appendedImages.length !== 0) {
-                                                                    setAppendedImages([])
-                                                                    setAppendedLabels([])
-                                                                }
-                                                                appendImages()
-                                                                setChangedData(true)
-                                                            }}>Add</button>
+                                                    <h1>Dataset</h1>
+                                                    <div className="create-dataset-upload">
+                                                        <input type="file" 
+                                                                name="data"
+                                                                accept="image/*"
+                                                                multiple
+                                                                onChange={e => {setImageFiles(e.target.files)}} />
+                                                        {type === "create" && uploadedImages.length === 0 && 
+                                                            <button className="white-button"
+                                                                    disabled={imageFiles.length === 0}
+                                                                    onClick={() => {
+                                                                        addImages()
+                                                                        setChangedData(true)
+                                                                    }}>Add</button>
+                                                        }
+                                                        {(dataset.self || type === "create") && uploadedImages.length !== 0 && 
+                                                            <>
+                                                                <button className="white-button"
+                                                                        disabled={imageFiles.length === 0}
+                                                                        onClick={() => {
+                                                                            setUploadedImages([])
+                                                                            replaceImages()
+                                                                            setChangedData(true)
+                                                                        }}>Replace</button>
+                                                                <button className="white-button"
+                                                                        disabled={imageFiles.length === 0}
+                                                                        onClick={() => {
+                                                                            if (appendedImages.length !== 0) {
+                                                                                setAppendedImages([])
+                                                                                setAppendedLabels([])
+                                                                            }
+                                                                            appendImages()
+                                                                            setChangedData(true)
+                                                                        }}>Add</button>
+                                                            </>
+                                                        }
+                                                        {uploadedImages.length !== 0 &&
+                                                            <div className="create-dataset-pagination">
+                                                                <ArrowBackIosNewIcon className="create-dataset-pagination-icon" onClick={() => {previousPage()}} />
+                                                                <p>Page {page} / {Math.ceil(uploadedImages.length/30)}</p>
+                                                                <ArrowForwardIosIcon className="create-dataset-pagination-icon" onClick={() => {nextPage()}} />
+                                                            </div>
+                                                        }
+                                                    </div>
                                                 </>
-                                            }
-                                            {uploadedImages.length !== 0 &&
-                                                <div className="create-dataset-pagination">
-                                                    <ArrowBackIosNewIcon className="create-dataset-pagination-icon" onClick={() => {previousPage()}} />
-                                                    <p>Page {page} / {Math.ceil(uploadedImages.length/30)}</p>
-                                                    <ArrowForwardIosIcon className="create-dataset-pagination-icon" onClick={() => {nextPage()}} />
-                                                </div>
                                             }
                                         </div>
                                         {(type === "create" || dataset.self) && appendedImages.length !== 0 && 
@@ -662,24 +764,25 @@ const Dataset = ({currentUser, type}) => {
                                                 if (i >= start && i < end) {
                                                     return (
                                                         <div className="create-dataset-image" key={i}>
-                                                            <img src={type === "create" ? URL.createObjectURL(image) : `http://127.0.0.1:5000/files/${dataset.imageFile}/${image}.jpg`} />
+                                                            <img src={type === "create" ? 
+                                                                            URL.createObjectURL(image) 
+                                                                        : assignedLabels[i] === "No label" ?
+                                                                            `http://127.0.0.1:5000/files/${dataset.imageFile}/no-label/${image}.jpg`
+                                                                        : assignedLabels[i] !== "No label" ?
+                                                                            `http://127.0.0.1:5000/files/${dataset.imageFile}/images/${assignedLabels[i]}/${image}.jpg`
+                                                                        :
+                                                                            URL.createObjectURL(image) 
+                                                                        } 
+                                                            />
                                                             <div>
                                                                 <select value={assignedLabels[i]}
-                                                                        onChange={e => {setAssignedLabels(state => {
-                                                                                    const stateCopy = [...state]
-                                                                                
-                                                                                    stateCopy[i] = e.target.value
-                                                                                
-                                                                                    return stateCopy
-                                                                                })
-                                                                                setChangedData(true)
-                                                                                setRefreshLabels(new Date().getTime())}}>
+                                                                        onChange={e => {updateLabel(e, i)}}>
                                                                     <option value="No label">No label</option>
                                                                     {labels.map((label, j) => 
                                                                         <option value={label} key={j}>{label}</option>
                                                                     )}
                                                                 </select>
-                                                                <div onClick={() => {deleteImage(image, i)}}>
+                                                                <div onClick={() => {deleteImage(image, i, assignedLabels[i])}}>
                                                                     <DeleteIcon className="create-dataset-image-delete" />
                                                                 </div>
                                                             </div>
@@ -699,7 +802,7 @@ const Dataset = ({currentUser, type}) => {
                                                 if (i >= start && i < end) {
                                                     return (
                                                         <div className="create-dataset-image" key={i}>
-                                                            <img src={`http://127.0.0.1:5000/files/${dataset.imageFile}/${image}.jpg`} />
+                                                            <img src={`http://127.0.0.1:5000/files/${dataset.imageFile}/images/${assignedLabels[i]}/${image}.jpg`} />
                                                             <div>
                                                                 <p>{assignedLabels[i]}</p>
                                                             </div>
@@ -727,21 +830,7 @@ const Dataset = ({currentUser, type}) => {
                                             <div className={`create-dataset-label ${colours[i % colours.length]}`} key={i}>
                                                 <p>{label}</p>
                                                 {(type === "create" || dataset.self) &&
-                                                    <div onClick={() => {
-                                                        assignedLabels.map((assignedLabel, j) => {
-                                                            if (assignedLabel === labels[i]) {
-                                                                setAssignedLabels(state => {
-                                                                    const stateCopy = [...state]
-                                                                
-                                                                    stateCopy[j] = "No label"
-                                                                
-                                                                    return stateCopy
-                                                                })
-                                                            }
-                                                        })
-                                                        labels.splice(i, 1)
-                                                        setRefreshLabels(new Date().getTime())
-                                                    }}>
+                                                    <div onClick={() => {deleteLabel(i)}}>
                                                         <CloseIcon className="create-dataset-label-icon" /> 
                                                     </div>
                                                 }

@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const maxAge = 30 * 24 * 60 * 60;
 
 const createToken = (id) => {
-    return jwt.sign({ id }, 'edge secret', {
+    return jwt.sign({ id }, 'a*7NJDia$:7dnSi2j*6%', {
         expiresIn: maxAge
     })
 }

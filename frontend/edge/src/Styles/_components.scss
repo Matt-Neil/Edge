@@ -325,11 +325,12 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 40px;
-        height: 32px;
-        padding: 0 15px;
+        min-width: 40px;
+        width: fit-content;
+        height: 30px;
+        padding: 0 10px;
         border-radius: 10px;
-        font-size: 13px;
+        font-size: 12px;
         cursor: pointer;
     }
     .model-node-selected {
@@ -348,9 +349,9 @@
         color: $grey7;
     }
     .model-node-connector {
-        height: 35px;
+        height: 25px;
         object-fit: contain;
-        margin: 0 0 2px 0;
+        margin: 2px 0;
     }
 }
 .model-node-input {
@@ -408,4 +409,19 @@
 .sidebar-divided {
     margin: 15px;
     border-top: 1px $grey4 solid;
+}
+.chart {
+    display: flex;
+    flex-direction: column;
+    margin: 0 0 20px 0;
+    background-color: $grey3;
+    border-radius: 15px;
+    border: 1px $grey4 solid;
+    padding: 0 20px 20px 20px;
+
+    .chart-title { 
+        color: $grey7;
+        margin: 20px auto;
+        font-size: 14px;
+    }
 }

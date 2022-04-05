@@ -1,5 +1,6 @@
 .create-item-title {
     min-height: 40px;
+    width: 100%;
     border: none;
     background: none;
     color: $grey7;
@@ -31,6 +32,29 @@
         background: none;
         color: $grey7;
     }
+    .create-item-setup-dimension {
+        height: 36px;
+        width: 40px;
+        border: none;
+        border-radius: 10px;
+        color: white;
+        padding: 0 10px;
+        border: 1px $grey2 solid;
+    }
+    .dataset-dimension {
+        height: 36px;
+        width: 40px;
+        border: none;
+        border-radius: 10px;
+        color: white;
+        padding: 0 10px;
+        border: 1px $grey2 solid;
+        line-height: 36px;
+        background-color: $grey4;
+        margin: 0;
+        font-size: 14px;
+        @include not-selectable()
+    }
 }
 .create-workspace-uploaded-dataset {
     margin: 15px;
@@ -51,8 +75,10 @@
         display: flex;
         color: $grey5;
         text-decoration: none;
-        font-size: 13px;
         cursor: pointer;
+    }
+    .create-item-view-dataset-icon {
+        font-size: 20px;
     }
     .create-item-view-dataset:hover {
         color: $grey7;
@@ -106,20 +132,21 @@
 .create-modelling-body {
     display: flex;
     width: 100%;
-    height: 100%;
+    flex: 1;
 
     .create-model {
-        position: relative;
         display: flex;
         flex-direction: column;
-        width: 70%;
         align-items: center;
+        width: 70%;
+        max-height: calc(100vh - 160px);
         overflow-x: hidden;
-        white-space: nowrap;
-        margin: 20px 0 0 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
 
         .create-model-diagram {
-            position: absolute;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -132,6 +159,8 @@
             .create-model-diagram-node {
                 display: flex;
                 align-items: flex-start;
+                margin: 0 auto;
+                width: fit-content;
 
                 .create-model-diagram-remove {
                     margin: 10px 0 0 8px;
@@ -151,39 +180,44 @@
                     display: flex;
                     flex-direction: column;
                     align-items: center;
-                    width: 90px;
-                    height: 90px;
+                    width: fit-content;
+                    height: fit-content;
                     margin: 5px 0 20px 0;
+                    padding: 0 10px 10px 10px;
                     border-radius: 10px;
                     background-color: $grey1;
                     border: 1px solid $grey1;
                     position: relative;
                     left: 50%;
-                    transform: translateX(-60%);
+                    transform: translateX(-55%);
 
                     button {
-                        width: 70px;
-                        height: 30px;
+                        width: 110px;
+                        min-height: 30px;
+                        height: fit-content;
                         margin: 10px 0 0 0;
                         border-radius: 10px;
+                        text-align: left;
+                        padding: 5px 10px;
                         background-color: $grey4;
                         border: 1px solid $grey4;
+                        line-height: 18px;
                         color: $grey7;
                         cursor: pointer;
                     }
                 }
             }
             .create-model-diagram-add-icon {
-                margin: 5px 0 0 0;
+                margin: 10px 0 0 0;
                 position: relative;
                 left: 50%;
                 transform: translateX(-105%);
-                color: white;
+                color: $grey4;
                 font-size: 14px;
                 border: none;
                 padding: 2px;
                 border-radius: 11px;
-                background-color: $blue1;
+                background-color: white;
                 cursor: pointer;
             }
         }
@@ -193,38 +227,34 @@
     }
     .create-model-selected {
         display: flex;
-        align-items: center;
+        flex-direction: column;
         padding: 0 15px;
         max-width: 295px;
         min-width: 295px;
-        height: 100px;
+        height: fit-content;
         border-radius: 10px;
         background-color: $grey8;
         font-size: 14px;
-        margin: 0 0 15px 0;
+        margin: -15px 0 15px 0;
         
         p {
-            font-weight: 500;
-            height: 100%;
-            width: 55px;
-            min-width: 55px;
-            line-height: 50px;
-            padding: 0 20px 0 0;
-            border-right: 1px $grey4 solid;
+            width: 100%;
+            height: 30px;
+            border-bottom: 1px $grey4 solid;
             color: $grey7;
+            font-weight: 500;
         }
         .create-model-selected-input {
             display: flex;
             flex-direction: column;
-            height: 100%;
 
             div {
                 display: flex;
                 align-items: center;
-                margin: 10px 0 5px 0;
+                margin: 0 0 10px 0;
 
                 label {
-                    margin: 0 10px 0 20px;
+                    margin: 0 10px 0 0;
                     color: $grey6;
                 }
                 input, select, p {
@@ -252,6 +282,13 @@
                     width: 100px;
                     padding: 0 5px;
                 }
+                .create-model-selected-option-checkbox {
+                    width: 15px;
+                    height: 15px;
+                }
+                p {
+                    width: 40px;
+                }
             }
         }
     }
@@ -260,7 +297,12 @@
         justify-content: center;
         min-width: 325px;
         max-width: 325px;
-        height: fit-content;
+        max-height: calc(100vh - 250px);
+        border-radius: 10px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
 
         .create-model-configuration-option {
             display: flex;
@@ -310,6 +352,77 @@
             }
         }
     }
+    .create-model-configuration::-webkit-scrollbar {
+        display: none;
+    }
+}
+.create-training-body {
+    margin: 30px 0 0 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    p:first-child {
+        font-size: 16px;
+        color: $grey7;
+    }
+    p:last-child {
+        font-size: 12px;
+        color: $grey5;
+    }
+}
+.create-evaluation-body {
+    width: 100%;
+
+    .create-evaluation-header {
+        font-size: 16px;
+        color: $grey7;
+        margin: 45px 0 0 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .create-evaluation-test {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: auto;
+        height: 40px;
+        margin: 20px 0;
+        background-color: $grey3;
+        border-radius: 10px;
+        border: 1px $grey4 solid;
+
+        div {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: $grey5;
+
+            p {
+                margin: 0 0 0 20px;
+                font-size: 14px;
+            }
+            p:last-child {
+                margin: 0 0 0 10px;
+                color: $grey7;
+            }
+        }
+        div:first-child {
+            grid-column-start: 1;
+            grid-column-end: 2;
+            border-right: 1px $grey4 solid;
+        }
+        div:nth-child(2) {
+            grid-column-start: 2;
+            grid-column-end: 3;
+        }
+        div:last-child {
+            grid-column-start: 3;
+            grid-column-end: 4;
+            border-left: 1px $grey4 solid;
+        }
+    }
 }
 .create-workspace-data {
     position: sticky;
@@ -351,7 +464,6 @@
             align-items: center;
             height: 75px;
             width: 100%;
-            margin: 0 0 10px 0;
             border-radius: 10px;
 
             img {
@@ -448,53 +560,15 @@
         display: none;
     }
 }
-.create-dataset-upload {
-    position: sticky;
-    top: 110px;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    height: 60px;
-    padding: 0 0 20px 0;
-    z-index: 4000;
-    background-color: $grey2;
-
-    input {
-        background: none;
-        color: $grey5;
-        max-width: 250px;
-        width: 100%;
-        margin: 0 20px 0 0;
-    }
-    button {
-        margin: 0 20px 0 0;
-    }
-    .create-dataset-pagination {
-        display: flex;
-        align-items: center;
-        margin: 0 0 0 auto;
-    
-        p {
-            color: $grey5;  
-            font-size: 12px;
-            margin: 0 10px;
-        }
-        .create-dataset-pagination-icon {
-            color: $grey7;
-            font-size: 14px;
-            cursor: pointer;
-        }
-    }
-}
 .create-dataset-images-list {
     display: flex;
     flex-wrap: wrap;
-    margin: 10px 0 0 0; 
+    margin: -35px 0 0 0; 
 }
 .create-dataset-appended {
     height: fit-content;
     width: calc(100% - 40px);
-    margin: 10px 0; 
+    margin: -15px 0 40px 0; 
     padding: 0 20px 20px 20px;
     border-radius: 10px;
     background-color: $grey1;

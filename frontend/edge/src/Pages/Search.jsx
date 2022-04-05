@@ -8,7 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import Shortcut from '../Components/Shortcut'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
-const AccountWorkspaces = ({searchPhrase, setSearchPhrase, currentUser}) => {
+const Search = ({searchPhrase, setSearchPhrase, currentUser}) => {
     const [items, setItems] = useState();
     const [loaded, setLoaded] = useState(false);
     const [input, setInput] = useState("");
@@ -145,4 +145,4 @@ const AccountWorkspaces = ({searchPhrase, setSearchPhrase, currentUser}) => {
     )
 }
 
-export default AccountWorkspaces
+export default Search

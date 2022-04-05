@@ -1,37 +1,70 @@
 .view-items-top {
     position: sticky;
     top: 40px;
-    height: 70px;
+    height: 100px;
     width: 100%;
     z-index: 4000;
     background-color: $grey2;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    margin: 0 0 15px 0;
+    padding: 0 0 20px 0;
 
     h1 {
-        font-family: 'Poppins', sans-serif;
-        font-size: 20px;
-        font-weight: 400;
-        color: $grey7;
-        margin: 5px 0 0 0;
-        flex: 1;
+        margin: 25px 0 0 0;
+    }
+    div {
+        display: flex;
+        align-items: center;
     }
     button {
         margin: 5px 0 0 0;  
     }
-    p {
-        color: $grey7;
-        margin: 10px 0 0 0;
-    }
     .item-header-button-selected {
         color: $grey7;
         margin: 15px 40px auto 0;
-        text-decoration: underline;
-        text-underline-offset: 5px;
     }
     .item-header-button-unselected {
         color: $grey5;
         margin: 15px 40px auto 0;
+    }
+    span {
+        flex: 1;
+    }
+    .create-dataset-upload {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        margin: 10px 0;
+        height: 100px;
+        background-color: $grey2;
+    
+        input {
+            background: none;
+            color: $grey5;
+            max-width: 250px;
+            width: 100%;
+            margin: 0 20px 0 0;
+        }
+        button {
+            margin: 0 20px 0 0;
+        }
+        .create-dataset-pagination {
+            display: flex;
+            align-items: center;
+            margin: 0 0 0 auto;
+        
+            p {
+                color: $grey5;  
+                font-size: 12px;
+                margin: 0 10px;
+            }
+            .create-dataset-pagination-icon {
+                color: $grey7;
+                font-size: 14px;
+                cursor: pointer;
+            }
+        }
     }
 }
 .item-save {

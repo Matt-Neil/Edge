@@ -1,66 +1,114 @@
-import pandas as pd
-from sklearn.model_selection import train_test_split
+from flask import jsonify
+import tensorflow as tf
+from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
 from tensorflow.keras.callbacks import LearningRateScheduler, EarlyStopping
-from sklearn.metrics import accuracy_score
+import json
 import sys
 
 def model(body):
-    if body['dataType'] == "value":
-        dataFrame = pd.read_csv('files/{}.csv'.format(body['datafile']))
-
-        X = pd.get_dummies(dataFrame.drop([body['target']], axis=1))
-
-        target = []
-
-        for index, row in dataFrame.iterrows():
-            target.append(body.getlist('labels[]').index(row[body['target']]))
-
-        y = pd.DataFrame(
-            {
-                body['target']: target
-            }
-        )
-
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=float(body['test_split'])) 
+    if int(body['label']) > 2:
+        label_mode = 'categorical'
     else:
-        X = ""
-        y = body.getlist('labels[]')
+        label_mode = 'binary'
 
-        #y_train and y_test are labels
+    training_set = tf.keras.utils.image_dataset_from_directory(
+                'files/{}/images'.format(body['imageFile']),
+                validation_split=float(body['validation_split']),
+                subset="training",
+                seed=123,
+                label_mode=label_mode,
+                image_size=(int(body['height']), int(body['width'])),
+                batch_size=int(body['batch']))
+        
+    validation_set = tf.keras.utils.image_dataset_from_directory(
+                    'files/{}/images'.format(body['imageFile']),
+                    validation_split=float(body['validation_split']),
+                    subset="validation",
+                    seed=123,
+                    label_mode=label_mode,
+                    image_size=(int(body['height']), int(body['width'])),
+                    batch_size=int(body['batch']))
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    AUTOTUNE = tf.data.AUTOTUNE
 
-    X_train.head()
-    y_train.head() 
+    training_set = training_set.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
+    validation_set = validation_set.prefetch(buffer_size=AUTOTUNE)
+
+    if body['rgb']:
+        channels = 3
+    else:
+        channels = 1
 
     model = Sequential()
-    
-    for i in range(1, len(body.getlist("activations[]"))):
-        if i == 1:
-            if body['dataType'] == "value":
-                model.add(Dense(units=int(body.getlist("units[]")[i]), activation=body.getlist("activations[]")[i], input_dim=len(X_train.columns)))
-            else:
-                model.add(Flatten(input_shape(28, 28))) 
-                model.add(Dense(units=int(body.getlist("units[]")[i]), activation=body.getlist("activations[]")[i]))
+
+    for i in range(len(body.getlist("model[]"))):
+        node = json.loads(body.getlist("model[]")[i])
+
+        if i == 0:
+            model.add(layers.Rescaling(1./255, 
+                                        input_shape=(int(body['height']), 
+                                        int(body['width']), 
+                                        channels)))
+        elif i == len(body.getlist("model[]"))-1:
+            model.add(layers.Dense(units=int(body['label']), 
+                                    activation=node['activation']))
         else:
-            model.add(Dense(units=int(body.getlist("units[]")[i]), activation=body.getlist("activations[]")[i]))
+            if node['type'] == "Conv2D":
+                model.add(layers.Conv2D(int(node['filters']),
+                                        kernel_size=(int(node['kernel']), int(node['kernel'])), 
+                                        strides=(int(node['strides']), int(node['strides'])), 
+                                        padding=node['padding'],
+                                        activation=node['activation']))
+            elif node['type'] == "MaxPooling2D":
+                model.add(layers.MaxPooling2D(pool_size=(int(node['pool']), int(node['pool'])), 
+                                                strides=(int(node['strides']), int(node['strides'])), 
+                                                padding=node['padding']))
+            elif node['type'] == "AveragePooling2D":
+                model.add(layers.AveragePooling2D(pool_size=(int(node['pool']), int(node['pool'])), 
+                                                    strides=(int(node['strides']), int(node['strides'])), 
+                                                    padding=node['padding']))
+            elif node['type'] == "Dropout":
+                model.add(layers.Dropout(rate=float(node['rate'])))
+            elif node['type'] == "BatchNormalisation":
+                model.add(layers.BatchNormalization(momentum=float(node['momentum'])))
+            elif node['type'] == "Dense":
+                model.add(layers.Dense(units=int(node['units']), 
+                                        activation=node['activation']))
+            else:
+                model.add(layers.Flatten())
 
-    model.compile(loss=body['loss'], optimizer=body['optimiser'], metrics='accuracy')
+    if body['optimiser'] == "Adadelta":
+        optimiser = tf.keras.optimizers.Adadelta(learning_rate=float(body['initial_lr']))
+    elif body['optimiser'] == "Adagrad":
+        optimiser = tf.keras.optimizers.Adagrad(learning_rate=float(body['initial_lr']))
+    elif body['optimiser'] == "Adam":
+        optimiser = tf.keras.optimizers.Adam(learning_rate=float(body['initial_lr']))
+    elif body['optimiser'] == "Adamax":
+        optimiser = tf.keras.optimizers.Adamax(learning_rate=float(body['initial_lr']))
+    elif body['optimiser'] == "Ftrl":  
+        optimiser = tf.keras.optimizers.Ftrl(learning_rate=float(body['initial_lr']))
+    elif body['optimiser'] == "Nadam":
+        optimiser = tf.keras.optimizers.Nadam(learning_rate=float(body['initial_lr']))
+    elif body['optimiser'] == "RMSprop":
+        optimiser = tf.keras.optimizers.RMSprop(learning_rate=float(body['initial_lr']))
+    else:
+        optimiser = tf.keras.optimizers.SGD(learning_rate=float(body['initial_lr']))
 
-    callbacks = [EarlyStopping(monitor='loss', patience=int(body['patience']), min_delta=float(body['improvement']), mode='auto')]
+    model.compile(loss=body['loss'], optimizer=optimiser, metrics=['accuracy'])
 
-    if bool(body['lr_scheduler']):
-        callbacks.append(LearningRateScheduler(lambda epoch: 1e-4 * 10**(epoch/20))) 
+    callbacks = []
 
-    history = model.fit(X_train, y_train, epochs=int(body['epochs']), validation_split=(float(body['validation_split'])/(1-float(body['test_split']))), callbacks=callbacks, batch_size=int(body['batch']))
+    if body['early_stopping'] == "true":
+        callbacks.append(EarlyStopping(monitor='loss', patience=int(body['patience']), min_delta=float(body['improvement']), mode='auto'))
 
-    y_hat = model.predict(X_test)
-    if len(int(body.getlist('labels[]'))) == 2:
-        y_hat = [0 if val < 0.5 else 1 for val in y_hat]
-    print(history.history)
+    if body['lr_scheduler'] == "true":
+        callbacks.append(LearningRateScheduler(lambda epoch: 1e-4 * 10**(epoch/20)))
+
+    history = model.fit(training_set, validation_data=validation_set, epochs=int(body['epochs']), callbacks=callbacks)
+
+    test_loss, test_acc = model.evaluate(validation_set, verbose=0)
 
     model.save('models/{}'.format(body['id']))
 
-    return "%.5f" % accuracy_score(y_test, y_hat)
+    return {"training": history.history, "test_loss": test_loss, "test_acc": test_acc, "epochs": len(history.history['accuracy'])}

@@ -73,7 +73,7 @@ const Home = ({setSearchPhrase}) => {
                     <div className="inner">
                         <div className="home-inner">
                             <div className="view-items-top">
-                                <h1>Recently Updated</h1>
+                                <h1>Your Recents</h1>
                                 <div className="toggle-card-type">
                                     <span />
                                     <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {changeCardFormat()}} />

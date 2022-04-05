@@ -7,7 +7,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 
-const WorkspaceSquareCard = ({item, created, creator, currentUserID}) => {
+const ItemSquareCard = ({item, created, creator, currentUserID}) => {
     const [bookmarked, setBookmarked] = useState(item.bookmarked)
     const [upvoted, setUpvoted] = useState(item.upvoted)
     const [upvotes, setUpvotes] = useState(item.upvotes)
@@ -110,4 +110,4 @@ const WorkspaceSquareCard = ({item, created, creator, currentUserID}) => {
     )
 }
 
-export default WorkspaceSquareCard
+export default ItemSquareCard

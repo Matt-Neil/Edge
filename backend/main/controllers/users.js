@@ -38,8 +38,6 @@ exports.getRecent = async (req, res, next) => {
                 $sort: { 
                     'updated': -1
                 } 
-            }, { 
-                $limit : 20 
             }
         ]);
     

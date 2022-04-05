@@ -4,8 +4,10 @@ import usersAPI from '../API/users'
 import itemsAPI from '../API/items'
 import globalAPI from '../API/global'
 import imageAPI from '../API/images'
+import filesAPI from '../API/files'
 import trainAPI from '../API/train'
 import ModelNode from '../Components/Model-Node';
+import Chart from '../Components/Chart'
 import { OpenItemsContext } from '../Contexts/openItemsContext';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
@@ -30,6 +32,7 @@ const Workspace = ({currentUser, type}) => {
     const [picture, setPicture] = useState()
     const [date, setDate] = useState("")
     const [start, setStart] = useState(0)
+    const [trainTime, setTrainTime] = useState(0)
     const [end, setEnd] = useState(20)
     const [page, setPage] = useState(1)
     const [image, setImage] = useState();
@@ -41,17 +44,17 @@ const Workspace = ({currentUser, type}) => {
     const [refreshData, setRefreshData] = useState()
     const [refreshDiagram, setRefreshDiagram] = useState()
     const [changedSettings, setChangedSettings] = useState(false)
-    const [model, setModel] = useState([])
+    const [model, setModel] = useState([{type: "Input"}])
+    const [evaluation, setEvaluation] = useState()
     const [selectedNode, setSelectedNode] = useState(0)
-    const [configuration, setConfiguration] = useState({epochs: "", training_split: "", validation_split: "", test_split: "", improvement: "",
-                                                        patience: "", batch: "", lr_scheduler: false, optimiser: "", loss: ""})
+    const [configuration, setConfiguration] = useState({epochs: 0, training_split: 0, validation_split: 0, improvement: 0, early_stopping: false,
+                                                        patience: 0, batch: 32, lr_scheduler: false, initial_lr: 0.01, optimiser: "", loss: ""})
     const [addNode, setAddNode] = useState(false)
-    const [results, setResults] = useState()
     const [loaded, setLoaded] = useState(false);
     const [exist, setExist] = useState()
     const [noData, setNoData] = useState()
-    const [disableCreate, setDisabledCreate] = useState(false)
-    const [disableTrain, setDisabledTrain] = useState(true)
+    const [disabledCreate, setDisabledCreate] = useState(false)
+    const [disabledTrain, setDisabledTrain] = useState(false)
     const [displayPublic, setDisplayPublic] = useState(false)
     const [displayExist, setDisplayExist] = useState(false)
     const {addOpenItems, removeOpenItems} = useContext(OpenItemsContext);
@@ -93,6 +96,16 @@ const Workspace = ({currentUser, type}) => {
                     setModel(workspace.data.data.model)
                     setConfiguration(workspace.data.data.configuration)
                     setUploadedDataset(workspace.data.data.dataset)
+                    setEvaluation({
+                        testAcc: workspace.data.data.evaluation.testAcc,
+                        testLoss: workspace.data.data.evaluation.testLoss,
+                        trainAcc: workspace.data.data.evaluation.trainAcc,
+                        trainLoss: workspace.data.data.evaluation.trainLoss,
+                        validationAcc: workspace.data.data.evaluation.validationAcc,
+                        validationLoss: workspace.data.data.evaluation.validationLoss,
+                        trainEpochs: Array.from(Array(workspace.data.data.evaluation.trainEpochs), (e, i) => (i + 1).toString())
+                    })
+                    setTrainTime(workspace.data.data.evaluation.trainTime)
 
                     fetch(`http://127.0.0.1:5000/files/${workspace.data.data.dataset.imageFile}/labels.json`)
                         .then(response => response.json())
@@ -119,6 +132,15 @@ const Workspace = ({currentUser, type}) => {
     }, [])
 
     useEffect(() => {
+        const timerID = stage === "train" && setInterval(() => {
+            setTrainTime(previous => previous + 1);
+        }, 1000);
+        return () => {
+            clearInterval(timerID)
+        }
+    }, [trainTime, stage])
+
+    useEffect(() => {
         if (modelRef.current) {
             modelRef.current.scrollIntoView({
                 behavior: 'smooth',
@@ -126,7 +148,7 @@ const Workspace = ({currentUser, type}) => {
                 inline: 'end'
             })
         }
-    }, [model, addNode])
+    }, [model.length, addNode])
 
     useEffect(() => {
         if (loaded && exist) {
@@ -235,9 +257,6 @@ const Workspace = ({currentUser, type}) => {
                             })
                             setUploadedDataset(checkPublic.data.data)
                             setRefreshData(new Date().getTime())
-                            {model.length === 0 &&
-                                setModel([{type: "Input", value: 1, activation: "none"}])
-                            }
                             setChangedSettings(true)
                         })
             } else if (checkPublic.data.success && !checkPublic.data.data.visibility) {
@@ -267,6 +286,17 @@ const Workspace = ({currentUser, type}) => {
 
     const uploadData = async (imageName) => {
         try {
+            const updatedEvaluation = {
+                testAcc: evaluation.testAcc,
+                testLoss: evaluation.testLoss,
+                trainAcc: evaluation.trainAcc,
+                trainLoss: evaluation.trainLoss,
+                validationAcc: evaluation.validationAcc,
+                validationLoss: evaluation.validationLoss,
+                trainEpochs: evaluation.trainEpochs[evaluation.trainEpochs.length-1],
+                trainTime: trainTime
+            }
+    
             const workspaceResponse = await itemsAPI.post("/", {
                 title: title,
                 dataset: uploadedDataset._id,
@@ -279,6 +309,7 @@ const Workspace = ({currentUser, type}) => {
                 configuration: configuration,
                 updated: new Date().toISOString(),
                 visibility: visibility,
+                evaluation: updatedEvaluation,
                 type: "workspace"
             });
 
@@ -288,7 +319,8 @@ const Workspace = ({currentUser, type}) => {
 
     const train = async () => {
         try {
-            // setDisabledTrain(true)
+            setTrainTime(0)
+            setDisabledTrain(true)
             setStage("train")
     
             const formData = new FormData();
@@ -296,35 +328,60 @@ const Workspace = ({currentUser, type}) => {
             formData.append('epochs', configuration.epochs)
             formData.append('training_split', configuration.training_split)
             formData.append('validation_split', configuration.validation_split)
-            formData.append('test_split', configuration.test_split)
             formData.append('improvement', configuration.improvement)
             formData.append('patience', configuration.patience)
             formData.append('batch', configuration.batch)
-            formData.append('lr_scheduler', configuration.lr_scheduler)
+            formData.append('early_stopping', configuration.early_stopping ? "true" : "false")
+            formData.append('lr_scheduler', configuration.lr_scheduler ? "true" : "false")
+            formData.append('initial_lr', configuration.initial_lr)
             formData.append('optimiser', configuration.optimiser)
             formData.append('loss', configuration.loss)
+            formData.append('rgb', uploadedDataset.rgb)
             formData.append('imageFile', uploadedDataset.imageFile)
+            formData.append('height', uploadedDataset.height)
+            formData.append('width', uploadedDataset.width)
+            formData.append('label', uploadedDataset.labels.length)
+            formData.append('id', uploadedDataset._id)
 
-            uploadedDataset.labels.map(label => {
-                formData.append('labels[]', label)
-            })
             model.map(node => {
-                formData.append('activations[]', node.activation)
-                formData.append('units[]', node.value)
+                formData.append('model[]', JSON.stringify(node))
             })
 
             const response = await trainAPI.post("", formData);
 
+            setDisabledTrain(false)
+
             if (response) {
-                setResults(response)
+                setEvaluation({
+                    testAcc: response.data.test_acc,
+                    testLoss: response.data.test_loss,
+                    trainAcc: response.data.training.accuracy,
+                    trainLoss: response.data.training.loss,
+                    validationAcc: response.data.training.val_accuracy,
+                    validationLoss: response.data.training.val_loss,
+                    trainEpochs: Array.from(Array(response.data.epochs), (e, i) => (i + 1).toString())
+                })
                 setStage("evaluation")
-            } else {
-                setDisabledTrain(false)
+                setChangedSettings(true)
             }
-        } catch (err) {}
+        } catch (err) {
+            setStage("model")
+            setDisabledTrain(false)
+        }
     }
 
     const updateWorkspace = async () => {
+        const updatedEvaluation = {
+            testAcc: evaluation.testAcc,
+            testLoss: evaluation.testLoss,
+            trainAcc: evaluation.trainAcc,
+            trainLoss: evaluation.trainLoss,
+            validationAcc: evaluation.validationAcc,
+            validationLoss: evaluation.validationLoss,
+            trainEpochs: evaluation.trainEpochs[evaluation.trainEpochs.length-1],
+            trainTime: trainTime
+        }
+
         if (image) {
             const formImage = new FormData();
             formImage.append('image', image);
@@ -339,6 +396,7 @@ const Workspace = ({currentUser, type}) => {
                     picture: imageResponse.data.data,
                     dataset: uploadedDataset._id,
                     model: model,
+                    evaluation: updatedEvaluation,
                     configuration: configuration,
                     updated: new Date().toISOString()
                 })
@@ -358,6 +416,7 @@ const Workspace = ({currentUser, type}) => {
                     picture: picture,
                     dataset: uploadedDataset._id,
                     model: model,
+                    evaluation: updatedEvaluation,
                     configuration: configuration,
                     updated: new Date().toISOString()
                 })
@@ -370,7 +429,11 @@ const Workspace = ({currentUser, type}) => {
 
     const deleteWorkspace = async () => {
         try {
+            const formData = new FormData();
+            formData.append('id', workspace._id);
+
             await itemsAPI.delete(`/${workspaceID}`)
+            await filesAPI.post(`/remove-workspace`, formData)
 
             removeOpenItems(workspaceID)
             history.replace("/home")
@@ -457,7 +520,11 @@ const Workspace = ({currentUser, type}) => {
                                             onChange={e => {setDatasetID(e.target.value)}}
                                             onKeyPress={searchFunctionKey}
                                             value={datasetID} />
-                                    {type === "view" && <Link className="create-item-view-dataset" to={`/dataset/${datasetID}`}><OpenInNewIcon /></Link>}
+                                    {type === "view" && 
+                                        <Link className="create-item-view-dataset" to={`/dataset/${datasetID}`}>
+                                            <OpenInNewIcon className="create-item-view-dataset-icon" />
+                                        </Link>
+                                    }
                                 </>
                             :
                                 <div>
@@ -477,7 +544,7 @@ const Workspace = ({currentUser, type}) => {
                                         <div className="sidebar-divided" />
                                         <button className="blue-button item-save"
                                                 disabled={!changedSettings}
-                                                onClick={() => {updateWorkspace()}}>Save Changes</button>
+                                                onClick={() => {updateWorkspace()}}>Save Workspace</button>
                                         <button className="text-button item-delete"
                                                 onClick={() => {deleteWorkspace()}}>Delete</button>
                                     </>
@@ -494,23 +561,39 @@ const Workspace = ({currentUser, type}) => {
                                     {type === "create" &&
                                         <>
                                             <h1>Create Workspace</h1>
-                                            <button className="blue-button"
-                                                    disabled={disableTrain}
-                                                    onClick={() => {uploadImage()}}>Train</button>
+                                            <div>
+                                                <button className={`text-button ${stage === "model" ? "item-header-button-selected" : "item-header-button-unselected"}`}
+                                                        onClick={() => {setStage("model")}}>Model</button>
+                                                <button className={`text-button ${stage === "evaluation" ? "item-header-button-selected" : "item-header-button-unselected"}`}
+                                                        onClick={() => {setStage("evaluation")}}>Evaluation</button>
+                                                <span />
+                                                <button className="blue-button"
+                                                        disabled={disabledTrain || model[model.length-1].type !== "Output" || model.length === 0}
+                                                        onClick={() => {train()}}>Train</button>
+                                            </div>
                                         </>
                                     }
                                     {type === "view" &&
                                         <>
-                                            <button className={`text-button ${stage === "model" ? "item-header-button-selected" : "item-header-button-unselected"}`}
-                                                    onClick={() => {setStage("model")}}>Model</button>
-                                            <button className={`text-button ${stage === "evaluation" ? "item-header-button-selected" : "item-header-button-unselected"}`}
-                                                    onClick={() => {setStage("evaluation")}}>Evaluation</button>
+                                            <h1>Workspace</h1>
+                                            <div>
+                                                <button className={`text-button ${stage === "model" ? "item-header-button-selected" : "item-header-button-unselected"}`}
+                                                        onClick={() => {setStage("model")}}>Model</button>
+                                                <button className={`text-button ${stage === "evaluation" ? "item-header-button-selected" : "item-header-button-unselected"}`}
+                                                        onClick={() => {setStage("evaluation")}}>Evaluation</button>
+                                                <span />
+                                                {workspace.self &&
+                                                    <button className="blue-button"
+                                                            disabled={disabledTrain || model[model.length-1].type !== "Output" || model.length === 0}
+                                                            onClick={() => {train()}}>Train</button>
+                                                }
+                                            </div>
                                         </>
                                     }
                                 </div>
                                 {stage === "model" ?
                                     <>
-                                        {model.length !== 0 ?
+                                        {uploadedDataset ?
                                             <div className="create-modelling-body">
                                                 <div className="create-model">
                                                     <div className="create-model-diagram" key={refreshDiagram}>
@@ -542,7 +625,7 @@ const Workspace = ({currentUser, type}) => {
                                                                             </div>
                                                                         }
                                                                     </div>
-                                                                    {i === model.length-1 && node.type !== "Output" &&
+                                                                    {i === model.length-1 && model[selectedNode].type !== "Output" &&
                                                                         <>
                                                                             {addNode && (workspace.self || type === "create") ?
                                                                                 <div className="create-model-diagram-add">
@@ -550,34 +633,166 @@ const Workspace = ({currentUser, type}) => {
                                                                                         <RemoveIcon className="create-model-diagram-add-icon" />
                                                                                     </div>
                                                                                     <div className="create-model-diagram-add-options">
-                                                                                        <button onClick={() => {setModel(state => [...state, {
-                                                                                                type: "Dense",
-                                                                                                value: 0,
-                                                                                                activation: ""
-                                                                                            }])
-                                                                                            setSelectedNode(model.length)
-                                                                                            setAddNode(false)
-                                                                                            setChangedSettings(true)
-                                                                                        }}>Dense</button>
-                                                                                        {model.length > 1 &&
+                                                                                        {(model[selectedNode].type === "Input" || model[selectedNode].type === "Conv2D" || model[selectedNode].type === "MaxPooling2D" ||
+                                                                                            model[selectedNode].type === "Dropout" || model[selectedNode].type === "BatchNormalisation") &&
+                                                                                            <>
+                                                                                                <button onClick={() => {
+                                                                                                    setModel(state => {
+                                                                                                        const stateCopy = [...state]
+                                                                                                    
+                                                                                                        stateCopy.splice(selectedNode+1, 0, {
+                                                                                                            type: "Conv2D",
+                                                                                                            filters: 0,
+                                                                                                            kernel: 3,
+                                                                                                            strides: 2,
+                                                                                                            padding: "same",
+                                                                                                            activation: ""
+                                                                                                        })
+                                                                                                    
+                                                                                                        return stateCopy
+                                                                                                    })
+
+                                                                                                    setSelectedNode(state => state + 1)
+                                                                                                    setAddNode(false)
+                                                                                                    setChangedSettings(true)
+                                                                                                }}>Conv2D</button>
+                                                                                                <button onClick={() => {
+                                                                                                    setModel(state => {
+                                                                                                        const stateCopy = [...state]
+                                                                                                    
+                                                                                                        stateCopy.splice(selectedNode+1, 0, {
+                                                                                                            type: "MaxPooling2D",
+                                                                                                            pool: 3,
+                                                                                                            strides: 2,
+                                                                                                            padding: "same"
+                                                                                                        })
+                                                                                                    
+                                                                                                        return stateCopy
+                                                                                                    })
+                                                                                                    
+                                                                                                    setSelectedNode(state => state + 1)
+                                                                                                    setAddNode(false)
+                                                                                                    setChangedSettings(true)
+                                                                                                }}>MaxPooling2D</button>
+                                                                                                <button onClick={() => {
+                                                                                                    setModel(state => {
+                                                                                                        const stateCopy = [...state]
+                                                                                                    
+                                                                                                        stateCopy.splice(selectedNode+1, 0, {
+                                                                                                            type: "AvgPooling2D",
+                                                                                                            pool: 3,
+                                                                                                            strides: 2,
+                                                                                                            padding: "same"
+                                                                                                        })
+                                                                                                    
+                                                                                                        return stateCopy
+                                                                                                    })
+                                                                                                    
+                                                                                                    setSelectedNode(state => state + 1)
+                                                                                                    setAddNode(false)
+                                                                                                    setChangedSettings(true)
+                                                                                                }}>AvgPooling2D</button>
+                                                                                                <button onClick={() => {
+                                                                                                    setModel(state => {
+                                                                                                        const stateCopy = [...state]
+                                                                                                    
+                                                                                                        stateCopy.splice(selectedNode+1, 0, {
+                                                                                                            type: "BatchNormalisation",
+                                                                                                            momentum: 0
+                                                                                                        })
+                                                                                                    
+                                                                                                        return stateCopy
+                                                                                                    })
+
+                                                                                                    setSelectedNode(state => state + 1)
+                                                                                                    setAddNode(false)
+                                                                                                    setChangedSettings(true)
+                                                                                                }}>Batch Normalisation</button>
+                                                                                                <button onClick={() => {
+                                                                                                    setModel(state => {
+                                                                                                        const stateCopy = [...state]
+                                                                                                    
+                                                                                                        stateCopy.splice(selectedNode+1, 0, {
+                                                                                                            type: "Dropout",
+                                                                                                            rate: 0
+                                                                                                        })
+                                                                                                    
+                                                                                                        return stateCopy
+                                                                                                    })
+
+                                                                                                    setSelectedNode(state => state + 1)
+                                                                                                    setAddNode(false)
+                                                                                                    setChangedSettings(true)
+                                                                                                }}>Dropout</button>
+                                                                                                {selectedNode === model.length-1 &&
+                                                                                                    <button onClick={() => {setModel(state => [...state, {
+                                                                                                            type: "Flatten"
+                                                                                                        }])
+                                                                                                        setSelectedNode(state => state + 1)
+                                                                                                        setAddNode(false)
+                                                                                                        setChangedSettings(true)
+                                                                                                    }}>Flatten</button>
+                                                                                                }
+                                                                                            </>
+                                                                                        }
+                                                                                        {(model[selectedNode].type === "Flatten" || model[selectedNode].type === "Dense") &&
                                                                                             <button onClick={() => {
-                                                                                                    {uploadedDataset.labels.length === 2 ?
-                                                                                                        setModel(state => [...state, {
-                                                                                                            type: "Output",
-                                                                                                            value: 1,
-                                                                                                            activation: ""
-                                                                                                        }])
-                                                                                                    :
-                                                                                                        setModel(state => [...state, {
-                                                                                                            type: "Output",
-                                                                                                            value: uploadedDataset.labels.length,
-                                                                                                            activation: ""
-                                                                                                        }])
-                                                                                                    }
-                                                                                                setSelectedNode(model.length)
+                                                                                                setModel(state => {
+                                                                                                    const stateCopy = [...state]
+                                                                                                
+                                                                                                    stateCopy.splice(selectedNode+1, 0, {
+                                                                                                        type: "Dense",
+                                                                                                        units: 0,
+                                                                                                        activation: ""
+                                                                                                    })
+                                                                                                
+                                                                                                    return stateCopy
+                                                                                                })
+                                                                                                
+                                                                                                setSelectedNode(state => state + 1)
                                                                                                 setAddNode(false)
                                                                                                 setChangedSettings(true)
-                                                                                            }}>Output</button>
+                                                                                            }}>Dense</button>
+                                                                                        }
+                                                                                        {model[selectedNode].type === "Dense" &&
+                                                                                            <>
+                                                                                                <button onClick={() => {
+                                                                                                    setModel(state => {
+                                                                                                        const stateCopy = [...state]
+                                                                                                    
+                                                                                                        stateCopy.splice(selectedNode+1, 0, {
+                                                                                                            type: "Dropout",
+                                                                                                            rate: 0
+                                                                                                        })
+                                                                                                    
+                                                                                                        return stateCopy
+                                                                                                    })
+
+                                                                                                    setSelectedNode(state => state + 1)
+                                                                                                    setAddNode(false)
+                                                                                                    setChangedSettings(true)
+                                                                                                }}>Dropout</button>
+                                                                                                {selectedNode === model.length-1 &&
+                                                                                                    <button onClick={() => {
+                                                                                                            {uploadedDataset.labels.length === 2 ?
+                                                                                                                setModel(state => [...state, {
+                                                                                                                    type: "Output",
+                                                                                                                    units: 1,
+                                                                                                                    activation: ""
+                                                                                                                }])
+                                                                                                            :
+                                                                                                                setModel(state => [...state, {
+                                                                                                                    type: "Output",
+                                                                                                                    units: uploadedDataset.labels.length,
+                                                                                                                    activation: ""
+                                                                                                                }])
+                                                                                                            }
+                                                                                                        setSelectedNode(state => state + 1)
+                                                                                                        setAddNode(false)
+                                                                                                        setChangedSettings(true)
+                                                                                                    }}>Output</button>
+                                                                                                }
+                                                                                            </>
                                                                                         }
                                                                                     </div>
                                                                                 </div>
@@ -602,59 +817,212 @@ const Workspace = ({currentUser, type}) => {
                                                     <div className="create-model-selected">
                                                         <p>{model[selectedNode].type}</p>
                                                         <div className="create-model-selected-input">
-                                                            <div>
-                                                                <label>Units</label>
-                                                                <input value={model[selectedNode].value} 
-                                                                        disabled={(model[selectedNode].type === "Input" || model[selectedNode].type === "Output") && !(workspace.self || type === "create")}
-                                                                        onChange={e => {setModel(state => {
-                                                                                            const stateCopy = [...state]
-                                                                                        
-                                                                                            stateCopy[selectedNode] = {
-                                                                                                ...stateCopy[selectedNode],
-                                                                                                value: Number(e.target.value)
-                                                                                            }
-                                                                                        
-                                                                                            return stateCopy
-                                                                                        })
-                                                                                        setChangedSettings(true)
-                                                                                        setRefreshDiagram(new Date().getTime())}} />
-                                                            </div>
-                                                            <div>
-                                                                <label>Activation</label>
-                                                                {model[selectedNode].type !== "Input" ?
-                                                                    <select value={model[selectedNode].activation} 
-                                                                            disabled={!(workspace.self || type === "create")}
-                                                                            onChange={e => {setModel(state => {
-                                                                                                const stateCopy = [...state]
-                                                                                            
-                                                                                                stateCopy[selectedNode] = {
-                                                                                                    ...stateCopy[selectedNode],
-                                                                                                    activation: e.target.value
-                                                                                                }
-                                                                                            
-                                                                                                return stateCopy
-                                                                                            })
-                                                                                            setChangedSettings(true)
-                                                                                            setRefreshDiagram(new Date().getTime())}}>
-                                                                            <option disabled defaultValue value=""></option>
-                                                                            <option value="sigmoid">Sigmoid</option>
-                                                                            <option value="softmax">Softmax</option>
-                                                                            <option value="softplus">Softplus</option>
-                                                                            <option value="softsign">Softsign</option>
-                                                                            <option value="swish">Swish</option>
-                                                                            <option value="selu">Selu</option>
-                                                                            <option value="tanh">Tanh</option>
-                                                                            <option value="elu">Elu</option>
-                                                                            <option value="exponential">Exponential</option>
-                                                                            <option value="gelu">Gelu</option>
-                                                                            <option value="hard_sigmoid">Hard Sigmoid</option>
-                                                                            <option value="linear">Linear</option>
-                                                                            <option value="relu">Relu</option>
-                                                                    </select>
-                                                                :
-                                                                    <p>None</p>
-                                                                }
-                                                            </div>
+                                                            {model[selectedNode].type !== "Flatten" &&
+                                                                <>
+                                                                    {model[selectedNode].type === "Dense" &&
+                                                                        <div>
+                                                                            <label>Units</label>
+                                                                            <input value={model[selectedNode].units} 
+                                                                                    disabled={!(workspace.self || type === "create")}
+                                                                                    onChange={e => {setModel(state => {
+                                                                                                        const stateCopy = [...state]
+                                                                                                    
+                                                                                                        stateCopy[selectedNode] = {
+                                                                                                            ...stateCopy[selectedNode],
+                                                                                                            units: Number(e.target.value)
+                                                                                                        }
+                                                                                                    
+                                                                                                        return stateCopy
+                                                                                                    })
+                                                                                                    setChangedSettings(true)
+                                                                                                    setRefreshDiagram(new Date().getTime())}} />
+                                                                        </div>
+                                                                    }
+                                                                    {(model[selectedNode].type === "Dense" || model[selectedNode].type === "Conv2D" || model[selectedNode].type === "Output") &&
+                                                                        <div>
+                                                                            <label>Activation</label>
+                                                                            <select value={model[selectedNode].activation} 
+                                                                                    disabled={!(workspace.self || type === "create")}
+                                                                                    onChange={e => {setModel(state => {
+                                                                                                        const stateCopy = [...state]
+                                                                                                    
+                                                                                                        stateCopy[selectedNode] = {
+                                                                                                            ...stateCopy[selectedNode],
+                                                                                                            activation: e.target.value
+                                                                                                        }
+                                                                                                    
+                                                                                                        return stateCopy
+                                                                                                    })
+                                                                                                    setChangedSettings(true)
+                                                                                                    setRefreshDiagram(new Date().getTime())}}>
+                                                                                    <option disabled defaultValue value=""></option>
+                                                                                    <option value="sigmoid">Sigmoid</option>
+                                                                                    <option value="softmax">Softmax</option>
+                                                                                    <option value="softplus">Softplus</option>
+                                                                                    <option value="softsign">Softsign</option>
+                                                                                    <option value="swish">Swish</option>
+                                                                                    <option value="selu">Selu</option>
+                                                                                    <option value="tanh">Tanh</option>
+                                                                                    <option value="elu">Elu</option>
+                                                                                    <option value="exponential">Exponential</option>
+                                                                                    <option value="gelu">Gelu</option>
+                                                                                    <option value="hard_sigmoid">Hard Sigmoid</option>
+                                                                                    <option value="linear">Linear</option>
+                                                                                    <option value="relu">Relu</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    }
+                                                                    {(model[selectedNode].type === "Conv2D" || model[selectedNode].type === "MaxPooling2D") &&
+                                                                        <>
+                                                                            <div>
+                                                                                <label>Padding</label>
+                                                                                <select value={model[selectedNode].padding} 
+                                                                                    disabled={!(workspace.self || type === "create")}
+                                                                                    onChange={e => {setModel(state => {
+                                                                                                        const stateCopy = [...state]
+                                                                                                    
+                                                                                                        stateCopy[selectedNode] = {
+                                                                                                            ...stateCopy[selectedNode],
+                                                                                                            padding: e.target.value
+                                                                                                        }
+                                                                                                    
+                                                                                                        return stateCopy
+                                                                                                    })
+                                                                                                    setChangedSettings(true)
+                                                                                                    setRefreshDiagram(new Date().getTime())}}>
+                                                                                    <option disabled defaultValue value=""></option>
+                                                                                    <option value="same">Same</option>
+                                                                                    <option value="valid">Valid</option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div>
+                                                                                <label>Strides</label>
+                                                                                <input value={model[selectedNode].strides} 
+                                                                                    disabled={!(workspace.self || type === "create")}
+                                                                                    onChange={e => {setModel(state => {
+                                                                                                        const stateCopy = [...state]
+                                                                                                    
+                                                                                                        stateCopy[selectedNode] = {
+                                                                                                            ...stateCopy[selectedNode],
+                                                                                                            strides: Number(e.target.value)
+                                                                                                        }
+                                                                                                    
+                                                                                                        return stateCopy
+                                                                                                    })
+                                                                                                    setChangedSettings(true)
+                                                                                                    setRefreshDiagram(new Date().getTime())}} />
+                                                                            </div>
+                                                                        </>
+                                                                    }
+                                                                    {model[selectedNode].type === "Conv2D" &&
+                                                                        <>
+                                                                            <div>
+                                                                                <label>Filters</label>
+                                                                                <input value={model[selectedNode].filters} 
+                                                                                    disabled={!(workspace.self || type === "create")}
+                                                                                    onChange={e => {setModel(state => {
+                                                                                                        const stateCopy = [...state]
+                                                                                                    
+                                                                                                        stateCopy[selectedNode] = {
+                                                                                                            ...stateCopy[selectedNode],
+                                                                                                            filters: Number(e.target.value)
+                                                                                                        }
+                                                                                                    
+                                                                                                        return stateCopy
+                                                                                                    })
+                                                                                                    setChangedSettings(true)
+                                                                                                    setRefreshDiagram(new Date().getTime())}} />
+                                                                            </div>
+                                                                            <div>
+                                                                                <label>Kernel Size</label>
+                                                                                <input value={model[selectedNode].kernel} 
+                                                                                    disabled={!(workspace.self || type === "create")}
+                                                                                    onChange={e => {setModel(state => {
+                                                                                                        const stateCopy = [...state]
+                                                                                                    
+                                                                                                        stateCopy[selectedNode] = {
+                                                                                                            ...stateCopy[selectedNode],
+                                                                                                            kernel: Number(e.target.value)
+                                                                                                        }
+                                                                                                    
+                                                                                                        return stateCopy
+                                                                                                    })
+                                                                                                    setChangedSettings(true)
+                                                                                                    setRefreshDiagram(new Date().getTime())}} />
+                                                                            </div>
+                                                                        </>
+                                                                    }
+                                                                    {model[selectedNode].type === "MaxPooling2D" &&
+                                                                        <div>
+                                                                            <label>Pooling Size</label>
+                                                                            <input value={model[selectedNode].pool} 
+                                                                                disabled={!(workspace.self || type === "create")}
+                                                                                onChange={e => {setModel(state => {
+                                                                                                    const stateCopy = [...state]
+                                                                                                
+                                                                                                    stateCopy[selectedNode] = {
+                                                                                                        ...stateCopy[selectedNode],
+                                                                                                        pool: Number(e.target.value)
+                                                                                                    }
+                                                                                                
+                                                                                                    return stateCopy
+                                                                                                })
+                                                                                                setChangedSettings(true)
+                                                                                                setRefreshDiagram(new Date().getTime())}} />
+                                                                        </div>
+                                                                    }
+                                                                    {model[selectedNode].type === "Dropout" &&
+                                                                        <div>
+                                                                            <label>Rate</label>
+                                                                            <input value={model[selectedNode].rate} 
+                                                                                disabled={!(workspace.self || type === "create")}
+                                                                                onChange={e => {setModel(state => {
+                                                                                                    const stateCopy = [...state]
+                                                                                                
+                                                                                                    stateCopy[selectedNode] = {
+                                                                                                        ...stateCopy[selectedNode],
+                                                                                                        rate: Number(e.target.value)
+                                                                                                    }
+                                                                                                
+                                                                                                    return stateCopy
+                                                                                                })
+                                                                                                setChangedSettings(true)
+                                                                                                setRefreshDiagram(new Date().getTime())}} />
+                                                                        </div>
+                                                                    }
+                                                                    {model[selectedNode].type === "BatchNormalisation" &&
+                                                                        <div>
+                                                                            <label>Momentum</label>
+                                                                            <input value={model[selectedNode].momentum} 
+                                                                                disabled={!(workspace.self || type === "create")}
+                                                                                onChange={e => {setModel(state => {
+                                                                                                    const stateCopy = [...state]
+                                                                                                
+                                                                                                    stateCopy[selectedNode] = {
+                                                                                                        ...stateCopy[selectedNode],
+                                                                                                        momentum: Number(e.target.value)
+                                                                                                    }
+                                                                                                
+                                                                                                    return stateCopy
+                                                                                                })
+                                                                                                setChangedSettings(true)
+                                                                                                setRefreshDiagram(new Date().getTime())}} />
+                                                                        </div>
+                                                                    }
+                                                                    {model[selectedNode].type === "Input" &&
+                                                                        <>
+                                                                            <div>
+                                                                                <label>Image Height</label>
+                                                                                <p>{uploadedDataset.height}</p>
+                                                                            </div>
+                                                                            <div>
+                                                                                <label>Image Width</label>
+                                                                                <p>{uploadedDataset.width}</p>
+                                                                            </div>
+                                                                        </>
+                                                                    }
+                                                                </>
+                                                            }
                                                         </div>
                                                     </div>
                                                     <div className="create-model-configuration">
@@ -696,18 +1064,6 @@ const Workspace = ({currentUser, type}) => {
                                                                         }} />
                                                             </div>
                                                             <div>
-                                                                <label>Test Split</label>
-                                                                <input value={configuration.test_split} 
-                                                                        disabled={!(workspace.self || type === "create")}
-                                                                        onChange={e => {
-                                                                            setConfiguration(state => ({
-                                                                                ...state,
-                                                                                test_split: e.target.value
-                                                                            }))
-                                                                            setChangedSettings(true)
-                                                                        }} />
-                                                            </div>
-                                                            <div>
                                                                 <label>Minimum Improvement</label>
                                                                 <input value={configuration.improvement} 
                                                                         disabled={!(workspace.self || type === "create")}
@@ -744,11 +1100,23 @@ const Workspace = ({currentUser, type}) => {
                                                                         }} />
                                                             </div>
                                                             <div>
+                                                                <label>Initial Learning Rate</label>
+                                                                <input value={configuration.initial_lr} 
+                                                                        disabled={!(workspace.self || type === "create")}
+                                                                        onChange={e => {
+                                                                            setConfiguration(state => ({
+                                                                                ...state,
+                                                                                initial_lr: e.target.value
+                                                                            }))
+                                                                            setChangedSettings(true)
+                                                                        }} />
+                                                            </div>
+                                                            <div>
                                                                 <label>Learning Rate Scheduler</label>
                                                                 <input className="create-model-configuration-option-checkbox"
                                                                         type="checkbox" 
                                                                         disabled={!(workspace.self || type === "create")}
-                                                                        onChange={e => {
+                                                                        onChange={() => {
                                                                             setConfiguration(state => ({
                                                                                 ...state,
                                                                                 lr_scheduler: !configuration.lr_scheduler
@@ -756,6 +1124,20 @@ const Workspace = ({currentUser, type}) => {
                                                                             setChangedSettings(true)
                                                                         }}
                                                                         checked={configuration.lr_scheduler} />
+                                                            </div>
+                                                            <div>
+                                                                <label>Early Stopping</label>
+                                                                <input className="create-model-configuration-option-checkbox"
+                                                                        type="checkbox" 
+                                                                        disabled={!(workspace.self || type === "create")}
+                                                                        onChange={() => {
+                                                                            setConfiguration(state => ({
+                                                                                ...state,
+                                                                                early_stopping: !configuration.early_stopping
+                                                                            }))
+                                                                            setChangedSettings(true)
+                                                                        }}
+                                                                        checked={configuration.early_stopping} />
                                                             </div>
                                                             <div>
                                                                 <label>Optimiser</label>
@@ -801,7 +1183,6 @@ const Workspace = ({currentUser, type}) => {
                                                                     {uploadedDataset.labels.length > 2 &&
                                                                         <>
                                                                             <option value="categorical_crossentropy">Categorical Crossentropy</option>
-                                                                            <option value="sparse_categorical_crossentropy">Sparse Categorical Crossentropy</option>
                                                                             <option value="kl_divergence">Kullback Leibler Divergence</option>
                                                                         </>
                                                                     }
@@ -816,9 +1197,35 @@ const Workspace = ({currentUser, type}) => {
                                         }
                                     </>
                                 : (stage === "evaluation") ?
-                                    <></>
+                                    <div className='create-evaluation-body'>
+                                        {!evaluation ?
+                                            <p className='create-evaluation-header'>Train your model...</p>
+                                        :
+                                            <>
+                                                <div className="create-evaluation-test">
+                                                    <div>
+                                                        <p>Training Time:</p>
+                                                        <p>{trainTime} seconds</p>
+                                                    </div>
+                                                    <div>
+                                                        <p>Test Accuracy:</p>
+                                                        <p>{evaluation.testAcc.toFixed(3)}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p>Test Loss:</p>
+                                                        <p>{evaluation.testLoss.toFixed(3)}</p>
+                                                    </div>
+                                                </div>
+                                                <Chart x={evaluation.trainEpochs} y1={evaluation.trainAcc} y2={evaluation.validationAcc} type={"Accuracy"} />
+                                                <Chart x={evaluation.trainEpochs} y1={evaluation.trainLoss} y2={evaluation.validationLoss} type={"Loss"} />
+                                            </>
+                                        }
+                                    </div>
                                 : 
-                                    <></>
+                                    <div className='create-training-body'>
+                                        <p>Training Model...</p>
+                                        <p>Elapsed Time: {trainTime} seconds</p>
+                                    </div>
                                 }
                             </div>
                             {uploadedDataset && 
@@ -832,10 +1239,10 @@ const Workspace = ({currentUser, type}) => {
                                             <div className="sidebar-divided" />
                                             <div className="create-workspace-data-images-list" key={refreshData}>
                                                 {images.map((image, i) => {
-                                                    if (i >= start && i < end) {
+                                                    if (i >= start && i < end && assignedLabels[i] !== "No label") {
                                                         return (
                                                             <div className="create-workspace-data-image" key={i}>
-                                                                <img src={`http://127.0.0.1:5000/files/${uploadedDataset.imageFile}/${image}.jpg`} />
+                                                                <img src={`http://127.0.0.1:5000/files/${uploadedDataset.imageFile}/images/${assignedLabels[i]}/${image}.jpg`}  />
                                                                 <p>{assignedLabels[i]}</p>
                                                             </div>
                                                         )

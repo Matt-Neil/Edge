@@ -88,6 +88,8 @@ exports.getItem = async (req, res, next) => {
                         'imageFile': 1,
                         'visibility': 1,
                         'labels': 1,
+                        'height': 1,
+                        'width': 1,
                         'rgb': 1,
                         'self': { $eq: [mongoose.Types.ObjectId(res.locals.currentUser._id), '$creator']},
                         'bookmarked': { $in: [res.locals.currentUser._id, '$bookmarks'] },
@@ -149,6 +151,7 @@ exports.getItem = async (req, res, next) => {
                         'visibility': 1,
                         'model': 1,
                         'configuration': 1,
+                        'evaluation': 1,
                         'self': { $eq: [mongoose.Types.ObjectId(res.locals.currentUser._id), '$creator']},
                         'bookmarked': { $in: [res.locals.currentUser._id, '$bookmarks'] },
                         'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
@@ -159,7 +162,9 @@ exports.getItem = async (req, res, next) => {
                         'dataset.title': 1,
                         'dataset.imageFile': 1,
                         'dataset.labels': 1,
-                        'dataset._id': 1,
+                        'dataset._id': 1, 
+                        'dataset.height': 1,
+                        'dataset.width': 1,
                         'creatorName.name': 1,
                         'type': 1
                     }
@@ -218,7 +223,7 @@ exports.putItem = async (req, res, next) => {
         if (!item) {
             res.status(404).json({
                 success: false,
-                error: "No Dataset Found."
+                error: "No Item Found."
             })
         } else {
             item.title = req.body.title
@@ -229,10 +234,13 @@ exports.putItem = async (req, res, next) => {
             if (item.type === "dataset") {
                 item.labels = req.body.labels
                 item.rgb = req.body.rgb
+                item.height = req.body.height
+                item.width = req.body.width
             } else {
                 item.model = req.body.model
                 item.configuration = req.body.configuration
                 item.dataset = req.body.dataset
+                item.evaluation = req.body.evaluation
             }
             
             await item.save();
@@ -242,6 +250,7 @@ exports.putItem = async (req, res, next) => {
             })
         }
     } catch (err) {
+        console.log(err)
         res.status(500).json({
             success: false,
             error: 'Server Error'
@@ -251,7 +260,7 @@ exports.putItem = async (req, res, next) => {
 
 exports.getCheckPublicDataset = async (req, res, next) => {
     try {
-        const check = await Items.findById(req.query.id, '_id visibility imageFile labels title')
+        const check = await Items.findById(req.query.id, '_id visibility imageFile labels title height width')
         
         if (check) {
             res.status(201).json({
