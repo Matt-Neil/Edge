@@ -10,17 +10,12 @@ import sys
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
-@app.route('/api/predict-model')
+@app.route('/api/predict-model', methods=['POST'])
 def predict_model():
-    return prediction_model.model()
-
-@app.route('/api/train-model', methods=['POST'])
-def train_model():
     body = request.form
-
-    print(body, sys.stdout)
+    file = request.files['image']
     
-    results = make_response(training_model.model(body))
+    results = make_response(prediction_model.predict(body, file))
     results.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
     results.headers.add('Access-Control-Allow-Credentials', 'true')
 
@@ -29,18 +24,18 @@ def train_model():
     except Exception:  
         return "Error", 400
 
-@app.route('/api/test', methods=['POST'])
-def test_model():
-
-    return test.model()
-
-@app.route('/api/predict-model', methods=['POST'])
-def prediction_model():
+@app.route('/api/train-model', methods=['POST'])
+def train_model():
     body = request.form
     
-    results = make_response(prediction_model.model(body))
-    results.headers.add('Access-Control-Allow-Origin', '*')
-    return results
+    results = make_response(training_model.train(body))
+    results.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    results.headers.add('Access-Control-Allow-Credentials', 'true')
+
+    try:
+        return results
+    except Exception:  
+        return "Error", 400
 
 @app.route('/api/file/upload-image', methods = ['POST'])
 def upload_image():

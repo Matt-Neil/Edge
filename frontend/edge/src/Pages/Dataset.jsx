@@ -563,6 +563,7 @@ const Dataset = ({currentUser, type}) => {
                                 <div className="create-item-setup">
                                     <label className="create-item-setup-label">Image Height</label>
                                     <input className="create-item-setup-dimension"
+                                            placeholder="Pixels"
                                             disabled={!(dataset.self || type === "create")}
                                             value={height}
                                             onChange={e => {
@@ -573,6 +574,7 @@ const Dataset = ({currentUser, type}) => {
                                 <div className="create-item-setup">
                                     <label className="create-item-setup-label">Image Width</label>
                                     <input className="create-item-setup-dimension"
+                                            placeholder="Pixels"
                                             disabled={!(dataset.self || type === "create")}
                                             value={width}
                                             onChange={e => {

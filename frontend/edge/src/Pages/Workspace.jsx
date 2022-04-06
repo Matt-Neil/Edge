@@ -6,6 +6,7 @@ import globalAPI from '../API/global'
 import imageAPI from '../API/images'
 import filesAPI from '../API/files'
 import trainAPI from '../API/train'
+import predictAPI from '../API/predict'
 import ModelNode from '../Components/Model-Node';
 import Chart from '../Components/Chart'
 import { OpenItemsContext } from '../Contexts/openItemsContext';
@@ -40,6 +41,8 @@ const Workspace = ({currentUser, type}) => {
     const [uploadedDataset, setUploadedDataset] = useState()
     const [workspace, setWorkspace] = useState([]);
     const [images, setImages] = useState([])
+    const [predictionFile, setPredictionFile] = useState()
+    const [prediction, setPrediction] = useState()
     const [assignedLabels, setAssignedLabels] = useState([])
     const [refreshData, setRefreshData] = useState()
     const [refreshDiagram, setRefreshDiagram] = useState()
@@ -343,7 +346,7 @@ const Workspace = ({currentUser, type}) => {
             formData.append('height', uploadedDataset.height)
             formData.append('width', uploadedDataset.width)
             formData.append('label', uploadedDataset.labels.length)
-            formData.append('id', uploadedDataset._id)
+            formData.append('id', workspaceID)
 
             model.map(node => {
                 formData.append('model[]', JSON.stringify(node))
@@ -370,6 +373,28 @@ const Workspace = ({currentUser, type}) => {
             setStage("model")
             setDisabledTrain(false)
         }
+    }
+
+    const predictModel = async () => {
+        try {
+            setPrediction("")
+
+            const formData = new FormData();
+
+            formData.append('id', workspaceID)
+            formData.append('rgb', uploadedDataset.rgb)
+            formData.append('height', uploadedDataset.height)
+            formData.append('width', uploadedDataset.width)
+            formData.append('image', predictionFile)
+
+            uploadedDataset.labels.map(label => {
+                formData.append('labels[]', label)
+            })
+
+            const response = await predictAPI.post("", formData);
+            
+            setPrediction(response.data)
+        } catch (err) {console.log(err)}
     }
 
     const updateWorkspace = async () => {
@@ -560,41 +585,26 @@ const Workspace = ({currentUser, type}) => {
                         <div className="workspace-body">
                             <div className="workspace-inner">
                                 <div className="view-items-top">
-                                    {type === "create" &&
-                                        <>
-                                            <h1>Create Workspace</h1>
-                                            <div>
-                                                <button className={`text-button ${stage === "model" ? "item-header-button-selected" : "item-header-button-unselected"}`}
-                                                        onClick={() => {setStage("model")}}>Model</button>
-                                                <button className={`text-button ${stage === "evaluation" ? "item-header-button-selected" : "item-header-button-unselected"}`}
-                                                        onClick={() => {setStage("evaluation")}}>Evaluation</button>
-                                                <span />
-                                                <button className="workspace-train blue-button"
-                                                        disabled={disabledTrain || model[model.length-1].type !== "Output" || model.length === 0}
-                                                        onClick={() => {train()}}>Train</button>
-                                                <button className="blue-button"
-                                                        disabled={!evaluation || title === "" || description === "" || model[model.length-1].type !== "Output"}
-                                                        onClick={() => {uploadImage()}}>Create</button>
-                                            </div>
-                                        </>
-                                    }
-                                    {type === "view" &&
-                                        <>
-                                            <h1>Workspace</h1>
-                                            <div>
-                                                <button className={`text-button ${stage === "model" ? "item-header-button-selected" : "item-header-button-unselected"}`}
-                                                        onClick={() => {setStage("model")}}>Model</button>
-                                                <button className={`text-button ${stage === "evaluation" ? "item-header-button-selected" : "item-header-button-unselected"}`}
-                                                        onClick={() => {setStage("evaluation")}}>Evaluation</button>
-                                                <span />
-                                                {workspace.self &&
-                                                    <button className="blue-button"
-                                                            disabled={disabledTrain || model[model.length-1].type !== "Output" || model.length === 0}
-                                                            onClick={() => {train()}}>Train</button>
-                                                }
-                                            </div>
-                                        </>
-                                    }
+                                    <h1>{type === "create" ? "Create Workspace" : "Workspace"}</h1>
+                                    <div>
+                                        <button className={`text-button ${stage === "model" ? "item-header-button-selected" : "item-header-button-unselected"}`}
+                                                onClick={() => {setStage("model")}}>Model</button>
+                                        <button className={`text-button ${stage === "evaluation" ? "item-header-button-selected" : "item-header-button-unselected"}`}
+                                                onClick={() => {setStage("evaluation")}}>Evaluation</button>
+                                        <button className={`text-button ${stage === "prediction" ? "item-header-button-selected" : "item-header-button-unselected"}`}
+                                                onClick={() => {setStage("prediction")}}>Prediction</button>
+                                        <span />
+                                        {(workspace.self || type === "create") &&
+                                            <button className="workspace-train blue-button"
+                                                    disabled={disabledTrain || model[model.length-1].type !== "Output" || model.length === 0}
+                                                    onClick={() => {train()}}>Train</button>
+                                        }
+                                        {type === "create" &&
+                                            <button className="blue-button"
+                                                    disabled={!evaluation || title === "" || description === "" || model[model.length-1].type !== "Output"}
+                                                    onClick={() => {uploadImage()}}>Create</button>
+                                        }
+                                    </div>
                                 </div>
                                 {stage === "model" ?
                                     <>
@@ -1236,7 +1246,7 @@ const Workspace = ({currentUser, type}) => {
                                 : (stage === "evaluation") ?
                                     <div className='create-evaluation-body'>
                                         {!evaluation ?
-                                            <p className='create-evaluation-header'>Train your model...</p>
+                                            <p className='create-evaluation-header'>Model must be trained first...</p>
                                         :
                                             <>
                                                 <div className="create-evaluation-test">
@@ -1258,10 +1268,26 @@ const Workspace = ({currentUser, type}) => {
                                             </>
                                         }
                                     </div>
-                                : 
+                                : (stage === "train") ?
                                     <div className='create-training-body'>
                                         <p>Training Model...</p>
                                         <p>Elapsed Time: {trainTime} seconds</p>
+                                    </div>
+                                :
+                                    <div className='create-prediction-body'>
+                                        {!evaluation ?
+                                            <p className='create-evaluation-header'>Model must be trained first...</p>
+                                        :
+                                            <>
+                                                <input type="file" 
+                                                        name="data"
+                                                        accept="image/*"
+                                                        onChange={e => {setPredictionFile(e.target.files[0])}} />
+                                                <button className="white-button"
+                                                        onClick={() => {predictModel()}}>Predict</button>
+                                                <p>{prediction}</p>
+                                            </>
+                                        }
                                     </div>
                                 }
                             </div>

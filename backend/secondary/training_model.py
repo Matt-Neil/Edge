@@ -5,9 +5,8 @@ from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.optimizers.schedules import ExponentialDecay
 from tensorflow.keras.optimizers import Adadelta, Adagrad, Adam, Adamax, Ftrl, Nadam, RMSprop, SGD
 import json
-import sys
 
-def model(body):
+def train(body):
     if int(body['label']) > 2:
         label_mode = 'categorical'
     else:
@@ -78,8 +77,7 @@ def model(body):
                                         activation=node['activation']))
             else:
                 model.add(layers.Flatten())
-    print(training_set, sys.stdout)
-    print(int(len(training_set)/int(body['batch'])), sys.stdout)
+    
     if body['lr_scheduler'] == "true":
         lr_scheduler = ExponentialDecay(initial_learning_rate=float(body['initial_lr']), 
                                         decay_steps=int(body['decay_steps']), 
