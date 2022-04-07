@@ -661,64 +661,56 @@ const Dataset = ({currentUser, type}) => {
                                 {(type === "create" || dataset.self) ?
                                     <>
                                         <div className="view-items-top">
-                                            {type === "create" ?
-                                                <>
-                                                    <h1>Create Dataset</h1>
-                                                    <div>
-                                                        <span />
-                                                        <button className="blue-button"
-                                                                disabled={disableCreate}
-                                                                onClick={() => {uploadImage()}}>Create</button>
-                                                    </div>
-                                                </>
-                                            :
-                                                <>
-                                                    <h1>Dataset</h1>
-                                                    <div className="create-dataset-upload">
-                                                        <input type="file" 
-                                                                name="data"
-                                                                accept="image/*"
-                                                                multiple
-                                                                onChange={e => {setImageFiles(e.target.files)}} />
-                                                        {type === "create" && uploadedImages.length === 0 && 
-                                                            <button className="white-button"
-                                                                    disabled={imageFiles.length === 0}
-                                                                    onClick={() => {
-                                                                        addImages()
-                                                                        setChangedData(true)
-                                                                    }}>Add</button>
-                                                        }
-                                                        {(dataset.self || type === "create") && uploadedImages.length !== 0 && 
-                                                            <>
-                                                                <button className="white-button"
-                                                                        disabled={imageFiles.length === 0}
-                                                                        onClick={() => {
-                                                                            setUploadedImages([])
-                                                                            replaceImages()
-                                                                            setChangedData(true)
-                                                                        }}>Replace</button>
-                                                                <button className="white-button"
-                                                                        disabled={imageFiles.length === 0}
-                                                                        onClick={() => {
-                                                                            if (appendedImages.length !== 0) {
-                                                                                setAppendedImages([])
-                                                                                setAppendedLabels([])
-                                                                            }
-                                                                            appendImages()
-                                                                            setChangedData(true)
-                                                                        }}>Add</button>
-                                                            </>
-                                                        }
-                                                        {uploadedImages.length !== 0 &&
-                                                            <div className="create-dataset-pagination">
-                                                                <ArrowBackIosNewIcon className="create-dataset-pagination-icon" onClick={() => {previousPage()}} />
-                                                                <p>Page {page} / {Math.ceil(uploadedImages.length/30)}</p>
-                                                                <ArrowForwardIosIcon className="create-dataset-pagination-icon" onClick={() => {nextPage()}} />
-                                                            </div>
-                                                        }
-                                                    </div>
-                                                </>
+                                            <h1>Create Dataset</h1>
+                                            {type === "create" &&
+                                                <div>
+                                                    <span />
+                                                    <button className="blue-button"
+                                                            disabled={disableCreate}
+                                                            onClick={() => {uploadImage()}}>Create</button>
+                                                </div>
                                             }
+                                            <div className="create-dataset-upload">
+                                                <input type="file" 
+                                                        name="data"
+                                                        accept="image/*"
+                                                        multiple
+                                                        onChange={e => {setImageFiles(e.target.files)}} />
+                                                {type === "create" && uploadedImages.length === 0 && 
+                                                    <button className="white-button"
+                                                            disabled={imageFiles.length === 0}
+                                                            onClick={() => {
+                                                                addImages()
+                                                                setChangedData(true)
+                                                            }}>Add</button>
+                                                }
+                                                {uploadedImages.length !== 0 && 
+                                                    <>
+                                                        <button className="white-button"
+                                                                disabled={imageFiles.length === 0}
+                                                                onClick={() => {
+                                                                    setUploadedImages([])
+                                                                    replaceImages()
+                                                                    setChangedData(true)
+                                                                }}>Replace</button>
+                                                        <button className="white-button"
+                                                                disabled={imageFiles.length === 0}
+                                                                onClick={() => {
+                                                                    if (appendedImages.length !== 0) {
+                                                                        setAppendedImages([])
+                                                                        setAppendedLabels([])
+                                                                    }
+                                                                    appendImages()
+                                                                    setChangedData(true)
+                                                                }}>Add</button>
+                                                        <div className="create-dataset-pagination">
+                                                            <ArrowBackIosNewIcon className="create-dataset-pagination-icon" onClick={() => {previousPage()}} />
+                                                            <p>Page {page} / {Math.ceil(uploadedImages.length/30)}</p>
+                                                            <ArrowForwardIosIcon className="create-dataset-pagination-icon" onClick={() => {nextPage()}} />
+                                                        </div>
+                                                    </>
+                                                }
+                                            </div>
                                         </div>
                                         {(type === "create" || dataset.self) && appendedImages.length !== 0 && 
                                             <div className="create-dataset-appended">
@@ -800,7 +792,7 @@ const Dataset = ({currentUser, type}) => {
                                 :   
                                     <>
                                         <div className="view-items-top">
-                                            <p>Dataset</p>
+                                            <h1>Dataset</h1>
                                         </div>
                                         <div className="create-dataset-images-list" key={refreshData}>
                                             {uploadedImages.map((image, i) => {

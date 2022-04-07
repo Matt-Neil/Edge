@@ -20,6 +20,7 @@ import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import DownloadIcon from '@mui/icons-material/Download';
 
 const Workspace = ({currentUser, type}) => {
     const [stage, setStage] = useState("model");
@@ -357,6 +358,8 @@ const Workspace = ({currentUser, type}) => {
             setDisabledTrain(false)
 
             if (response) {
+                updateWorkspace()
+
                 setEvaluation({
                     testAcc: response.data.test_acc,
                     testLoss: response.data.test_loss,
@@ -552,6 +555,9 @@ const Workspace = ({currentUser, type}) => {
                                             <OpenInNewIcon className="create-item-view-dataset-icon" />
                                         </Link>
                                     }
+                                    <a href={`http://127.0.0.1:5000/models/${workspaceID}`} download>
+                                        <DownloadIcon className="dataset-download-icon" />
+                                    </a>
                                 </>
                             :
                                 <div>
@@ -595,12 +601,12 @@ const Workspace = ({currentUser, type}) => {
                                                 onClick={() => {setStage("prediction")}}>Prediction</button>
                                         <span />
                                         {(workspace.self || type === "create") &&
-                                            <button className="workspace-train blue-button"
+                                            <button className="blue-button"
                                                     disabled={disabledTrain || model[model.length-1].type !== "Output" || model.length === 0}
                                                     onClick={() => {train()}}>Train</button>
                                         }
                                         {type === "create" &&
-                                            <button className="blue-button"
+                                            <button className="workspace-create blue-button"
                                                     disabled={!evaluation || title === "" || description === "" || model[model.length-1].type !== "Output"}
                                                     onClick={() => {uploadImage()}}>Create</button>
                                         }
@@ -1276,16 +1282,27 @@ const Workspace = ({currentUser, type}) => {
                                 :
                                     <div className='create-prediction-body'>
                                         {!evaluation ?
-                                            <p className='create-evaluation-header'>Model must be trained first...</p>
+                                            <p className='create-prediction-header'>Model must be trained first...</p>
                                         :
                                             <>
-                                                <input type="file" 
-                                                        name="data"
-                                                        accept="image/*"
-                                                        onChange={e => {setPredictionFile(e.target.files[0])}} />
-                                                <button className="white-button"
-                                                        onClick={() => {predictModel()}}>Predict</button>
-                                                <p>{prediction}</p>
+                                                <div className="create-prediction-top">
+                                                    <input type="file" 
+                                                            name="data"
+                                                            accept="image/*"
+                                                            onChange={e => {
+                                                                setPrediction("")
+                                                                setPredictionFile(e.target.files[0])}} 
+                                                            />
+                                                    <button className="white-button"
+                                                            onClick={() => {predictModel()}}>Predict</button>
+                                                </div>
+                                                {predictionFile && 
+                                                    <div className="create-prediction-card">
+                                                        <img src={URL.createObjectURL(predictionFile)} />
+                                                        <p>{prediction ? "Predicted label:" : "Predict label..."}</p>
+                                                        <p className="create-prediction-card-prediction">{prediction}</p>
+                                                    </div>
+                                                }
                                             </>
                                         }
                                     </div>

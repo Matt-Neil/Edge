@@ -12,11 +12,18 @@ def train(body):
     else:
         label_mode = 'binary'
 
+    if body['rgb']:
+        color_mode = "rgb"
+    else:
+        color_mode = "grayscale"
+
     training_set = tf.keras.utils.image_dataset_from_directory(
                 'files/{}/images'.format(body['imageFile']),
                 validation_split=float(body['validation_split']),
+                labels='inferred',
                 subset="training",
                 seed=123,
+                color_mode=color_mode,
                 label_mode=label_mode,
                 image_size=(int(body['height']), int(body['width'])),
                 batch_size=int(body['batch']))
@@ -24,8 +31,10 @@ def train(body):
     validation_set = tf.keras.utils.image_dataset_from_directory(
                     'files/{}/images'.format(body['imageFile']),
                     validation_split=float(body['validation_split']),
+                    labels='inferred',
                     subset="validation",
                     seed=123,
+                    color_mode=color_mode,
                     label_mode=label_mode,
                     image_size=(int(body['height']), int(body['width'])),
                     batch_size=int(body['batch']))
@@ -35,21 +44,13 @@ def train(body):
     training_set = training_set.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
     validation_set = validation_set.prefetch(buffer_size=AUTOTUNE)
 
-    if body['rgb']:
-        channels = 3
-    else:
-        channels = 1
-
     model = Sequential()
 
     for i in range(len(body.getlist("model[]"))):
         node = json.loads(body.getlist("model[]")[i])
 
         if i == 0:
-            model.add(layers.Rescaling(1./255, 
-                                        input_shape=(int(body['height']), 
-                                        int(body['width']), 
-                                        channels)))
+            model.add(layers.Rescaling(1./255))
         elif i == len(body.getlist("model[]"))-1:
             model.add(layers.Dense(units=int(body['label']), 
                                     activation=node['activation']))
@@ -109,7 +110,7 @@ def train(body):
     if body['early_stopping'] == "true":
         callbacks.append(EarlyStopping(monitor='loss', patience=int(body['patience']), min_delta=float(body['improvement']), mode='auto'))
 
-    history = model.fit(training_set, validation_data=validation_set, epochs=int(body['epochs']), batch_size=int(body['batch']), callbacks=callbacks, verbose=0)
+    history = model.fit(training_set, validation_data=validation_set, epochs=int(body['epochs']), callbacks=callbacks, verbose=0)
 
     test_loss, test_acc = model.evaluate(validation_set, verbose=0)
 
