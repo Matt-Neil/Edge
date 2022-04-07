@@ -162,6 +162,7 @@ const Dataset = ({currentUser, type}) => {
             const formData = new FormData();
 
             formData.append('id', dataset.imageFile)
+            formData.append('datasetID', datasetID)
             formData.append('label', addLabel)
 
             await fileAPI.post("/add-label", formData)
@@ -185,6 +186,7 @@ const Dataset = ({currentUser, type}) => {
             const formData = new FormData();
 
             formData.append('id', dataset.imageFile)
+            formData.append('datasetID', datasetID)
             formData.append('label', labels[index])
 
             labels.splice(index, 1)
@@ -203,6 +205,7 @@ const Dataset = ({currentUser, type}) => {
             const formData = new FormData();
 
             formData.append('id', dataset.imageFile)
+            formData.append('datasetID', datasetID)
             formData.append('filename', uploadedImages[index])
             formData.append('oldLabel', assignedLabels[index])
             formData.append('newLabel', e.target.value)
@@ -279,6 +282,7 @@ const Dataset = ({currentUser, type}) => {
             const formData = new FormData();
 
             formData.append('id', dataset.imageFile)
+            formData.append('datasetID', datasetID)
             formData.append('index', index)
             formData.append('label', label)
             formData.append('filename', filename)
@@ -313,6 +317,7 @@ const Dataset = ({currentUser, type}) => {
             const formData = new FormData();
 
             formData.append('id', dataset.imageFile)
+            formData.append('datasetID', datasetID)
 
             for (let i = 0; i < imageFiles.length; i++) {
                 formData.append('data[]', imageFiles[i]);
@@ -362,6 +367,7 @@ const Dataset = ({currentUser, type}) => {
             const formData = new FormData();
 
             formData.append('id', dataset.imageFile)
+            formData.append('datasetID', datasetID)
             formData.append('last', uploadedImages.length-1)
 
             for (let i = 0; i < appendedImages.length; i++) {
@@ -393,6 +399,7 @@ const Dataset = ({currentUser, type}) => {
             const id = new Date().toISOString();
 
             formData.append('id', id)
+            formData.append('datasetID', datasetID)
 
             for (let i = 0; i < uploadedImages.length; i++) {
                 formData.append('data[]', uploadedImages[i]);
@@ -623,12 +630,12 @@ const Dataset = ({currentUser, type}) => {
                                 <div className="sidebar-divided" />
                                 <div className="sidebar-dataset-copy">
                                     <div>
-                                        {copyData ? <p>Data ID</p> : <p>Copied</p>}
+                                        <p>{copyData ? "Dataset ID" : "Copied"}</p>
                                         <button disabled={!copyData} onClick={() => {copiedInterval()}}>
                                             <ContentCopyIcon className="dataset-copy-icon" />
                                         </button>
                                     </div>
-                                    <a href={`http://127.0.0.1:5000/files/${dataset.imageFile}`} download>
+                                    <a href={`http://127.0.0.1:5000/files/${dataset.imageFile}/${datasetID}-dataset.zip`} download>
                                         <DownloadIcon className="dataset-download-icon" />
                                     </a>
                                 </div>

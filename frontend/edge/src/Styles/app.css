@@ -682,6 +682,11 @@
           align-items: center;
 }
 
+.create-workspace-uploaded-dataset .workspace-download-icon {
+  color: #FBFBFB;
+  margin: 10px 0 0 15px;
+}
+
 .create-workspace-uploaded-dataset .create-workspace-import-existing {
   margin: 0;
   min-height: 40px;
@@ -2351,12 +2356,8 @@
 }
 
 .signin-side h1 {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 400;
-  color: #FBFBFB;
-  margin: 5px 0 0 0;
+  margin: 5px 0 30px 0;
   font-size: 24px;
-  margin: 0 0 30px 0;
 }
 
 .signin-side label {
@@ -2687,9 +2688,6 @@ h1 {
   font-weight: 400;
   color: #FBFBFB;
   margin: 5px 0 0 0;
-  -webkit-box-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
 }
 
 p {
@@ -2771,25 +2769,27 @@ input, textarea {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+  margin: 15px;
 }
 
 .whole-body .main-body .sidebar .sidebar-dataset-copy div {
-  height: 30px;
-  width: 95px;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  height: 30px;
   background-color: #292929;
-  margin: 15px;
   border-radius: 8px;
   border: 1px solid #1A1A1A;
 }
 
 .whole-body .main-body .sidebar .sidebar-dataset-copy div p {
-  width: 70px;
+  width: 100%;
   color: #FBFBFB;
   font-size: 12px;
   margin: 0 8px;
@@ -2828,7 +2828,7 @@ input, textarea {
   text-decoration: none;
   color: #FBFBFB;
   font-size: 14px;
-  margin: 0;
+  margin: 0 0 0 15px;
 }
 
 .whole-body .main-body .sidebar .sidebar-dataset-copy a .dataset-download-icon {

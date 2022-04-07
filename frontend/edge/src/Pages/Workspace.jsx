@@ -555,9 +555,6 @@ const Workspace = ({currentUser, type}) => {
                                             <OpenInNewIcon className="create-item-view-dataset-icon" />
                                         </Link>
                                     }
-                                    <a href={`http://127.0.0.1:5000/models/${workspaceID}`} download>
-                                        <DownloadIcon className="dataset-download-icon" />
-                                    </a>
                                 </>
                             :
                                 <div>
@@ -568,8 +565,12 @@ const Workspace = ({currentUser, type}) => {
                                     </Link>
                                 </div>
                             }
+                            {type === "view" &&
+                                <a href={`http://127.0.0.1:5000/models/${workspaceID}/${workspaceID}-model.zip`} download>
+                                    <DownloadIcon className="workspace-download-icon" />
+                                </a>
+                            }
                         </div>
-                        
                         {type === "view" &&
                             <>
                                 {workspace.self &&

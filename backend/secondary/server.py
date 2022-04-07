@@ -2,10 +2,9 @@ from flask import Flask, request, send_from_directory, json, make_response
 from flask_cors import CORS
 import os
 import shutil
+from zipfile import ZipFile, ZIP_DEFLATED
 import training_model
 import prediction_model
-import test
-import sys
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
@@ -38,7 +37,7 @@ def train_model():
         return "Error", 400
 
 @app.route('/api/file/upload-image', methods = ['POST'])
-def upload_image():
+def upload_images():
     images = request.files.getlist("data[]")
     assignedLabels = request.form.getlist("labels[]")
     os.makedirs('files/' + request.form['id'])
@@ -59,6 +58,8 @@ def upload_image():
     with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
         json.dump(labels, outfile)
 
+    dataset_zip(request.form['id'], request.form['datasetID'])
+
     return "OK"
 
 @app.route('/api/file/delete-image', methods = ['POST'])
@@ -76,10 +77,12 @@ def delete_image():
     with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
         json.dump(labels, outfile)
 
+    dataset_zip(request.form['id'], request.form['datasetID'])
+
     return "OK"
 
 @app.route('/api/file/replace-image', methods = ['POST'])
-def replace_image():
+def replace_images():
     images = request.files.getlist("data[]")
     assignedLabels = request.form.getlist("labels[]")
     os.remove('files/{}'.format(request.form['id']))
@@ -100,10 +103,12 @@ def replace_image():
     with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
         json.dump(labels, outfile)
 
+    dataset_zip(request.form['id'], request.form['datasetID'])
+
     return "OK"
 
 @app.route('/api/file/append-image', methods = ['POST'])
-def append_image():
+def append_images():
     images = request.files.getlist("data[]")
     filenames = request.form.getlist("filenames[]")
     assignedLabels = request.form.getlist("labels[]")
@@ -124,10 +129,12 @@ def append_image():
     with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
         json.dump(previous, outfile)
 
+    dataset_zip(request.form['id'], request.form['datasetID'])
+
     return "OK"
 
 @app.route('/api/file/update-image', methods = ['POST'])
-def update_image():
+def update_images():
     if request.form['oldLabel'] == "No label":
         os.rename('files/{}/no-label/{}.jpg'.format(request.form['id'], request.form['filename']),
             'files/{}/images/{}/{}.jpg'.format(request.form['id'], request.form['newLabel'], request.form['filename']))
@@ -146,11 +153,15 @@ def update_image():
     with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
         json.dump(previous, outfile)
 
+    dataset_zip(request.form['id'], request.form['datasetID'])
+
     return "OK"
 
 @app.route('/api/file/add-label', methods = ['POST'])
 def add_label():
     os.makedirs('files/{}/images/{}'.format(request.form['id'], request.form['label']))
+
+    dataset_zip(request.form['id'], request.form['datasetID'])
 
     return "OK"
 
@@ -170,6 +181,8 @@ def delete_label():
         json.dump(previous, outfile)
 
     os.rmdir('files/{}/images/{}'.format(request.form['id'], request.form['label']))
+
+    dataset_zip(request.form['id'], request.form['datasetID'])
             
     return "OK"
 
@@ -186,11 +199,26 @@ def remove_model():
     return "OK"
 
 @app.route('/files/<path:path>')
-def get_data(path):
+def get_labels(path):
     file = send_from_directory('files', path)
     file.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    file.headers.add('Access-Control-Allow-Credentials', 'true')
 
     return file
+
+@app.route('/models/<path:path>')
+def get_model(path):
+    file = send_from_directory('models', path)
+    file.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    file.headers.add('Access-Control-Allow-Credentials', 'true')
+
+    return file
+
+def dataset_zip(file_id, datasetID):
+    with ZipFile("files/{}/{}-dataset.zip".format(file_id, datasetID), 'w', ZIP_DEFLATED) as zip_file:
+        for root, dirs, files in os.walk('files/{}/images/'.format(file_id)):
+            for file in files:
+                zip_file.write(os.path.join(root, file))
 
 if __name__ == "__main__":
     app.run(debug=True)

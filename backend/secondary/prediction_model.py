@@ -11,7 +11,7 @@ def predict(body, file):
     else:
         color_mode = "L"
 
-    loaded_model = load_model("models/{}".format(body['id']), compile = True)
+    loaded_model = load_model("models/{}/model".format(body['id']), compile = True)
 
     prediction_image = Image.open(file)
     prediction_image = prediction_image.resize((int(body['width']), int(body['height'])))

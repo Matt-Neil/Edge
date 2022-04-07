@@ -5,6 +5,8 @@ from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.optimizers.schedules import ExponentialDecay
 from tensorflow.keras.optimizers import Adadelta, Adagrad, Adam, Adamax, Ftrl, Nadam, RMSprop, SGD
 import json
+from zipfile import ZipFile, ZIP_DEFLATED
+import os
 
 def train(body):
     if int(body['label']) > 2:
@@ -114,6 +116,11 @@ def train(body):
 
     test_loss, test_acc = model.evaluate(validation_set, verbose=0)
 
-    model.save('models/{}'.format(body['id']))
+    model.save('models/{}/model/'.format(body['id']))
+
+    with ZipFile("models/{}/{}-model.zip".format(body['id'], body['id']), 'w', ZIP_DEFLATED) as zip_file:
+        for root, dirs, files in os.walk('models/{}/model/'.format(body['id'])):
+            for file in files:
+                zip_file.write(os.path.join(root, file))
 
     return {"training": history.history, "test_loss": test_loss, "test_acc": test_acc, "epochs": len(history.history['accuracy'])}
