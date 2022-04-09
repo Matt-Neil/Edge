@@ -598,6 +598,38 @@
   font-size: 14px;
 }
 
+.message-card {
+  position: fixed;
+  margin: 0 0 20px 0;
+  left: 50%;
+  -webkit-transform: translate(-50%, 0);
+          transform: translate(-50%, 0);
+  bottom: 0;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+  padding: 5px 20px;
+  background-color: #FBFBFB;
+  border-radius: 10px;
+}
+
+.message-card p {
+  color: #1D1D1D;
+  font-size: 14px;
+}
+
 .create-item-title {
   min-height: 40px;
   width: 100%;
@@ -2547,7 +2579,7 @@
 }
 
 .view-items-top div .workspace-create {
-  margin: 0 0 0 15px;
+  margin: 5px 0 0 15px;
 }
 
 .view-items-top button {

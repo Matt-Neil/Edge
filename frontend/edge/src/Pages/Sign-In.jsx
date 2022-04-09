@@ -1,6 +1,8 @@
 import React, {useState, useContext} from 'react'
 import authAPI from "../API/auth"
 import { CurrentUserContext } from '../Contexts/currentUserContext';
+import { MessageContext } from '../Contexts/messageContext';
+import MessageCard from '../Components/MessageCard'
 
 const SignIn = () => {
     const [signin, setSignin] = useState(true);
@@ -9,7 +11,9 @@ const SignIn = () => {
     const [createEmail, setCreateEmail] = useState("");
     const [createPassword, setCreatePassword] = useState("");
     const [createName, setCreateName] = useState("")
+    const [message, setMessage] = useState("")
     const {changeCurrentUser} = useContext(CurrentUserContext);
+    const {displayMessage, displayMessageInterval} = useContext(MessageContext);
 
     const signinUser = async (e) => {
         e.preventDefault();
@@ -32,7 +36,8 @@ const SignIn = () => {
                 window.location = `/home`
             }
         } catch (err) {
-            console.log(err)
+            setMessage("Error occurred")
+            displayMessageInterval()
         }
     }
 
@@ -58,7 +63,35 @@ const SignIn = () => {
 
                     window.location = `/home`
                 }
-            } catch (err) {}
+            } catch (err) {
+                setMessage("Error occurred")
+                displayMessageInterval()
+            }
+        } else {
+            let error = ""
+
+            if (createName === "") {
+                error = "Name is blank"
+            }
+
+            if (createEmail === "") {
+                if (error === "") {
+                    error = error + "Email is blank"
+                } else {
+                    error = error + " | Email is blank"
+                }
+            }
+
+            if (createPassword === "") {
+                if (error === "") {
+                    error = error + "Password is blank"
+                } else {
+                    error = error + " | Password is blank"
+                }
+            }
+
+            setMessage(error)
+            displayMessageInterval()
         }
     }
 
@@ -99,6 +132,7 @@ const SignIn = () => {
                     </div>
                 </form>
             }
+            {displayMessage && <MessageCard message={message} />}
         </>
     )
 }

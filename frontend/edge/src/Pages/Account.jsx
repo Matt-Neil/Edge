@@ -6,7 +6,9 @@ import usersAPI from '../API/users'
 import authAPI from "../API/auth"
 import { CurrentUserContext } from '../Contexts/currentUserContext';
 import { OpenItemsContext } from '../Contexts/openItemsContext';
+import { MessageContext } from '../Contexts/messageContext';
 import Shortcut from '../Components/Shortcut';
+import MessageCard from '../Components/MessageCard';
 
 const Account = ({setSearchPhrase}) => {
     const [user, setUser] = useState();
@@ -14,8 +16,10 @@ const Account = ({setSearchPhrase}) => {
     const [password, setPassword] = useState("")
     const [input, setInput] = useState("");
     const [changed, setChanged] = useState(false)
+    const [message, setMessage] = useState("")
     const {removeCurrentUser} = useContext(CurrentUserContext);
     const {clearItems} = useContext(OpenItemsContext);
+    const {displayMessage, displayMessageInterval} = useContext(MessageContext);
     const history = useHistory()
 
     useEffect(() => {
@@ -25,7 +29,10 @@ const Account = ({setSearchPhrase}) => {
 
                 setUser(user.data.data);
                 setLoaded(true);
-            } catch (err) {}
+            } catch (err) {
+                setMessage("Error occurred")
+                displayMessageInterval()
+            }
         }
         fetchData();
     }, [])
@@ -57,8 +64,19 @@ const Account = ({setSearchPhrase}) => {
 
     const updateAccount = async () => {
         try {
-            await usersAPI.put("/", {password: password})
-        } catch (err) {}
+            if (password !== "") {
+                await usersAPI.put("/", {password: password})
+
+                setMessage("Account Updated")
+                displayMessageInterval()
+            } else {
+                setMessage("Password is blank")
+                displayMessageInterval()
+            }
+        } catch (err) {
+            setMessage("Error occurred")
+            displayMessageInterval()
+        }
     }
 
     const deleteAccount = async () => {
@@ -66,7 +84,10 @@ const Account = ({setSearchPhrase}) => {
             await usersAPI.delete("/")
 
             signout()
-        } catch (err) {}
+        } catch (err) {
+            setMessage("Error occurred")
+            displayMessageInterval()
+        }
     }
 
     return (
@@ -115,7 +136,7 @@ const Account = ({setSearchPhrase}) => {
                                     }} />
                             <button className={"account-save blue-button"}
                                     disabled={password === "" || !changed}
-                                    onClick={() => {updateAccount()}}>Save Changes</button>
+                                    onClick={() => {updateAccount()}}>Update Account</button>
                             <div>
                                 <button className="text-button account-signout" 
                                         onClick={() => {signout()}}>Sign Out</button>
@@ -123,6 +144,7 @@ const Account = ({setSearchPhrase}) => {
                                         onClick={() => {deleteAccount()}}>Delete Account</button>
                             </div>
                         </div>
+                        {displayMessage && <MessageCard message={message} />}
                     </div>
                 </div>
             }

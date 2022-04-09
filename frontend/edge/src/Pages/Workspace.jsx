@@ -10,6 +10,7 @@ import predictAPI from '../API/predict'
 import ModelNode from '../Components/Model-Node';
 import Chart from '../Components/Chart'
 import { OpenItemsContext } from '../Contexts/openItemsContext';
+import { MessageContext } from '../Contexts/messageContext';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -21,6 +22,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import DownloadIcon from '@mui/icons-material/Download';
+import MessageCard from '../Components/MessageCard'
 
 const Workspace = ({currentUser, type}) => {
     const [stage, setStage] = useState("model");
@@ -51,21 +53,19 @@ const Workspace = ({currentUser, type}) => {
     const [model, setModel] = useState([{type: "Input"}])
     const [evaluation, setEvaluation] = useState()
     const [selectedNode, setSelectedNode] = useState(0)
-    const [configuration, setConfiguration] = useState({epochs: 0, training_split: 0, validation_split: 0, improvement: 0, early_stopping: false, decay_rate: 0,
-                                                        decay_steps: 1, patience: 0, batch: 32, lr_scheduler: false, initial_lr: 0.01, optimiser: "", loss: ""})
+    const [configuration, setConfiguration] = useState({epochs: 1, training_split: 0.8, validation_split: 0.2, improvement: 0.1, early_stopping: false, decay_rate: 0.01,
+                                                        decay_steps: 1, patience: 1, batch: 32, lr_scheduler: false, initial_lr: 0.01, optimiser: "", loss: ""})
     const [addNode, setAddNode] = useState(false)
     const [loaded, setLoaded] = useState(false);
     const [exist, setExist] = useState()
     const [noData, setNoData] = useState()
     const [disabledCreate, setDisabledCreate] = useState(false)
     const [disabledTrain, setDisabledTrain] = useState(false)
-    const [displayPublic, setDisplayPublic] = useState(false)
-    const [displayExist, setDisplayExist] = useState(false)
+    const [message, setMessage] = useState("")
     const {addOpenItems, removeOpenItems} = useContext(OpenItemsContext);
+    const {displayMessage, displayMessageInterval} = useContext(MessageContext);
     const modelRef = useRef(null)
     const workspaceID = useParams().id;
-    const publicInterval = useRef(0)
-    const existInterval = useRef(0)
     const history = useHistory();
 
     useEffect(() => {
@@ -192,7 +192,10 @@ const Workspace = ({currentUser, type}) => {
             }
 
             setUpvoted(state => !state)
-        } catch (err) {}
+        } catch (err) {
+            setMessage("Error occurred")
+            displayMessageInterval()
+        }
     }
 
     const updateBookmark = async () => {
@@ -200,7 +203,10 @@ const Workspace = ({currentUser, type}) => {
             await globalAPI.put(`/bookmark/${workspaceID}?state=${bookmarked}`);
             
             setBookmarked(state => !state)
-        } catch (err) {}
+        } catch (err) {
+            setMessage("Error occurred")
+            displayMessageInterval()
+        }
     }
 
     const updateVisibility = async () => {
@@ -208,25 +214,10 @@ const Workspace = ({currentUser, type}) => {
             await globalAPI.put(`/visibility/${workspaceID}`);
 
             setVisibility(state => !state)
-        } catch (err) {}
-    }
-
-    const displayPublicInterval = () => {
-        clearInterval(publicInterval.current)
-        setDisplayPublic(true);
-        publicInterval.current = setInterval(() => {
-            setDisplayPublic(false);
-        }, 1200)
-        return ()=> {clearInterval(publicInterval.current)};
-    }
-
-    const displayExistInterval = () => {
-        clearInterval(existInterval.current)
-        setDisplayExist(true);
-        existInterval.current = setInterval(() => {
-            setDisplayExist(false);
-        }, 1200)
-        return ()=> {clearInterval(existInterval.current)};
+        } catch (err) {
+            setMessage("Error occurred")
+            displayMessageInterval()
+        }
     }
 
     const previousPage = () => {
@@ -251,7 +242,10 @@ const Workspace = ({currentUser, type}) => {
         try {
             const checkPublic = await itemsAPI.get(`/check-public-dataset?id=${datasetID}`)
     
-            if (checkPublic.data.success && checkPublic.data.data.visibility) {
+            console.log(checkPublic.data.data.creator)
+            console.log(currentUser.id)
+            if (checkPublic.data.success && (checkPublic.data.data.visibility || 
+                    checkPublic.data.data.creator === currentUser.id)) {
                 fetch(`http://127.0.0.1:5000/files/${checkPublic.data.data.imageFile}/labels.json`)
                         .then(response => response.json())
                         .then(images => {
@@ -263,28 +257,73 @@ const Workspace = ({currentUser, type}) => {
                             setRefreshData(new Date().getTime())
                             setChangedSettings(true)
                         })
-            } else if (checkPublic.data.success && !checkPublic.data.data.visibility) {
-                displayPublicInterval()
+            } else if (checkPublic.data.success && !checkPublic.data.data.visibility && 
+                            checkPublic.data.data.creator !== currentUser.id) {
+                setMessage("Dataset is private")
+                displayMessageInterval()
             } else {
-                displayExistInterval()
+                setMessage("Dataset not found")
+                displayMessageInterval()
             }
-        } catch (err) {}
+        } catch (err) {
+            setMessage("Error occurred")
+            displayMessageInterval()
+        }
     }
 
     const uploadImage = async () => {
         setDisabledCreate(true)
+        
+        if (uploadedDataset && evaluation && title !== "" && description !== "") {
+            if (image) {
+                const formImage = new FormData();
+                formImage.append('image', image);
 
-        if (uploadedDataset && title !== "" && description !== "" && image) {
-            const formImage = new FormData();
-            formImage.append('image', image);
+                try {
+                    const imageResponse = await imageAPI.post("/upload", formImage);
 
-            try {
-                const imageResponse = await imageAPI.post("/upload", formImage);
-
-                uploadData(imageResponse.data.data)
-            } catch (err) {}
+                    uploadData(imageResponse.data.data)
+                } catch (err) {
+                    setMessage("Error occurred")
+                    displayMessageInterval()
+                }
+            } else {
+                uploadData("default.png")
+            }
         } else {
-            uploadData("default.png")
+            let error = ""
+
+            if (!uploadedDataset) {
+                error = "Missing dataset"
+            }
+
+            if (!evaluation) {
+                if (error === "") {
+                    error = error + "Model not trained"
+                } else {
+                    error = error + " | Model not trained"
+                }
+            }
+
+            if (title === "") {
+                if (error === "") {
+                    error = error + "Title is blank"
+                } else {
+                    error = error + " | Title is blank"
+                }
+            }
+
+            if (description === "") {
+                if (error === "") {
+                    error = error + "Title is blank"
+                } else {
+                    error = error + " | Description is blank"
+                }
+            }
+
+            setMessage(error)
+            displayMessageInterval()
+            setDisabledCreate(false)
         }
     }
 
@@ -317,64 +356,163 @@ const Workspace = ({currentUser, type}) => {
                 type: "workspace"
             });
 
+            setMessage("Workspace created")
+            displayMessageInterval()
             history.push(`/workspace/${workspaceResponse.data.data}`)
-        } catch (err) {}
-    }
-
-    const train = async () => {
-        try {
-            setTrainTime(0)
-            setDisabledTrain(true)
-            setStage("train")
-    
-            const formData = new FormData();
-        
-            formData.append('epochs', configuration.epochs)
-            formData.append('training_split', configuration.training_split)
-            formData.append('validation_split', configuration.validation_split)
-            formData.append('improvement', configuration.improvement)
-            formData.append('patience', configuration.patience)
-            formData.append('batch', configuration.batch)
-            formData.append('decay_rate', configuration.decay_rate)
-            formData.append('decay_steps', configuration.decay_steps)
-            formData.append('early_stopping', configuration.early_stopping ? "true" : "false")
-            formData.append('lr_scheduler', configuration.lr_scheduler ? "true" : "false")
-            formData.append('initial_lr', configuration.initial_lr)
-            formData.append('optimiser', configuration.optimiser)
-            formData.append('loss', configuration.loss)
-            formData.append('rgb', uploadedDataset.rgb)
-            formData.append('imageFile', uploadedDataset.imageFile)
-            formData.append('height', uploadedDataset.height)
-            formData.append('width', uploadedDataset.width)
-            formData.append('label', uploadedDataset.labels.length)
-            formData.append('id', workspaceID)
-
-            model.map(node => {
-                formData.append('model[]', JSON.stringify(node))
-            })
-
-            const response = await trainAPI.post("", formData);
-
-            setDisabledTrain(false)
-
-            if (response) {
-                updateWorkspace()
-
-                setEvaluation({
-                    testAcc: response.data.test_acc,
-                    testLoss: response.data.test_loss,
-                    trainAcc: response.data.training.accuracy,
-                    trainLoss: response.data.training.loss,
-                    validationAcc: response.data.training.val_accuracy,
-                    validationLoss: response.data.training.val_loss,
-                    trainEpochs: Array.from(Array(response.data.epochs), (e, i) => (i + 1).toString())
-                })
-                setStage("evaluation")
-                setChangedSettings(true)
-            }
         } catch (err) {
-            setStage("model")
-            setDisabledTrain(false)
+            setMessage("Error occurred")
+            displayMessageInterval()
+        }
+    }
+    
+    const train = async () => {
+        if (parseInt(configuration.epochs) >= 1 && parseInt(configuration.epochs) <= 50 &&
+            parseFloat(configuration.training_split) > 0 && parseFloat(configuration.training_split) < 1 &&
+            parseFloat(configuration.validation_split) > 0 && parseFloat(configuration.validation_split) < 1 &&
+            parseFloat(configuration.validation_split) + parseFloat(configuration.training_split) === 1 && 
+            parseInt(configuration.batch) >= 1 && parseFloat(configuration.improvement) >= 0 && 
+            parseInt(configuration.patience) >= 1 && parseFloat(configuration.decay_rate) >= 0 && 
+            parseFloat(configuration.decay_rate) <= 1 && parseInt(configuration.decay_steps) >= 1 && 
+            parseFloat(configuration.initial_lr) > 0 && parseFloat(configuration.initial_lr) < 1)
+
+            try {
+                setTrainTime(0)
+                setDisabledTrain(true)
+                setStage("train")
+        
+                const formData = new FormData();
+            
+                formData.append('epochs', configuration.epochs)
+                formData.append('training_split', configuration.training_split)
+                formData.append('validation_split', configuration.validation_split)
+                formData.append('improvement', configuration.improvement)
+                formData.append('patience', configuration.patience)
+                formData.append('batch', configuration.batch)
+                formData.append('decay_rate', configuration.decay_rate)
+                formData.append('decay_steps', configuration.decay_steps)
+                formData.append('early_stopping', configuration.early_stopping ? "true" : "false")
+                formData.append('lr_scheduler', configuration.lr_scheduler ? "true" : "false")
+                formData.append('initial_lr', configuration.initial_lr)
+                formData.append('optimiser', configuration.optimiser)
+                formData.append('loss', configuration.loss)
+                formData.append('rgb', uploadedDataset.rgb)
+                formData.append('imageFile', uploadedDataset.imageFile)
+                formData.append('height', uploadedDataset.height)
+                formData.append('width', uploadedDataset.width)
+                formData.append('label', uploadedDataset.labels.length)
+                formData.append('id', workspaceID)
+
+                model.map(node => {
+                    formData.append('model[]', JSON.stringify(node))
+                })
+
+                const response = await trainAPI.post("", formData);
+
+                setDisabledTrain(false)
+
+                if (response) {
+                    updateWorkspace()
+
+                    setEvaluation({
+                        testAcc: response.data.test_acc,
+                        testLoss: response.data.test_loss,
+                        trainAcc: response.data.training.accuracy,
+                        trainLoss: response.data.training.loss,
+                        validationAcc: response.data.training.val_accuracy,
+                        validationLoss: response.data.training.val_loss,
+                        trainEpochs: Array.from(Array(response.data.epochs), (e, i) => (i + 1).toString())
+                    })
+                    setStage("evaluation")
+                    setChangedSettings(true)
+                }
+            } catch (err) {
+                setStage("model")
+                setDisabledTrain(false)
+                setMessage("Error occurred")
+                displayMessageInterval()
+            }
+        else {
+            let error = ""
+
+            if (!(parseInt(configuration.epochs) >= 1 && parseInt(configuration.epochs) <= 50)) {
+                error = "Epochs must be 1-50"
+            }
+
+            if (!(parseFloat(configuration.training_split) > 0 && parseFloat(configuration.training_split) < 1)) {
+                if (error === "") {
+                    error = error + "Training split must be 0-1"
+                } else {
+                    error = error + " | Training split must be 0-1"
+                }
+            }
+
+            if (!(parseFloat(configuration.validation_split) > 0 && parseFloat(configuration.validation_split) < 1)) {
+                if (error === "") {
+                    error = error + "Validation split must be 0-1"
+                } else {
+                    error = error + " | Validation split must be 0-1"
+                }
+            }
+
+            if (!(parseFloat(configuration.validation_split) + parseFloat(configuration.training_split) === 1)) {
+                if (error === "") {
+                    error = error + "Training and validation split must sum to 1"
+                } else {
+                    error = error + " | Training and validation split must equal 1"
+                }
+            }
+
+            if (!(parseInt(configuration.batch) >= 1)) {
+                if (error === "") {
+                    error = error + "Batch size must be at least 1"
+                } else {
+                    error = error + " | Batch size must be at least 1"
+                }
+            }
+
+            if (!(parseFloat(configuration.improvement) >= 0)) {
+                if (error === "") {
+                    error = error + "Improvement must be at least 0"
+                } else {
+                    error = error + " | Improvement must be at least 0"
+                }
+            }
+            
+            if (!(parseInt(configuration.patience) >= 1)) {
+                if (error === "") {
+                    error = error + "Patience must be at least 1"
+                } else {
+                    error = error + " | Patience must be at least 1"
+                }
+            }
+            
+            if (!(parseFloat(configuration.decay_rate) >= 0 && parseFloat(configuration.decay_rate) <= 1)) {
+                if (error === "") {
+                    error = error + "Decay rate must be 0-1"
+                } else {
+                    error = error + " | Decay rate must be 0-1"
+                }
+            }
+            
+            if (!(parseInt(configuration.decay_steps) >= 1)) {
+                if (error === "") {
+                    error = error + "Decay steps must be at least 1"
+                } else {
+                    error = error + " | Decay steps must be at least 1"
+                }
+            }
+
+            if (!(parseFloat(configuration.initial_lr) > 0 && parseFloat(configuration.initial_lr) < 1)) {
+                if (error === "") {
+                    error = error + " | Initial learning rate must be 0-1"
+                } else {
+                    error = error + " | Initial learning rate must be 0-1"
+                }
+            }
+
+            setMessage(error)
+            displayMessageInterval()
+            setDisabledCreate(false)
         }
     }
 
@@ -437,7 +575,10 @@ const Workspace = ({currentUser, type}) => {
                 if (tempPicture !== "default.png") {
                     await imageAPI.put('/remove', {picture: tempPicture});
                 }
-            } catch (err) {}
+            } catch (err) {
+                setMessage("Error occurred")
+                displayMessageInterval()
+            }
         } else {
             try {
                 await itemsAPI.put(`/${workspaceID}?type=workspace`, {
@@ -450,7 +591,10 @@ const Workspace = ({currentUser, type}) => {
                     configuration: configuration,
                     updated: new Date().toISOString()
                 })
-            } catch (err) {}
+            } catch (err) {
+                setMessage("Error occurred")
+                displayMessageInterval()
+            }
         }
 
         setUpdated(new Date().toISOString())
@@ -467,7 +611,10 @@ const Workspace = ({currentUser, type}) => {
 
             removeOpenItems(workspaceID)
             history.replace("/home")
-        } catch (err) {}
+        } catch (err) {
+            setMessage("Error occurred")
+            displayMessageInterval()
+        }
     }
 
     return (
@@ -578,15 +725,17 @@ const Workspace = ({currentUser, type}) => {
                                         <div className="sidebar-divided" />
                                         <button className="blue-button item-save"
                                                 disabled={!changedSettings}
-                                                onClick={() => {updateWorkspace()}}>Save Workspace</button>
+                                                onClick={() => {
+                                                    updateWorkspace()
+                                                    setMessage("Workspace saved")
+                                                    displayMessageInterval()
+                                                }}>Save Workspace</button>
                                         <button className="text-button item-delete"
                                                 onClick={() => {deleteWorkspace()}}>Delete</button>
                                     </>
                                 }
                             </>
                         }
-                        {displayPublic && <p className="create-item-data-notification">Dataset not public</p>}
-                        {displayExist && <p className="create-item-data-notification">Dataset does not exist</p>}
                     </div>
                     <div className="inner">
                         <div className="workspace-body">
@@ -608,7 +757,7 @@ const Workspace = ({currentUser, type}) => {
                                         }
                                         {type === "create" &&
                                             <button className="workspace-create blue-button"
-                                                    disabled={!evaluation || title === "" || description === "" || model[model.length-1].type !== "Output"}
+                                                    disabled={disabledCreate}
                                                     onClick={() => {uploadImage()}}>Create</button>
                                         }
                                     </div>
@@ -1308,6 +1457,7 @@ const Workspace = ({currentUser, type}) => {
                                         }
                                     </div>
                                 }
+                                {displayMessage && <MessageCard message={message} />}
                             </div>
                             {uploadedDataset && 
                                 <>

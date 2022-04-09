@@ -6,6 +6,7 @@ import globalAPI from '../API/global'
 import imageAPI from '../API/images'
 import fileAPI from '../API/files'
 import { OpenItemsContext } from '../Contexts/openItemsContext';
+import { MessageContext } from '../Contexts/messageContext';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ThumbUpIcon from '@mui/icons-material/ThumbUp';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -17,6 +18,7 @@ import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DownloadIcon from '@mui/icons-material/Download';
 import Shortcut from '../Components/Shortcut'
+import MessageCard from '../Components/MessageCard'
 
 const Dataset = ({currentUser, type}) => {
     const [title, setTitle] = useState("");
@@ -50,8 +52,10 @@ const Dataset = ({currentUser, type}) => {
     const [loaded, setLoaded] = useState(false);
     const [exist, setExist] = useState()
     const [addLabel, setAddLabel] = useState("")
-    const [disableCreate, setDisabledCreate] = useState(false)
+    const [disabledCreate, setDisabledCreate] = useState(false)
+    const [message, setMessage] = useState("")
     const {addOpenItems, removeOpenItems} = useContext(OpenItemsContext);
+    const {displayMessage, displayMessageInterval} = useContext(MessageContext);
     const colours = ["label-blue1", "label-red", "label-green1", "label-orange1", "label-pink", 
         "label-orange2", "label-blue2", "label-yellow1", "label-green2", "label-yellow2"]
     const datasetID = useParams().id;
@@ -197,7 +201,10 @@ const Dataset = ({currentUser, type}) => {
 
             setRefreshLabels(new Date().getTime())
             setRefreshData(new Date().getTime())
-        } catch (err) {}
+        } catch (err) {
+            setMessage("Error occurred")
+            displayMessageInterval()
+        }
     }
 
     const updateLabel = async (e, index) => {
@@ -223,7 +230,10 @@ const Dataset = ({currentUser, type}) => {
 
             setChangedData(true)
             setRefreshLabels(new Date().getTime())
-        } catch (err) {}
+        } catch (err) {
+            setMessage("Error occurred")
+            displayMessageInterval()
+        }
     }
 
     const updateUpvote = async () => {
@@ -237,7 +247,10 @@ const Dataset = ({currentUser, type}) => {
             }
 
             setUpvoted(state => !state)
-        } catch (err) {}
+        } catch (err) {
+            setMessage("Error occurred")
+            displayMessageInterval()
+        }
     }
 
     const updateBookmark = async () => {
@@ -245,7 +258,10 @@ const Dataset = ({currentUser, type}) => {
             await globalAPI.put(`/bookmark/${datasetID}?state=${bookmarked}`);
             
             setBookmarked(state => !state)
-        } catch (err) {}
+        } catch (err) {
+            setMessage("Error occurred")
+            displayMessageInterval()
+        }
     }
 
     const updateVisibility = async () => {
@@ -253,7 +269,10 @@ const Dataset = ({currentUser, type}) => {
             await globalAPI.put(`/visibility/${datasetID}`);
 
             setVisibility(state => !state)
-        } catch (err) {}
+        } catch (err) {
+            setMessage("Error occurred")
+            displayMessageInterval()
+        }
     }
 
     const previousPage = () => {
@@ -291,7 +310,13 @@ const Dataset = ({currentUser, type}) => {
 
             try {
                 await fileAPI.post("/delete-image", formData);
-            } catch (err) {}
+
+                setMessage("Image deleted")
+                displayMessageInterval()
+            } catch (err) {
+                setMessage("Error occurred")
+                displayMessageInterval()
+            }
         }
 
         setRefreshData(new Date().getTime())
@@ -332,7 +357,13 @@ const Dataset = ({currentUser, type}) => {
                 for (let i = 0; i < imageFiles.length; i++) {
                     setUploadedImages(state => [...state, i])
                 }
-            } catch (err) {}
+
+                setMessage("Images replaced")
+                displayMessageInterval()
+            } catch (err) {
+                setMessage("Error occurred")
+                displayMessageInterval()
+            }
         }
         setAssignedLabels(Array(imageFiles).fill("No label"))
         setPage(1)
@@ -383,7 +414,13 @@ const Dataset = ({currentUser, type}) => {
 
             try {
                 await fileAPI.post("/append-image", formData)
-            } catch (err) {}
+
+                setMessage("Images appended")
+                displayMessageInterval()
+            } catch (err) {
+                setMessage("Error occurred")
+                displayMessageInterval()
+            }
         }
 
         setAppendedImages([])
@@ -408,7 +445,10 @@ const Dataset = ({currentUser, type}) => {
 
             try {
                 await fileAPI.post("/upload", formData);
-            } catch (err) {}
+            } catch (err) {
+                setMessage("Error occurred")
+                displayMessageInterval()
+            }
 
             if (image) {
                 const formImage = new FormData();
@@ -418,7 +458,10 @@ const Dataset = ({currentUser, type}) => {
                     const imageResponse = await imageAPI.post("/upload-image", formImage);
     
                     uploadDataset(imageResponse.data.data, id)
-                } catch (err) {}
+                } catch (err) {
+                    setMessage("Error occurred")
+                    displayMessageInterval()
+                }
             } else {
                 uploadDataset("default.png", id)
             }
@@ -446,8 +489,13 @@ const Dataset = ({currentUser, type}) => {
                 type: "dataset"
             });
 
+            setMessage("Dataset created")
+            displayMessageInterval()
             history.push(`/dataset/${datasetResponse.data.data}`)
-        } catch (err) {}
+        } catch (err) {
+            setMessage("Error occurred")
+            displayMessageInterval()
+        }
     }
 
     const updateDataset = async () => {
@@ -476,7 +524,10 @@ const Dataset = ({currentUser, type}) => {
                 if (tempPicture !== "default.png") {
                     await imageAPI.put('/remove', {picture: tempPicture});
                 }
-            } catch (err) {}
+            } catch (err) {
+                setMessage("Error occurred")
+                displayMessageInterval()
+            }
         } else {
             try {
                 await itemsAPI.put(`/${datasetID}?type=dataset`, {
@@ -489,7 +540,10 @@ const Dataset = ({currentUser, type}) => {
                     height: height,
                     updated: new Date().toISOString()
                 })
-            } catch (err) {}
+            } catch (err) {
+                setMessage("Error occurred")
+                displayMessageInterval()
+            }
         }
 
         setUpdated(new Date().toISOString())
@@ -507,7 +561,10 @@ const Dataset = ({currentUser, type}) => {
 
             removeOpenItems(datasetID)
             history.replace("/home")
-        } catch (err) {}
+        } catch (err) {
+            setMessage("Error occurred")
+            displayMessageInterval()
+        }
     }
 
     return (
@@ -654,7 +711,11 @@ const Dataset = ({currentUser, type}) => {
                                         <div className="sidebar-divided" />
                                         <button className="blue-button item-save"
                                                 disabled={!changedSettings && !changedData}
-                                                onClick={() => {updateDataset()}}>Save Dataset</button>
+                                                onClick={() => {
+                                                    updateDataset()
+                                                    setMessage("Dataset saved")
+                                                    displayMessageInterval()
+                                                }}>Save Dataset</button>
                                         <button className="text-button item-delete"
                                                 onClick={() => {deleteDataset()}}>Delete</button>
                                     </>
@@ -673,7 +734,7 @@ const Dataset = ({currentUser, type}) => {
                                                 <div>
                                                     <span />
                                                     <button className="blue-button"
-                                                            disabled={disableCreate}
+                                                            disabled={disabledCreate}
                                                             onClick={() => {uploadImage()}}>Create</button>
                                                 </div>
                                             }
@@ -817,6 +878,7 @@ const Dataset = ({currentUser, type}) => {
                                         </div>
                                     </>
                                 }
+                                {displayMessage && <MessageCard message={message} />}
                             </div>
                             <div className="create-workspace-data">
                                 <p className="create-workspace-data-header">Labels:</p>

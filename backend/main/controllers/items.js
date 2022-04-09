@@ -260,7 +260,7 @@ exports.putItem = async (req, res, next) => {
 
 exports.getCheckPublicDataset = async (req, res, next) => {
     try {
-        const check = await Items.findById(req.query.id, '_id visibility imageFile labels title height width')
+        const check = await Items.findById(req.query.id, '_id creator visibility imageFile labels title height width')
         
         if (check) {
             res.status(201).json({

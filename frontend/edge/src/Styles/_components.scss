@@ -425,3 +425,23 @@
         font-size: 14px;
     }
 }
+.message-card {
+    position: fixed;
+    margin: 0 0 20px 0;
+    left: 50%;
+    transform: translate(-50%, 0);
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: fit-content;
+    height: fit-content;
+    padding: 5px 20px;
+    background-color: $grey7;
+    border-radius: 10px;
+
+    p {
+        color: $grey2;
+        font-size: 14px;
+    }
+}
