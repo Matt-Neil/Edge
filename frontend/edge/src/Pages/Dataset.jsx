@@ -96,7 +96,7 @@ const Dataset = ({currentUser, type}) => {
                     setHeight(dataset.data.data.height)
                     setWidth(dataset.data.data.width)
 
-                    fetch(`http://127.0.0.1:5000/files/${dataset.data.data.imageFile}/labels.json`)
+                    fetch(`http://127.0.0.1:5000/datasets/${dataset.data.data.imageDir}/labels.json`)
                         .then(response => response.json())
                         .then(images => {
                             images.map(image => {
@@ -165,7 +165,7 @@ const Dataset = ({currentUser, type}) => {
             
             const formData = new FormData();
 
-            formData.append('id', dataset.imageFile)
+            formData.append('id', dataset.imageDir)
             formData.append('datasetID', datasetID)
             formData.append('label', addLabel)
 
@@ -189,7 +189,7 @@ const Dataset = ({currentUser, type}) => {
 
             const formData = new FormData();
 
-            formData.append('id', dataset.imageFile)
+            formData.append('id', dataset.imageDir)
             formData.append('datasetID', datasetID)
             formData.append('label', labels[index])
 
@@ -211,7 +211,7 @@ const Dataset = ({currentUser, type}) => {
         try {
             const formData = new FormData();
 
-            formData.append('id', dataset.imageFile)
+            formData.append('id', dataset.imageDir)
             formData.append('datasetID', datasetID)
             formData.append('filename', uploadedImages[index])
             formData.append('oldLabel', assignedLabels[index])
@@ -300,7 +300,7 @@ const Dataset = ({currentUser, type}) => {
         if (type === "view") {
             const formData = new FormData();
 
-            formData.append('id', dataset.imageFile)
+            formData.append('id', dataset.imageDir)
             formData.append('datasetID', datasetID)
             formData.append('index', index)
             formData.append('label', label)
@@ -341,7 +341,7 @@ const Dataset = ({currentUser, type}) => {
         } else {
             const formData = new FormData();
 
-            formData.append('id', dataset.imageFile)
+            formData.append('id', dataset.imageDir)
             formData.append('datasetID', datasetID)
 
             for (let i = 0; i < imageFiles.length; i++) {
@@ -397,7 +397,7 @@ const Dataset = ({currentUser, type}) => {
 
             const formData = new FormData();
 
-            formData.append('id', dataset.imageFile)
+            formData.append('id', dataset.imageDir)
             formData.append('datasetID', datasetID)
             formData.append('last', uploadedImages.length-1)
 
@@ -554,7 +554,7 @@ const Dataset = ({currentUser, type}) => {
     const deleteDataset = async () => {
         try {
             const formData = new formData()
-            formData.append('id', dataset.imageFile)
+            formData.append('id', dataset.imageDir)
 
             await itemsAPI.delete(`/${datasetID}`)
             await fileAPI.post("/remove-dataset", formData);
@@ -692,7 +692,7 @@ const Dataset = ({currentUser, type}) => {
                                             <ContentCopyIcon className="dataset-copy-icon" />
                                         </button>
                                     </div>
-                                    <a href={`http://127.0.0.1:5000/files/${dataset.imageFile}/${datasetID}-dataset.zip`} download>
+                                    <a href={`http://127.0.0.1:5000/datasets/${dataset.imageDir}/${datasetID}-dataset.zip`} download>
                                         <DownloadIcon className="dataset-download-icon" />
                                     </a>
                                 </div>
@@ -832,9 +832,9 @@ const Dataset = ({currentUser, type}) => {
                                                             <img src={type === "create" ? 
                                                                             URL.createObjectURL(image) 
                                                                         : assignedLabels[i] === "No label" ?
-                                                                            `http://127.0.0.1:5000/files/${dataset.imageFile}/no-label/${image}.jpg`
+                                                                            `http://127.0.0.1:5000/datasets/${dataset.imageDir}/no-label/${image}.jpg`
                                                                         : assignedLabels[i] !== "No label" ?
-                                                                            `http://127.0.0.1:5000/files/${dataset.imageFile}/images/${assignedLabels[i]}/${image}.jpg`
+                                                                            `http://127.0.0.1:5000/datasets/${dataset.imageDir}/images/${assignedLabels[i]}/${image}.jpg`
                                                                         :
                                                                             URL.createObjectURL(image) 
                                                                         } 
@@ -867,7 +867,7 @@ const Dataset = ({currentUser, type}) => {
                                                 if (i >= start && i < end) {
                                                     return (
                                                         <div className="create-dataset-image" key={i}>
-                                                            <img src={`http://127.0.0.1:5000/files/${dataset.imageFile}/images/${assignedLabels[i]}/${image}.jpg`} />
+                                                            <img src={`http://127.0.0.1:5000/datasets/${dataset.imageDir}/images/${assignedLabels[i]}/${image}.jpg`} />
                                                             <div>
                                                                 <p>{assignedLabels[i]}</p>
                                                             </div>

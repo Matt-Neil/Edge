@@ -111,7 +111,7 @@ const Workspace = ({currentUser, type}) => {
                     })
                     setTrainTime(workspace.data.data.evaluation.trainTime)
 
-                    fetch(`http://127.0.0.1:5000/files/${workspace.data.data.dataset.imageFile}/labels.json`)
+                    fetch(`http://127.0.0.1:5000/datasets/${workspace.data.data.dataset.imageDir}/labels.json`)
                         .then(response => response.json())
                         .then(images => {
                             images.map(image => {
@@ -246,7 +246,7 @@ const Workspace = ({currentUser, type}) => {
             console.log(currentUser.id)
             if (checkPublic.data.success && (checkPublic.data.data.visibility || 
                     checkPublic.data.data.creator === currentUser.id)) {
-                fetch(`http://127.0.0.1:5000/files/${checkPublic.data.data.imageFile}/labels.json`)
+                fetch(`http://127.0.0.1:5000/datasets/${checkPublic.data.data.imageDir}/labels.json`)
                         .then(response => response.json())
                         .then(images => {
                             images.map(image => {
@@ -396,7 +396,7 @@ const Workspace = ({currentUser, type}) => {
                 formData.append('optimiser', configuration.optimiser)
                 formData.append('loss', configuration.loss)
                 formData.append('rgb', uploadedDataset.rgb)
-                formData.append('imageFile', uploadedDataset.imageFile)
+                formData.append('imageFile', uploadedDataset.imageDir)
                 formData.append('height', uploadedDataset.height)
                 formData.append('width', uploadedDataset.width)
                 formData.append('label', uploadedDataset.labels.length)
@@ -1473,7 +1473,7 @@ const Workspace = ({currentUser, type}) => {
                                                     if (i >= start && i < end && assignedLabels[i] !== "No label") {
                                                         return (
                                                             <div className="create-workspace-data-image" key={i}>
-                                                                <img src={`http://127.0.0.1:5000/files/${uploadedDataset.imageFile}/images/${assignedLabels[i]}/${image}.jpg`}  />
+                                                                <img src={`http://127.0.0.1:5000/datasets/${uploadedDataset.imageDir}/images/${assignedLabels[i]}/${image}.jpg`}  />
                                                                 <p>{assignedLabels[i]}</p>
                                                             </div>
                                                         )
