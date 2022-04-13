@@ -179,7 +179,7 @@ const ItemsSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         required: false
     },
-    imageFile: {
+    imageDir: {
         type: String,
         required: false
     },

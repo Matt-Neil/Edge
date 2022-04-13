@@ -7,13 +7,11 @@ const CurrentUserContextProvider = (props) => {
     const [currentUser, setCurrentUser] = useState({loaded: false});
 
     useEffect(() => {
-        const localData = localStorage.getItem('currentUser');
-        
         const fetchData = async () => {
             try {
                 const response = await authAPI.get(`/`);
 
-                if ((localData && response.data.data) || (!localData && response.data.data)) {
+                if (response.data.data) {
                     setCurrentUser({
                         id: response.data.data._id,
                         name: response.data.data.name,
@@ -37,16 +35,8 @@ const CurrentUserContextProvider = (props) => {
         setCurrentUser(user);
     }
 
-    const removeCurrentUser = () => {
-        localStorage.removeItem('currentUser')
-    }
-
-    useEffect(() => {
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    }, [currentUser])
-
     return (
-        <CurrentUserContext.Provider value={{currentUser, changeCurrentUser, removeCurrentUser}}>
+        <CurrentUserContext.Provider value={{currentUser, changeCurrentUser}}>
             {props.children}
         </CurrentUserContext.Provider>
     )

@@ -396,7 +396,7 @@ const Workspace = ({currentUser, type}) => {
                 formData.append('optimiser', configuration.optimiser)
                 formData.append('loss', configuration.loss)
                 formData.append('rgb', uploadedDataset.rgb)
-                formData.append('imageFile', uploadedDataset.imageDir)
+                formData.append('imageDir', uploadedDataset.imageDir)
                 formData.append('height', uploadedDataset.height)
                 formData.append('width', uploadedDataset.width)
                 formData.append('label', uploadedDataset.labels.length)

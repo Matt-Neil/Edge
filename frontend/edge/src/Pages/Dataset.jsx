@@ -95,7 +95,7 @@ const Dataset = ({currentUser, type}) => {
                     setRgb(dataset.data.data.rgb)
                     setHeight(dataset.data.data.height)
                     setWidth(dataset.data.data.width)
-
+                    
                     fetch(`http://127.0.0.1:5000/datasets/${dataset.data.data.imageDir}/labels.json`)
                         .then(response => response.json())
                         .then(images => {
@@ -157,7 +157,7 @@ const Dataset = ({currentUser, type}) => {
         return ()=> {clearInterval(copyInterval.current)};
     }
 
-    const addFunctionKey = async (e) => {
+    const addLabelKey = async (e) => {
         if (e.key === "Enter" && addLabel !== "" && !labels.includes(addLabel)) {
             setLabels(state => [...state, addLabel])
             setChangedSettings(true)
@@ -474,7 +474,7 @@ const Dataset = ({currentUser, type}) => {
         try {
             const datasetResponse = await itemsAPI.post("/", {
                 title: title,
-                imageFile: id,
+                imageDir: id,
                 creator: currentUser.id,
                 description: description,
                 picture: imageName,
@@ -887,7 +887,7 @@ const Dataset = ({currentUser, type}) => {
                                     <input className="create-dataset-label-input"
                                             placeholder="Add Label"
                                             onChange={e => {setAddLabel(e.target.value)}}
-                                            onKeyPress={addFunctionKey}
+                                            onKeyPress={addLabelKey}
                                             value={addLabel} />
                                 }
                                 <div className="create-dataset-labels-list" key={refreshLabels}>

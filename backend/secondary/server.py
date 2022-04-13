@@ -40,22 +40,22 @@ def train_model():
 def upload_images():
     images = request.files.getlist("data[]")
     assignedLabels = request.form.getlist("labels[]")
-    os.makedirs('files/' + request.form['id'])
-    os.makedirs('files/' + request.form['id'] + '/images')
-    os.makedirs('files/' + request.form['id'] + '/no-label')
+    os.makedirs('datasets/' + request.form['id'])
+    os.makedirs('datasets/' + request.form['id'] + '/images')
+    os.makedirs('datasets/' + request.form['id'] + '/no-label')
     labels = []
 
     for label in assignedLabels:
-        os.makedirs('files/' + request.form['id'] + '/images/' + label)
+        os.makedirs('datasets/' + request.form['id'] + '/images/' + label)
 
     for i in range(len(images)):
         labels.append({
             'filename': i,
             'label': assignedLabels[i]
         }) 
-        images[i].save('files/{}/images/{}/{}.jpg'.format(request.form['id'], assignedLabels[i], i))
+        images[i].save('datasets/{}/images/{}/{}.jpg'.format(request.form['id'], assignedLabels[i], i))
     
-    with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
+    with open('datasets/{}/labels.json'.format(request.form['id']), 'w') as outfile:
         json.dump(labels, outfile)
 
     dataset_zip(request.form['id'], request.form['datasetID'])
@@ -65,16 +65,16 @@ def upload_images():
 @app.route('/api/file/delete-image', methods = ['POST'])
 def delete_image():
     if request.form['label'] == "No label":
-        os.remove('files/{}/no-label/{}.jpg'.format(request.form['id'], request.form['filename']))
+        os.remove('datasets/{}/no-label/{}.jpg'.format(request.form['id'], request.form['filename']))
     else:
-        os.remove('files/{}/images/{}/{}.jpg'.format(request.form['id'], request.form['label'], request.form['filename']))
+        os.remove('datasets/{}/images/{}/{}.jpg'.format(request.form['id'], request.form['label'], request.form['filename']))
 
-    with open('files/{}/labels.json'.format(request.form['id'])) as infile:
+    with open('datasets/{}/labels.json'.format(request.form['id'])) as infile:
         labels = json.load(infile)
 
     labels.pop(int(request.form['index']))
 
-    with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
+    with open('datasets/{}/labels.json'.format(request.form['id']), 'w') as outfile:
         json.dump(labels, outfile)
 
     dataset_zip(request.form['id'], request.form['datasetID'])
@@ -85,22 +85,22 @@ def delete_image():
 def replace_images():
     images = request.files.getlist("data[]")
     assignedLabels = request.form.getlist("labels[]")
-    os.remove('files/{}'.format(request.form['id']))
-    os.makedirs('files/' + request.form['id'])
-    os.makedirs('files/' + request.form['id'] + '/images')
+    os.remove('datasets/{}'.format(request.form['id']))
+    os.makedirs('datasets/' + request.form['id'])
+    os.makedirs('datasets/' + request.form['id'] + '/images')
     labels = []
 
     for label in assignedLabels:
-        os.makedirs('files/' + request.form['id'] + '/images/' + label)
+        os.makedirs('datasets/' + request.form['id'] + '/images/' + label)
 
     for i in range(len(images)):
         labels.append({
             'filename': i,
             'label': assignedLabels[i]
         }) 
-        images[i].save('files/{}/images/{}/{}.jpg'.format(request.form['id'], assignedLabels[i], i))
+        images[i].save('datasets/{}/images/{}/{}.jpg'.format(request.form['id'], assignedLabels[i], i))
     
-    with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
+    with open('datasets/{}/labels.json'.format(request.form['id']), 'w') as outfile:
         json.dump(labels, outfile)
 
     dataset_zip(request.form['id'], request.form['datasetID'])
@@ -114,7 +114,7 @@ def append_images():
     assignedLabels = request.form.getlist("labels[]")
     labels = []
 
-    with open('files/{}/labels.json'.format(request.form['id'])) as infile:
+    with open('datasets/{}/labels.json'.format(request.form['id'])) as infile:
         previous = json.load(infile)
     
     for i in range(len(filenames)):
@@ -122,11 +122,11 @@ def append_images():
             'filename': filenames[i],
             'label': assignedLabels[i]
         })
-        images[i].save('files/{}/images/{}/{}.jpg'.format(request.form['id'], assignedLabels[i], filenames[i]))
+        images[i].save('datasets/{}/images/{}/{}.jpg'.format(request.form['id'], assignedLabels[i], filenames[i]))
 
     previous.extend(labels)
     
-    with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
+    with open('datasets/{}/labels.json'.format(request.form['id']), 'w') as outfile:
         json.dump(previous, outfile)
 
     dataset_zip(request.form['id'], request.form['datasetID'])
@@ -136,21 +136,21 @@ def append_images():
 @app.route('/api/file/update-image', methods = ['POST'])
 def update_images():
     if request.form['oldLabel'] == "No label":
-        os.rename('files/{}/no-label/{}.jpg'.format(request.form['id'], request.form['filename']),
-            'files/{}/images/{}/{}.jpg'.format(request.form['id'], request.form['newLabel'], request.form['filename']))
+        os.rename('datasets/{}/no-label/{}.jpg'.format(request.form['id'], request.form['filename']),
+            'datasets/{}/images/{}/{}.jpg'.format(request.form['id'], request.form['newLabel'], request.form['filename']))
     elif request.form['newLabel'] == "No label":
-        os.rename('files/{}/images/{}/{}.jpg'.format(request.form['id'], request.form['oldLabel'], request.form['filename']),
-            'files/{}/no-label/{}.jpg'.format(request.form['id'], request.form['filename']))
+        os.rename('datasets/{}/images/{}/{}.jpg'.format(request.form['id'], request.form['oldLabel'], request.form['filename']),
+            'datasets/{}/no-label/{}.jpg'.format(request.form['id'], request.form['filename']))
     else:
-        os.rename('files/{}/images/{}/{}.jpg'.format(request.form['id'], request.form['oldLabel'], request.form['filename']),
-            'files/{}/images/{}/{}.jpg'.format(request.form['id'], request.form['newLabel'], request.form['filename']))
+        os.rename('datasets/{}/images/{}/{}.jpg'.format(request.form['id'], request.form['oldLabel'], request.form['filename']),
+            'datasets/{}/images/{}/{}.jpg'.format(request.form['id'], request.form['newLabel'], request.form['filename']))
 
-    with open('files/{}/labels.json'.format(request.form['id'])) as infile:
+    with open('datasets/{}/labels.json'.format(request.form['id'])) as infile:
         previous = json.load(infile)
 
     previous[int(request.form['index'])]['label'] = request.form['newLabel']
     
-    with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
+    with open('datasets/{}/labels.json'.format(request.form['id']), 'w') as outfile:
         json.dump(previous, outfile)
 
     dataset_zip(request.form['id'], request.form['datasetID'])
@@ -159,7 +159,7 @@ def update_images():
 
 @app.route('/api/file/add-label', methods = ['POST'])
 def add_label():
-    os.makedirs('files/{}/images/{}'.format(request.form['id'], request.form['label']))
+    os.makedirs('datasets/{}/images/{}'.format(request.form['id'], request.form['label']))
 
     dataset_zip(request.form['id'], request.form['datasetID'])
 
@@ -167,20 +167,20 @@ def add_label():
 
 @app.route('/api/file/delete-label', methods = ['POST'])
 def delete_label():
-    with open('files/{}/labels.json'.format(request.form['id'])) as infile:
+    with open('datasets/{}/labels.json'.format(request.form['id'])) as infile:
         previous = json.load(infile)
     
     for image in previous:
         if image['label'] == request.form['label']:
-            os.rename('files/{}/images/{}/{}.jpg'.format(request.form['id'], request.form['label'], image['filename']),
-                'files/{}/no-label/{}.jpg'.format(request.form['id'], image['filename']))
+            os.rename('datasets/{}/images/{}/{}.jpg'.format(request.form['id'], request.form['label'], image['filename']),
+                'datasets/{}/no-label/{}.jpg'.format(request.form['id'], image['filename']))
 
             image['label'] = "No label"
 
-    with open('files/{}/labels.json'.format(request.form['id']), 'w') as outfile:
+    with open('datasets/{}/labels.json'.format(request.form['id']), 'w') as outfile:
         json.dump(previous, outfile)
 
-    os.rmdir('files/{}/images/{}'.format(request.form['id'], request.form['label']))
+    os.rmdir('datasets/{}/images/{}'.format(request.form['id'], request.form['label']))
 
     dataset_zip(request.form['id'], request.form['datasetID'])
             
@@ -188,7 +188,7 @@ def delete_label():
 
 @app.route('/api/file/remove-dataset', methods = ['POST'])
 def remove_file():
-    shutil.rmtree('files/{}'.format(request.form['id']))
+    shutil.rmtree('datasets/{}'.format(request.form['id']))
     
     return "OK"
 
@@ -198,9 +198,9 @@ def remove_model():
     
     return "OK"
 
-@app.route('/files/<path:path>')
+@app.route('/datasets/<path:path>')
 def get_labels(path):
-    file = send_from_directory('files', path)
+    file = send_from_directory('datasets', path)
     file.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
     file.headers.add('Access-Control-Allow-Credentials', 'true')
 
@@ -215,8 +215,8 @@ def get_model(path):
     return file
 
 def dataset_zip(file_id, datasetID):
-    with ZipFile("files/{}/{}-dataset.zip".format(file_id, datasetID), 'w', ZIP_DEFLATED) as zip_file:
-        for root, dirs, files in os.walk('files/{}/images/'.format(file_id)):
+    with ZipFile("datasets/{}/{}-dataset.zip".format(file_id, datasetID), 'w', ZIP_DEFLATED) as zip_file:
+        for root, dirs, files in os.walk('datasets/{}/images/'.format(file_id)):
             for file in files:
                 zip_file.write(os.path.join(root, file))
 

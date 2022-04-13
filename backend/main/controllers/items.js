@@ -85,7 +85,7 @@ exports.getItem = async (req, res, next) => {
                         'title': 1,
                         'description': 1,
                         'picture': 1,
-                        'imageFile': 1,
+                        'imageDir': 1,
                         'visibility': 1,
                         'labels': 1,
                         'height': 1,
@@ -160,7 +160,7 @@ exports.getItem = async (req, res, next) => {
                         'dataset.rgb': 1,
                         'dataset.picture': 1,
                         'dataset.title': 1,
-                        'dataset.imageFile': 1,
+                        'dataset.imageDir': 1,
                         'dataset.labels': 1,
                         'dataset._id': 1, 
                         'dataset.height': 1,
@@ -260,7 +260,7 @@ exports.putItem = async (req, res, next) => {
 
 exports.getCheckPublicDataset = async (req, res, next) => {
     try {
-        const check = await Items.findById(req.query.id, '_id creator visibility imageFile labels title height width')
+        const check = await Items.findById(req.query.id, '_id creator visibility imageDir labels title height width')
         
         if (check) {
             res.status(201).json({

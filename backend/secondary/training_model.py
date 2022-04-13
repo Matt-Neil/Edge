@@ -20,7 +20,7 @@ def train(body):
         color_mode = "grayscale"
 
     training_set = tf.keras.utils.image_dataset_from_directory(
-                'files/{}/images'.format(body['imageFile']),
+                'datasets/{}/images'.format(body['imageDir']),
                 validation_split=float(body['validation_split']),
                 labels='inferred',
                 subset="training",
@@ -31,7 +31,7 @@ def train(body):
                 batch_size=int(body['batch']))
         
     validation_set = tf.keras.utils.image_dataset_from_directory(
-                    'files/{}/images'.format(body['imageFile']),
+                    'datasets/{}/images'.format(body['imageDir']),
                     validation_split=float(body['validation_split']),
                     labels='inferred',
                     subset="validation",
