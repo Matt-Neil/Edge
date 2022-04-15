@@ -690,7 +690,7 @@ const Workspace = ({currentUser, type}) => {
                         </div>
                         <div className="sidebar-divided" />
                         <div className="create-workspace-uploaded-dataset">
-                            {(type === "create" || workspace.self) ?
+                            {(type === "create" || workspace.self) &&
                                 <>
                                     <input className={`create-workspace-import-existing ${!(type === "view" && !workspace.self) && "create-item-edit-input"}`}
                                             placeholder="Dataset ID"
@@ -703,7 +703,15 @@ const Workspace = ({currentUser, type}) => {
                                         </Link>
                                     }
                                 </>
-                            :
+                            }
+                            {type === "view" &&
+                                <a href={`http://127.0.0.1:5000/models/${workspaceID}/${workspaceID}-model.zip`} download>
+                                    <DownloadIcon className="workspace-download-icon" />
+                                </a>
+                            }
+                        </div>
+                        <div className="create-workspace-uploaded-dataset">
+                            {!(type === "create" || workspace.self) &&
                                 <div>
                                     <p className="create-workspace-uploaded-dataset-header">Selected Dataset:</p>
                                     <Link to={`/dataset/${datasetID}`} className="create-workspace-uploaded-dataset-link">
@@ -711,11 +719,6 @@ const Workspace = ({currentUser, type}) => {
                                         <p>{uploadedDataset.title}</p>
                                     </Link>
                                 </div>
-                            }
-                            {type === "view" &&
-                                <a href={`http://127.0.0.1:5000/models/${workspaceID}/${workspaceID}-model.zip`} download>
-                                    <DownloadIcon className="workspace-download-icon" />
-                                </a>
                             }
                         </div>
                         {type === "view" &&

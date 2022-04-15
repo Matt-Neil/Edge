@@ -63,7 +63,7 @@
 
     .workspace-download-icon {
         color: $grey7;
-        margin: 10px 0 0 15px;
+        margin: 10px 0 0 0;
     }
     .create-workspace-import-existing {
         margin: 0;
@@ -83,6 +83,7 @@
     }
     .create-item-view-dataset-icon {
         font-size: 20px;
+        margin: 0 15px 0 0;
     }
     .create-item-view-dataset:hover {
         color: $grey7;
