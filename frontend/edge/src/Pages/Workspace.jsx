@@ -103,10 +103,16 @@ const Workspace = ({currentUser, type}) => {
                     setEvaluation({
                         testAcc: workspace.data.data.evaluation.testAcc,
                         testLoss: workspace.data.data.evaluation.testLoss,
+                        testPrecision: workspace.data.data.evaluation.testPrecision,
+                        testRecall: workspace.data.data.evaluation.testRecall,
                         trainAcc: workspace.data.data.evaluation.trainAcc,
                         trainLoss: workspace.data.data.evaluation.trainLoss,
                         validationAcc: workspace.data.data.evaluation.validationAcc,
                         validationLoss: workspace.data.data.evaluation.validationLoss,
+                        trainPrecision: workspace.data.data.evaluation.trainPrecision,
+                        trainRecall: workspace.data.data.evaluation.trainRecall,
+                        validationPrecision: workspace.data.data.evaluation.validationPrecision,
+                        validationRecall: workspace.data.data.evaluation.validationRecall,
                         trainEpochs: Array.from(Array(workspace.data.data.evaluation.trainEpochs), (e, i) => (i + 1).toString())
                     })
                     setTrainTime(workspace.data.data.evaluation.trainTime)
@@ -241,9 +247,7 @@ const Workspace = ({currentUser, type}) => {
     const existingDataset = async () => {
         try {
             const checkPublic = await itemsAPI.get(`/check-public-dataset?id=${datasetID}`)
-    
-            console.log(checkPublic.data.data.creator)
-            console.log(currentUser.id)
+
             if (checkPublic.data.success && (checkPublic.data.data.visibility || 
                     checkPublic.data.data.creator === currentUser.id)) {
                 fetch(`http://127.0.0.1:5000/datasets/${checkPublic.data.data.imageDir}/labels.json`)
@@ -332,10 +336,16 @@ const Workspace = ({currentUser, type}) => {
             const updatedEvaluation = {
                 testAcc: evaluation.testAcc,
                 testLoss: evaluation.testLoss,
+                testPrecision: evaluation.testPrecision,
+                testRecall: evaluation.testRecall,
                 trainAcc: evaluation.trainAcc,
                 trainLoss: evaluation.trainLoss,
                 validationAcc: evaluation.validationAcc,
                 validationLoss: evaluation.validationLoss,
+                trainPrecision: evaluation.trainPrecision,
+                trainRecall: evaluation.trainRecall,
+                validationPrecision: evaluation.validationPrecision,
+                validationRecall: evaluation.validationRecall,
                 trainEpochs: evaluation.trainEpochs[evaluation.trainEpochs.length-1],
                 trainTime: trainTime
             }
@@ -411,15 +421,23 @@ const Workspace = ({currentUser, type}) => {
                 setDisabledTrain(false)
 
                 if (response) {
-                    updateWorkspace()
+                    if (type === "view") {
+                        updateWorkspace()
+                    }
 
                     setEvaluation({
-                        testAcc: response.data.test_acc,
-                        testLoss: response.data.test_loss,
+                        testLoss: response.data.test[0],
+                        testAcc: response.data.test[1],
+                        testPrecision: response.data.test[2],
+                        testRecall: response.data.test[3],
                         trainAcc: response.data.training.accuracy,
                         trainLoss: response.data.training.loss,
                         validationAcc: response.data.training.val_accuracy,
                         validationLoss: response.data.training.val_loss,
+                        trainPrecision: response.data.training.precision,
+                        trainRecall: response.data.training.recall,
+                        validationPrecision: response.data.training.val_precision,
+                        validationRecall: response.data.training.val_recall,
                         trainEpochs: Array.from(Array(response.data.epochs), (e, i) => (i + 1).toString())
                     })
                     setStage("evaluation")
@@ -535,17 +553,23 @@ const Workspace = ({currentUser, type}) => {
             const response = await predictAPI.post("", formData);
             
             setPrediction(response.data)
-        } catch (err) {console.log(err)}
+        } catch (err) {}
     }
 
     const updateWorkspace = async () => {
         const updatedEvaluation = {
             testAcc: evaluation.testAcc,
             testLoss: evaluation.testLoss,
+            testPrecision: evaluation.testPrecision,
+            testRecall: evaluation.testRecall,
             trainAcc: evaluation.trainAcc,
             trainLoss: evaluation.trainLoss,
             validationAcc: evaluation.validationAcc,
             validationLoss: evaluation.validationLoss,
+            trainPrecision: evaluation.trainPrecision,
+            trainRecall: evaluation.trainRecall,
+            validationPrecision: evaluation.validationPrecision,
+            validationRecall: evaluation.validationRecall,
             trainEpochs: evaluation.trainEpochs[evaluation.trainEpochs.length-1],
             trainTime: trainTime
         }
@@ -808,7 +832,7 @@ const Workspace = ({currentUser, type}) => {
                                                                                     </div>
                                                                                     <div className="create-model-diagram-add-options">
                                                                                         {(model[selectedNode].type === "Input" || model[selectedNode].type === "Conv2D" || model[selectedNode].type === "MaxPooling2D" ||
-                                                                                            model[selectedNode].type === "Dropout" || model[selectedNode].type === "BatchNormalisation") &&
+                                                                                            model[selectedNode].type === "AvgPooling2D" || model[selectedNode].type === "Dropout" || model[selectedNode].type === "BatchNormalisation") &&
                                                                                             <>
                                                                                                 <button onClick={() => {
                                                                                                     setModel(state => {
@@ -1046,7 +1070,7 @@ const Workspace = ({currentUser, type}) => {
                                                                             </select>
                                                                         </div>
                                                                     }
-                                                                    {(model[selectedNode].type === "Conv2D" || model[selectedNode].type === "MaxPooling2D") &&
+                                                                    {(model[selectedNode].type === "Conv2D" || model[selectedNode].type === "MaxPooling2D" || model[selectedNode].type === "AvgPooling2D") &&
                                                                         <>
                                                                             <div>
                                                                                 <label>Padding</label>
@@ -1126,7 +1150,7 @@ const Workspace = ({currentUser, type}) => {
                                                                             </div>
                                                                         </>
                                                                     }
-                                                                    {model[selectedNode].type === "MaxPooling2D" &&
+                                                                    {(model[selectedNode].type === "MaxPooling2D" || model[selectedNode].type === "AvgPooling2D") &&
                                                                         <div>
                                                                             <label>Pooling Size</label>
                                                                             <input value={model[selectedNode].pool} 
@@ -1421,9 +1445,19 @@ const Workspace = ({currentUser, type}) => {
                                                         <p>Test Loss:</p>
                                                         <p>{evaluation.testLoss.toFixed(3)}</p>
                                                     </div>
+                                                    <div>
+                                                        <p>Test Precision:</p>
+                                                        <p>{evaluation.testPrecision.toFixed(3)}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p>Test Recall:</p>
+                                                        <p>{evaluation.testRecall.toFixed(3)}</p>
+                                                    </div>
                                                 </div>
                                                 <Chart x={evaluation.trainEpochs} y1={evaluation.trainAcc} y2={evaluation.validationAcc} type={"Accuracy"} />
                                                 <Chart x={evaluation.trainEpochs} y1={evaluation.trainLoss} y2={evaluation.validationLoss} type={"Loss"} />
+                                                <Chart x={evaluation.trainEpochs} y1={evaluation.trainPrecision} y2={evaluation.validationPrecision} type={"Precision"} />
+                                                <Chart x={evaluation.trainEpochs} y1={evaluation.trainRecall} y2={evaluation.validationRecall} type={"Recall"} />
                                             </>
                                         }
                                     </div>

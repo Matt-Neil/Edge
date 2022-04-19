@@ -60,7 +60,10 @@ def upload_images():
 
     dataset_zip(request.form['id'], request.form['datasetID'])
 
-    return "OK"
+    try:
+        return "Success"
+    except Exception:  
+        return "Error", 400
 
 @app.route('/api/file/delete-image', methods = ['POST'])
 def delete_image():
@@ -79,7 +82,10 @@ def delete_image():
 
     dataset_zip(request.form['id'], request.form['datasetID'])
 
-    return "OK"
+    try:
+        return "Success"
+    except Exception:  
+        return "Error", 400
 
 @app.route('/api/file/replace-image', methods = ['POST'])
 def replace_images():
@@ -105,7 +111,10 @@ def replace_images():
 
     dataset_zip(request.form['id'], request.form['datasetID'])
 
-    return "OK"
+    try:
+        return "Success"
+    except Exception:  
+        return "Error", 400
 
 @app.route('/api/file/append-image', methods = ['POST'])
 def append_images():
@@ -131,7 +140,10 @@ def append_images():
 
     dataset_zip(request.form['id'], request.form['datasetID'])
 
-    return "OK"
+    try:
+        return "Success"
+    except Exception:  
+        return "Error", 400
 
 @app.route('/api/file/update-image', methods = ['POST'])
 def update_images():
@@ -155,7 +167,10 @@ def update_images():
 
     dataset_zip(request.form['id'], request.form['datasetID'])
 
-    return "OK"
+    try:
+        return "Success"
+    except Exception:  
+        return "Error", 400
 
 @app.route('/api/file/add-label', methods = ['POST'])
 def add_label():
@@ -163,7 +178,10 @@ def add_label():
 
     dataset_zip(request.form['id'], request.form['datasetID'])
 
-    return "OK"
+    try:
+        return "Success"
+    except Exception:  
+        return "Error", 400
 
 @app.route('/api/file/delete-label', methods = ['POST'])
 def delete_label():
@@ -184,19 +202,28 @@ def delete_label():
 
     dataset_zip(request.form['id'], request.form['datasetID'])
             
-    return "OK"
+    try:
+        return "Success"
+    except Exception:  
+        return "Error", 400
 
 @app.route('/api/file/remove-dataset', methods = ['POST'])
 def remove_file():
     shutil.rmtree('datasets/{}'.format(request.form['id']))
     
-    return "OK"
+    try:
+        return "Success"
+    except Exception:  
+        return "Error", 400
 
 @app.route('/api/file/remove-workspace', methods = ['POST'])
 def remove_model():
     shutil.rmtree('models/{}'.format(request.form['id']))
     
-    return "OK"
+    try:
+        return "Success"
+    except Exception:  
+        return "Error", 400
 
 @app.route('/datasets/<path:path>')
 def get_labels(path):

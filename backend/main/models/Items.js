@@ -107,6 +107,14 @@ const EvaluationSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    testPrecision: {
+        type: Number,
+        required: true
+    },
+    testRecall: {
+        type: Number,
+        required: true
+    },
     trainAcc: {
         type: [Number],
         required: true

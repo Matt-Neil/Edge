@@ -105,16 +105,16 @@ def train(body):
     else:
         optimiser = SGD(learning_rate=lr_scheduler)
 
-    model.compile(loss=body['loss'], optimizer=optimiser, metrics=['accuracy'])
+    model.compile(loss=body['loss'], optimizer=optimiser, metrics=['accuracy', tf.keras.metrics.Precision(), tf.keras.metrics.Recall()])
 
     callbacks = []
 
     if body['early_stopping'] == "true":
         callbacks.append(EarlyStopping(monitor='loss', patience=int(body['patience']), min_delta=float(body['improvement']), mode='auto'))
 
-    history = model.fit(training_set, validation_data=validation_set, epochs=int(body['epochs']), callbacks=callbacks, verbose=0)
+    history = model.fit(training_set, validation_data=validation_set, epochs=int(body['epochs']), callbacks=callbacks)
 
-    test_loss, test_acc = model.evaluate(validation_set, verbose=0)
+    test = model.evaluate(validation_set, verbose=0)
 
     model.save('models/{}/model/'.format(body['id']))
 
@@ -123,4 +123,4 @@ def train(body):
             for file in files:
                 zip_file.write(os.path.join(root, file))
 
-    return {"training": history.history, "test_loss": test_loss, "test_acc": test_acc, "epochs": len(history.history['accuracy'])}
+    return {"training": history.history, "test": test, "epochs": len(history.history['accuracy'])}

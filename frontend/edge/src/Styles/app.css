@@ -716,7 +716,7 @@
 
 .create-workspace-uploaded-dataset .workspace-download-icon {
   color: #FBFBFB;
-  margin: 10px 0 0 15px;
+  margin: 10px 0 0 0;
 }
 
 .create-workspace-uploaded-dataset .create-workspace-import-existing {
@@ -741,6 +741,7 @@
 
 .create-workspace-uploaded-dataset .create-item-view-dataset-icon {
   font-size: 20px;
+  margin: 0 15px 0 0;
 }
 
 .create-workspace-uploaded-dataset .create-item-view-dataset:hover {
@@ -1177,9 +1178,9 @@
   display: grid;
   -ms-grid-columns: (1fr)[3];
       grid-template-columns: repeat(3, 1fr);
-  -ms-grid-rows: auto;
-      grid-template-rows: auto;
-  height: 40px;
+  -ms-grid-rows: (1fr)[2];
+      grid-template-rows: repeat(2, 1fr);
+  height: 80px;
   margin: 20px 0;
   background-color: #202020;
   border-radius: 10px;
@@ -1211,20 +1212,45 @@
   -ms-grid-column: 1;
       grid-column-start: 1;
   grid-column-end: 2;
-  border-right: 1px #292929 solid;
+  -ms-grid-row: 1;
+      grid-row-start: 1;
+  grid-row-end: 2;
 }
 
 .create-evaluation-body .create-evaluation-test div:nth-child(2) {
   -ms-grid-column: 2;
       grid-column-start: 2;
   grid-column-end: 3;
+  -ms-grid-row: 1;
+      grid-row-start: 1;
+  grid-row-end: 2;
 }
 
-.create-evaluation-body .create-evaluation-test div:last-child {
+.create-evaluation-body .create-evaluation-test div:nth-child(3) {
   -ms-grid-column: 3;
       grid-column-start: 3;
   grid-column-end: 4;
-  border-left: 1px #292929 solid;
+  -ms-grid-row: 1;
+      grid-row-start: 1;
+  grid-row-end: 2;
+}
+
+.create-evaluation-body .create-evaluation-test div:nth-child(4) {
+  -ms-grid-column: 1;
+      grid-column-start: 1;
+  grid-column-end: 2;
+  -ms-grid-row: 2;
+      grid-row-start: 2;
+  grid-row-end: 3;
+}
+
+.create-evaluation-body .create-evaluation-test div:last-child {
+  -ms-grid-column: 2;
+      grid-column-start: 2;
+  grid-column-end: 3;
+  -ms-grid-row: 2;
+      grid-row-start: 2;
+  grid-row-end: 3;
 }
 
 .create-prediction-body {

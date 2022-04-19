@@ -729,7 +729,7 @@ const Dataset = ({currentUser, type}) => {
                                 {(type === "create" || dataset.self) ?
                                     <>
                                         <div className="view-items-top">
-                                            <h1>Create Dataset</h1>
+                                            <h1>{type === "create" ? "Create Dataset" : "Dataset"}</h1>
                                             {type === "create" &&
                                                 <div>
                                                     <span />

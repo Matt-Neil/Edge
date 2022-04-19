@@ -392,8 +392,8 @@
     .create-evaluation-test {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: auto;
-        height: 40px;
+        grid-template-rows: repeat(2, 1fr);
+        height: 80px;
         margin: 20px 0;
         background-color: $grey3;
         border-radius: 10px;
@@ -417,16 +417,32 @@
         div:first-child {
             grid-column-start: 1;
             grid-column-end: 2;
-            border-right: 1px $grey4 solid;
+            grid-row-start: 1;
+            grid-row-end: 2;
         }
         div:nth-child(2) {
             grid-column-start: 2;
             grid-column-end: 3;
+            grid-row-start: 1;
+            grid-row-end: 2;
         }
-        div:last-child {
+        div:nth-child(3) {
             grid-column-start: 3;
             grid-column-end: 4;
-            border-left: 1px $grey4 solid;
+            grid-row-start: 1;
+            grid-row-end: 2;
+        }
+        div:nth-child(4) {
+            grid-column-start: 1;
+            grid-column-end: 2;
+            grid-row-start: 2;
+            grid-row-end: 3;
+        }
+        div:last-child {
+            grid-column-start: 2;
+            grid-column-end: 3;
+            grid-row-start: 2;
+            grid-row-end: 3;
         }
     }
 }
