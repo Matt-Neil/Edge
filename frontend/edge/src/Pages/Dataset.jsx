@@ -29,6 +29,7 @@ const Dataset = ({currentUser, type}) => {
     const [upvoted, setUpvoted] = useState()
     const [upvotes, setUpvotes] = useState()
     const [updated, setUpdated] = useState()
+    const [appendMode, setAppendMode] = useState()
     const [picture, setPicture] = useState()
     const [width, setWidth] = useState()
     const [height, setHeight] = useState()
@@ -39,12 +40,12 @@ const Dataset = ({currentUser, type}) => {
     const [image, setImage] = useState();
     const [dataset, setDataset] = useState([]);
     const [labels, setLabels] = useState([])
-    const [appendedLabels, setAppendedLabels] = useState([])
+    const [newLabels, setNewLabels] = useState([])
     const [copyData, setCopyData] = useState(true)
     const [changedSettings, setChangedSettings] = useState(false)
     const [changedData, setChangedData] = useState(false)
     const [uploadedImages, setUploadedImages] = useState([])
-    const [appendedImages, setAppendedImages] = useState([])
+    const [newImages, setNewImages] = useState([])
     const [imageFiles, setImageFiles] = useState([])
     const [assignedLabels, setAssignedLabels] = useState([])
     const [refreshData, setRefreshData] = useState()
@@ -140,7 +141,7 @@ const Dataset = ({currentUser, type}) => {
     }, [loaded, updated])
 
     useEffect(() => {
-        if (!firstRender.current && loaded) {
+        if (!firstRender.current && loaded && type !== "create") {
             updateDataset()
         } else {
             firstRender.current = false
@@ -163,13 +164,15 @@ const Dataset = ({currentUser, type}) => {
             setChangedSettings(true)
             setAddLabel("")
             
-            const formData = new FormData();
-
-            formData.append('id', dataset.imageDir)
-            formData.append('datasetID', datasetID)
-            formData.append('label', addLabel)
-
-            await fileAPI.post("/add-label", formData)
+            if (type !== "create") {
+                const formData = new FormData();
+    
+                formData.append('id', dataset.imageDir)
+                formData.append('datasetID', datasetID)
+                formData.append('label', addLabel)
+    
+                await fileAPI.post("/add-label", formData)
+            }
         }
     }
 
@@ -208,31 +211,33 @@ const Dataset = ({currentUser, type}) => {
     }
 
     const updateLabel = async (e, index) => {
-        try {
-            const formData = new FormData();
+        setAssignedLabels(state => {
+            const stateCopy = [...state]
+        
+            stateCopy[index] = e.target.value
+        
+            return stateCopy
+        })
 
-            formData.append('id', dataset.imageDir)
-            formData.append('datasetID', datasetID)
-            formData.append('filename', uploadedImages[index])
-            formData.append('oldLabel', assignedLabels[index])
-            formData.append('newLabel', e.target.value)
-            formData.append('index', index)
-
-            setAssignedLabels(state => {
-                const stateCopy = [...state]
-            
-                stateCopy[index] = e.target.value
-            
-                return stateCopy
-            })
-
-            await fileAPI.post("/update-image", formData);
-
-            setChangedData(true)
-            setRefreshLabels(new Date().getTime())
-        } catch (err) {
-            setMessage("Error occurred")
-            displayMessageInterval()
+        if (type !== "create") {
+            try {
+                const formData = new FormData();
+    
+                formData.append('id', dataset.imageDir)
+                formData.append('datasetID', datasetID)
+                formData.append('filename', uploadedImages[index])
+                formData.append('oldLabel', assignedLabels[index])
+                formData.append('newLabel', e.target.value)
+                formData.append('index', index)
+    
+                await fileAPI.post("/update-image", formData);
+    
+                setChangedData(true)
+                setRefreshLabels(new Date().getTime())
+            } catch (err) {
+                setMessage("Error occurred")
+                displayMessageInterval()
+            }
         }
     }
 
@@ -327,104 +332,122 @@ const Dataset = ({currentUser, type}) => {
             setUploadedImages(state => [...state, imageFiles[i]])
         }
 
-        setAssignedLabels(Array(imageFiles).fill("No label"))
+        setAssignedLabels(Array(imageFiles.length).fill("No label"))
         setPage(1)
         setRefreshData(new Date().getTime())
         setImageFiles([])
     }
 
-    const replaceImages = async () => {
+    const replaceImages = () => {
         if (type === "create") {
+            setUploadedImages([])
+
             for (let i = 0; i < imageFiles.length; i++) {
                 setUploadedImages(state => [...state, imageFiles[i]])
             }
+
+            setAssignedLabels(Array(imageFiles.length).fill("No label"))
         } else {
-            const formData = new FormData();
-
-            formData.append('id', dataset.imageDir)
-            formData.append('datasetID', datasetID)
-
             for (let i = 0; i < imageFiles.length; i++) {
-                formData.append('data[]', imageFiles[i]);
-                formData.append('labels[]', assignedLabels[i]);
+                setNewImages(state => [...state, imageFiles[i]])
             }
-
-            updateDataset()
-
-            try {
-                await fileAPI.post("/replace-image", formData);
-
-                for (let i = 0; i < imageFiles.length; i++) {
-                    setUploadedImages(state => [...state, i])
-                }
-
-                setMessage("Images replaced")
-                displayMessageInterval()
-            } catch (err) {
-                setMessage("Error occurred")
-                displayMessageInterval()
-            }
+    
+            setNewLabels(Array(imageFiles.length).fill("No label"))
+            setImageFiles([])
         }
-        setAssignedLabels(Array(imageFiles).fill("No label"))
+    }
+
+    const uploadReplaced = async () => {
+        setUploadedImages([])
+        setAssignedLabels([])
+
+        const formData = new FormData();
+
+        formData.append('id', dataset.imageDir)
+        formData.append('datasetID', datasetID)
+
+        for (let i = 0; i < newImages.length; i++) {
+            formData.append('data[]', newImages[i]);
+            formData.append('labels[]', newLabels[i]);
+        }
+
+        updateDataset()
+
+        try {
+            await fileAPI.post("/replace-image", formData);
+
+            for (let i = 0; i < newImages.length; i++) {
+                setUploadedImages(state => [...state, i])
+                setAssignedLabels(state => [...state, newLabels[i]])
+            }
+
+            setMessage("Images replaced")
+            displayMessageInterval()
+        } catch (err) {
+            setMessage("Error occurred")
+            displayMessageInterval()
+        }
+        
+        setNewImages([])
+        setNewLabels([])
         setPage(1)
         setRefreshData(new Date().getTime())
-        setImageFiles([])
     }
     
     const appendImages = () => {
-        for (let i = 0; i < imageFiles.length; i++) {
-            setAppendedImages(state => [...state, imageFiles[i]])
-        }
+        if (type === "create") {
+            for (let i = 0; i < imageFiles.length; i++) {
+                setUploadedImages(state => [imageFiles[i], ...state])
+            }
 
-        setAppendedLabels(Array(imageFiles).fill("No label"))
-        setImageFiles([])
+            setAssignedLabels(state => [...Array(imageFiles.length).fill("No label"), ...state])
+        } else {
+            for (let i = 0; i < imageFiles.length; i++) {
+                setNewImages(state => [...state, imageFiles[i]])
+            }
+    
+            setNewLabels(Array(imageFiles.length).fill("No label"))
+            setImageFiles([])
+        }
     }
 
-    const deleteAppended = (index) => {
-        appendedImages.splice(index, 1)
-        appendedLabels.splice(index, 1)
+    const deleteNewImages = (index) => {
+        newImages.splice(index, 1)
+        newLabels.splice(index, 1)
     }
 
     const uploadAppended = async () => {
-        if (type === "create") {
-            for (let i = 0; i < appendedImages.length; i++) {
-                setUploadedImages(state => [...state, appendedImages[i]])
-            }
+        let filenames = []
 
-            setAssignedLabels(state => [...state, ...appendedLabels])
-        } else {
-            let filenames = []
+        const formData = new FormData();
 
-            const formData = new FormData();
+        formData.append('id', dataset.imageDir)
+        formData.append('datasetID', datasetID)
+        formData.append('last', uploadedImages.length-1)
 
-            formData.append('id', dataset.imageDir)
-            formData.append('datasetID', datasetID)
-            formData.append('last', uploadedImages.length-1)
-
-            for (let i = 0; i < appendedImages.length; i++) {
-                formData.append('data[]', appendedImages[i]);
-                formData.append('labels[]', appendedLabels[i]);
-                formData.append('filenames[]', parseInt(uploadedImages[uploadedImages.length-1])+i+1);
-                filenames.push((parseInt(uploadedImages[uploadedImages.length-1])+i+1).toString())
-            }
-
-            setUploadedImages(state => [...state, ...filenames])
-            setAssignedLabels(state => [...state, ...appendedLabels])
-            updateDataset()
-
-            try {
-                await fileAPI.post("/append-image", formData)
-
-                setMessage("Images appended")
-                displayMessageInterval()
-            } catch (err) {
-                setMessage("Error occurred")
-                displayMessageInterval()
-            }
+        for (let i = 0; i < newImages.length; i++) {
+            formData.append('data[]', newImages[i]);
+            formData.append('labels[]', newLabels[i]);
+            formData.append('filenames[]', parseInt(uploadedImages[uploadedImages.length-1])+i+1);
+            filenames.push((parseInt(uploadedImages[uploadedImages.length-1])+i+1).toString())
         }
 
-        setAppendedImages([])
-        setAppendedLabels([])
+        setUploadedImages(state => [...state, ...filenames])
+        setAssignedLabels(state => [...state, ...newLabels])
+        updateDataset()
+
+        try {
+            await fileAPI.post("/append-image", formData)
+
+            setMessage("Images appended")
+            displayMessageInterval()
+        } catch (err) {
+            setMessage("Error occurred")
+            displayMessageInterval()
+        }
+
+        setNewImages([])
+        setNewLabels([])
         setRefreshData(new Date().getTime())
     }
 
@@ -757,17 +780,22 @@ const Dataset = ({currentUser, type}) => {
                                                         <button className="white-button"
                                                                 disabled={imageFiles.length === 0}
                                                                 onClick={() => {
-                                                                    setUploadedImages([])
+                                                                    if (newImages.length !== 0) {
+                                                                        setNewImages([])
+                                                                        setNewLabels([])
+                                                                    }
+                                                                    setAppendMode(false)
                                                                     replaceImages()
                                                                     setChangedData(true)
                                                                 }}>Replace</button>
                                                         <button className="white-button"
                                                                 disabled={imageFiles.length === 0}
                                                                 onClick={() => {
-                                                                    if (appendedImages.length !== 0) {
-                                                                        setAppendedImages([])
-                                                                        setAppendedLabels([])
+                                                                    if (newImages.length !== 0) {
+                                                                        setNewImages([])
+                                                                        setNewLabels([])
                                                                     }
+                                                                    setAppendMode(true)
                                                                     appendImages()
                                                                     setChangedData(true)
                                                                 }}>Add</button>
@@ -780,24 +808,24 @@ const Dataset = ({currentUser, type}) => {
                                                 }
                                             </div>
                                         </div>
-                                        {(type === "create" || dataset.self) && appendedImages.length !== 0 && 
+                                        {(type === "create" || dataset.self) && newImages.length !== 0 && 
                                             <div className="create-dataset-appended">
                                                 <div className="create-dataset-appended-header">
                                                     <p>Uploaded Images</p>
                                                     <button className="text-button"
                                                             onClick={() => {
-                                                        setAppendedImages([])
-                                                        setAppendedLabels([])
+                                                        setNewImages([])
+                                                        setNewLabels([])
                                                     }}>Discard</button>
                                                 </div>
                                                 <div className="create-dataset-appended-list">
-                                                    {appendedImages.map((image, i) => {
+                                                    {newImages.map((image, i) => {
                                                         return (
                                                             <div className="create-dataset-image" key={i}>
                                                                 <img src={URL.createObjectURL(image)} />
                                                                 <div>
-                                                                    <select value={appendedLabels[i]}
-                                                                            onChange={e => {setAppendedLabels(state => {
+                                                                    <select value={newLabels[i]}
+                                                                            onChange={e => {setNewLabels(state => {
                                                                                         const stateCopy = [...state]
                                                                                     
                                                                                         stateCopy[i] = e.target.value
@@ -809,7 +837,7 @@ const Dataset = ({currentUser, type}) => {
                                                                             <option value={label} key={j}>{label}</option>
                                                                         )}
                                                                     </select>
-                                                                    <div onClick={() => {deleteAppended(i)}}>
+                                                                    <div onClick={() => {deleteNewImages(i)}}>
                                                                         <DeleteIcon className="create-dataset-image-delete" />
                                                                     </div>
                                                                 </div>
@@ -819,8 +847,14 @@ const Dataset = ({currentUser, type}) => {
                                                 </div>
                                                 <div className="create-dataset-appended-footer">
                                                     <button className="blue-button" 
-                                                            disabled={appendedLabels.includes("No label")}
-                                                            onClick={() => {uploadAppended()}}>Upload</button>
+                                                            disabled={newLabels.includes("No label")}
+                                                            onClick={() => {
+                                                                if (appendMode) {
+                                                                    uploadAppended()
+                                                                } else {
+                                                                    uploadReplaced()
+                                                                }
+                                                            }}>Upload</button>
                                                 </div>
                                             </div>
                                         }

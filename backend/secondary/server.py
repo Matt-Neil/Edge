@@ -5,6 +5,7 @@ import shutil
 from zipfile import ZipFile, ZIP_DEFLATED
 import training_model
 import prediction_model
+import sys
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
@@ -91,7 +92,7 @@ def delete_image():
 def replace_images():
     images = request.files.getlist("data[]")
     assignedLabels = request.form.getlist("labels[]")
-    os.remove('datasets/{}'.format(request.form['id']))
+    shutil.rmtree('datasets/{}'.format(request.form['id']))
     os.makedirs('datasets/' + request.form['id'])
     os.makedirs('datasets/' + request.form['id'] + '/images')
     labels = []
