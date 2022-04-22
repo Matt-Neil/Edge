@@ -163,9 +163,11 @@ const ViewItems = ({type, currentUser, setSearchPhrase}) => {
                     <div className="inner">
                         <div className="home-inner">
                             <div className="view-items-top">
-                                {displayHeading()}
-                                {type === "created-workspaces" && <Link to="/create-workspace" className="blue-button">Create Workspace</Link>}
-                                {type === "created-datasets" && <Link to="/create-dataset" className="blue-button">Create Dataset</Link>}
+                                <div>
+                                    {displayHeading()}
+                                    {type === "created-workspaces" && <Link to="/create-workspace" className="blue-button create-item">Create Workspace</Link>}
+                                    {type === "created-datasets" && <Link to="/create-dataset" className="blue-button create-item">Create Dataset</Link>}
+                                </div>
                                 <div className="toggle-card-type">
                                     <span />
                                     <img src="http://localhost:3000/List.png" className="toggle-card-type-row-icon" onClick={() => {changeCardFormat()}} />

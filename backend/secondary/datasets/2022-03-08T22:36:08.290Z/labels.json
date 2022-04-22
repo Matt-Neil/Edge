@@ -1,5 +1,7 @@
 [
-    {"filename": 0, "label": "Dog"}, 
-    {"filename": 1, "label": "Cat"}, 
-    {"filename": 2, "label": "Cat"}
+    {"filename": "1", "label": "Apple"}, 
+    {"filename": "2", "label": "Banana"}, 
+    {"filename": "3", "label": "Apple"}, 
+    {"filename": "4", "label": "Apple"}, 
+    {"filename": "5", "label": "Banana"}
 ]

@@ -2592,7 +2592,11 @@
 }
 
 .view-items-top h1 {
-  margin: 25px 0 0 0;
+  margin: 25px 0 25px 0;
+}
+
+.view-items-top .create-item {
+  margin: 25px 0 25px auto;
 }
 
 .view-items-top div {
