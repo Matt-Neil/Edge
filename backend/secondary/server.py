@@ -5,7 +5,6 @@ import shutil
 from zipfile import ZipFile, ZIP_DEFLATED
 import training_model
 import prediction_model
-import sys
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
