@@ -10,32 +10,6 @@ const createToken = (id) => {
     })
 }
 
-const handleErrors = (err) => {
-    let errors = { email: "", password: "", name: "" };
-
-    if (err.message === "Incorrect email") {
-        errors.email = "Incorrect email"
-    }
-
-    if (err.message === "Incorrect password") {
-        errors.password = "Incorrect password"
-    }
-
-    if (err.code === 11000) {
-        errors.email = 'That email has already been registered';
-        return errors;
-    }
-
-    if (err.message.includes('User validation failed')) {
-        Object.values(err.errors).forEach(({properties}) => {
-            console.log(err.errors)
-            errors[properties.path] = properties.message;
-        })
-    }
-
-    return errors;
-}
-
 exports.postSignin = async (req, res, next) => {
     try {
         const user = await Users.findOne({ email: req.body.email });
@@ -58,8 +32,7 @@ exports.postSignin = async (req, res, next) => {
             throw "Wrong Email"
         }
     } catch (err) {
-        const errors = handleErrors(err);
-        res.status(400).json({ errors });
+        res.status(400);
     }
 }
 
@@ -79,8 +52,7 @@ exports.postSignup = async (req, res, next) => {
             data: { user: user._id }
         })
     } catch (err) {
-        const errors = handleErrors(err);
-        res.status(400).json({ errors });
+        res.status(400);
     }
 }
 
