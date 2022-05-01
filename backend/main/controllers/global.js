@@ -1,52 +1,65 @@
 const Items = require('../models/Items');
 const mongoose = require('mongoose');
 
+// Controller that finds all search results for a search phrase
 exports.getSearch = async (req, res, next) => {
     try {
+        // Fetches search results using the following query pipeline
         const items = await Items.aggregate([
             { 
+                // Matches all documents in the items collection that both satisfy the text matching and is visible
                 $match: { 
                     $text: { 
                         $search: req.query.phrase
                     },
                     visibility: true
                 }
+            // Populates the creator field with the user information
             }, { 
                 $lookup: { 
-                    from: 'users', 
-                    localField: 'creator', 
-                    foreignField: '_id', 
-                    as: 'creatorName' 
+                    from: "users", 
+                    localField: "creator", 
+                    foreignField: "_id", 
+                    as: "creatorName" 
                 }
             }, {
-                $unwind: '$creatorName'
+                // Deconstructs the creatorName array
+                $unwind: "$creatorName"
             }, {
+                // Specify the inclusion of fields
                 $project: {
                     _id: 0,
-                    '_id': 1,
-                    'creator': 1,
-                    'title': 1,
-                    'picture': 1,
-                    'bookmarks': { $in: [res.locals.currentUser._id, '$bookmarks'] },
-                    'upvoted': { $in: [res.locals.currentUser._id, '$upvotes'] },
-                    'upvotes': { $size: '$upvotes' },
-                    'updated': 1,
-                    'createdAt': 1,
-                    'page': { $lt: ['$_id', mongoose.Types.ObjectId(req.query.id)] },
-                    'creatorName.name': 1,
-                    'type': 1
+                    "_id": 1,
+                    "creator": 1,
+                    "title": 1,
+                    "picture": 1,
+                    // Returns boolean if currently signed-in user has bookmarked a workspace or dataset
+                    "bookmarks": { $in: [res.locals.currentUser._id, "$bookmarks"] },
+                    // Returns boolean if currently signed-in user has upvoted a workspace or dataset
+                    "upvoted": { $in: [res.locals.currentUser._id, "$upvotes"] },
+                    // Returns the number of upvotes
+                    "upvotes": { $size: "$upvotes" },
+                    "updated": 1,
+                    "createdAt": 1,
+                    // Returns boolean if document ID is less than the most recently returned document for pagination
+                    "page": { $lt: ["$_id", mongoose.Types.ObjectId(req.query.id)] },
+                    "creatorName.name": 1,
+                    "type": 1
                 }
             }, {
+                // Only document ID less than most recently returned document are forwarded
                 $match: {
                     page: true
                 }
             }, { 
+                // Queried documents are ordered in descending order by ID
                 $sort: { 
-                    '_id': -1
+                    "_id": -1
                 } 
-            }
+            }   
         ]).limit(21);
     
+        // Queried documents returned to front-end
         res.status(201).json({
             success: true,
             data: items
@@ -54,7 +67,7 @@ exports.getSearch = async (req, res, next) => {
     } catch (err) {
         res.status(500).json({
             success: false,
-            error: 'Server Error'
+            error: "Server Error"
         })
     }
 }

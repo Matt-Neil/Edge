@@ -14,10 +14,14 @@ import SignIn from "./Pages/Sign-In"
 import Header from "./Components/Header"
 
 export default function App() {
+    // Local state containing the entered search phrase
     const [searchPhrase, setSearchPhrase] = useState(null);
+    // Gaining access to current user information from the context provider
     const {currentUser} = useContext(CurrentUserContext);
+    // Gaining access to the open items state from the context provider
     const {openItems} = useContext(OpenItemsContext);
 
+    // Redirects page to sign-in page route if no user is signed-in or to the home page if there is
     const redirectPage = () => {
         if (currentUser.loaded) {
             if (currentUser.empty) {
@@ -28,6 +32,7 @@ export default function App() {
         }
     }
 
+    // Renders sign-in page if no user is signed-in or to the home page if there is
     const redirectSignin = () => {
         if (currentUser.loaded) {
             if (currentUser.empty) {
@@ -41,22 +46,28 @@ export default function App() {
     return (
         <Router>
             <Switch>
+                {/* The "/" route doesn't exist so if a user navigates to it, they are redirected */}
                 <Route exact path="/">
                     {redirectPage()}
                 </Route>
+                {/* If a logged in user navigates to the sign in page, they are redirected to the home page */}
                 <Route exact path="/sign-in">
                     {redirectSignin()}
                 </Route>
+                {/* Checks if a user has been fetched within the context provider */}
                 {currentUser.loaded &&
                     <>
+                        {/* If no user is currently signed in, the sign in page is rendered */}
                         {currentUser.empty ?
                             <Redirect to={"/sign-in"} />
                         :
+                        // Else the following routes available to signed in users are defined below
                             <>
                                 <div className="whole-body">
-                                    <Header openItems={openItems} />
+                                        <Header openItems={openItems} />
                                     <Route exact path="/home">
-                                        <Home setSearchPhrase={setSearchPhrase} currentUser={currentUser} />
+                                        <Home setSearchPhrase={setSearchPhrase} 
+                                            currentUser={currentUser} />
                                     </Route>
                                     <Route exact path="/created-workspaces">
                                         <ViewItems type={"created-workspaces"} />
@@ -81,15 +92,11 @@ export default function App() {
                                     <Route exact path="/account">
                                         <Account setSearchPhrase={setSearchPhrase} />
                                     </Route>
-                                    {/* <Route exact path="/404">
-                                        <NotFound />
-                                    </Route> */}
                                 </div>
                             </>
                         }
                     </>
                 }
-                {/* <Redirect to="/404" /> */}
             </Switch>
         </Router>
     );

@@ -7,7 +7,7 @@ import training_model
 import prediction_model
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/*": {"origins": "http:#localhost:3000"}})
 
 @app.route('/api/predict-model', methods=['POST'])
 def predict_model():
@@ -15,7 +15,7 @@ def predict_model():
     file = request.files['image']
     
     results = make_response(prediction_model.predict(body, file))
-    results.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    results.headers.add('Access-Control-Allow-Origin', 'http:#localhost:3000')
     results.headers.add('Access-Control-Allow-Credentials', 'true')
 
     try:
@@ -28,7 +28,7 @@ def train_model():
     body = request.form
     
     results = make_response(training_model.train(body))
-    results.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    results.headers.add('Access-Control-Allow-Origin', 'http:#localhost:3000')
     results.headers.add('Access-Control-Allow-Credentials', 'true')
 
     try:
@@ -145,28 +145,38 @@ def append_images():
     except Exception:  
         return "Error", 400
 
+# Defines API endpoint and request method as POST
 @app.route('/api/file/update-image', methods = ['POST'])
 def update_images():
+    # Checks if the image was previously unassigned a label
     if request.form['oldLabel'] == "No label":
+        # Moves the image into the new corresponding sub-directory from the no-label sub-directory
         os.rename('datasets/{}/no-label/{}.jpg'.format(request.form['id'], request.form['filename']),
             'datasets/{}/images/{}/{}.jpg'.format(request.form['id'], request.form['newLabel'], request.form['filename']))
+    # Checks if the image was newly unassigned a label
     elif request.form['newLabel'] == "No label":
+        # Moves the image into the no-label sub-directory from the old sub-directory
         os.rename('datasets/{}/images/{}/{}.jpg'.format(request.form['id'], request.form['oldLabel'], request.form['filename']),
             'datasets/{}/no-label/{}.jpg'.format(request.form['id'], request.form['filename']))
     else:
+        # Moves the image into the new corresponding sub-directory from the old sub-directory
         os.rename('datasets/{}/images/{}/{}.jpg'.format(request.form['id'], request.form['oldLabel'], request.form['filename']),
             'datasets/{}/images/{}/{}.jpg'.format(request.form['id'], request.form['newLabel'], request.form['filename']))
 
+    # Loads the corresponding labels.json file
     with open('datasets/{}/labels.json'.format(request.form['id'])) as infile:
         previous = json.load(infile)
-
+        
+    # Updates the relevant assigned label for the image to the new label in the labels.json file
     previous[int(request.form['index'])]['label'] = request.form['newLabel']
     
+    # Saves the updated labels.json file
     with open('datasets/{}/labels.json'.format(request.form['id']), 'w') as outfile:
         json.dump(previous, outfile)
-
+        
+    # Creates an updated zip file for the dataset
     dataset_zip(request.form['id'], request.form['datasetID'])
-
+    
     try:
         return "Success"
     except Exception:  
@@ -228,7 +238,7 @@ def remove_model():
 @app.route('/datasets/<path:path>')
 def get_labels(path):
     file = send_from_directory('datasets', path)
-    file.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    file.headers.add('Access-Control-Allow-Origin', 'http:#localhost:3000')
     file.headers.add('Access-Control-Allow-Credentials', 'true')
 
     return file
@@ -236,7 +246,7 @@ def get_labels(path):
 @app.route('/models/<path:path>')
 def get_model(path):
     file = send_from_directory('models', path)
-    file.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    file.headers.add('Access-Control-Allow-Origin', 'http:#localhost:3000')
     file.headers.add('Access-Control-Allow-Credentials', 'true')
 
     return file

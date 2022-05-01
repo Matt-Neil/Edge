@@ -6,13 +6,13 @@ import HeaderOpenItem from '../Components/Header-Open-Item'
 const Header = ({openItems}) => {
     return (
         <div className="header">
-            <Link to="/home" className="header-home">
-                <img src="http://localhost:3000/home-icon.png" className="header-home-icon" />
-            </Link>
+            <Link to="/home" className="header-link">Home</Link>
             <div className="header-open">
                 {openItems.length !== 0 &&
-                    <>
+                    <>  
+                        {/* Loop through all recently opened items in the context provider */}
                         {openItems.map((item, i) => {
+                            // Return tab component
                             return <HeaderOpenItem item={item} key={i} />
                         })}
                     </>

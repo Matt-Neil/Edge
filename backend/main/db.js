@@ -3,6 +3,7 @@ const mongoDB = process.env.MONGO;
 
 const connectDB = async () => {
     try {
+        // Connect to MongoDB server using mongoose
         await mongoose.connect(mongoDB, {
             useNewUrlParser: true,
             useUnifiedTopology: true

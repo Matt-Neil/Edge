@@ -9,12 +9,14 @@ const HeaderOpenItems = ({item}) => {
     const location = useLocation();
     const {removeOpenItems} = useContext(OpenItemsContext);
 
+    // Checks if the currently displayed page is in the array of open items
     const checkCurrent = () => {
         if (location.pathname.substring(11) === item.id || location.pathname.substring(9) === item.id) return true
 
         return false
     }
 
+    // Removes item from the array in the context provider
     const closeItem = () => {
         removeOpenItems(item.id)
         

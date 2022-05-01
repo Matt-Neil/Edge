@@ -15,9 +15,11 @@ const Home = ({setSearchPhrase}) => {
     const {cardFormat, changeCardFormat} = useContext(CardFormatContext);
     const history = useHistory();
 
+    // Whenever the home page is rendered the useEffect hook is executed to fetch content
     useEffect(() => {
         const fetchData = async () => {
             try {
+                // Creates GET request to fetch all the workspaces and datasets created by the current user sorted by most recent
                 const recent = await usersAPI.get("/recent");
 
                 setRecent(recent.data.data);
@@ -83,7 +85,9 @@ const Home = ({setSearchPhrase}) => {
                             <div className="view-items-list">
                                 {recent.length > 0 &&
                                     <>
+                                        // Loops through all workspaces and datasets fetched
                                         {recent.map((item, i) => {
+                                            // Displays workspaces and datasets in a card
                                             return cardFormat ? <ItemRowCard item={item} created={true} key={i} /> : <ItemSquareCard item={item} created={true} key={i} />
                                         })}
                                     </>

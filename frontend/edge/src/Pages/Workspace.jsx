@@ -1040,33 +1040,39 @@ const Workspace = ({currentUser, type}) => {
                                                                         <div>
                                                                             <label>Activation</label>
                                                                             <select value={model[selectedNode].activation} 
-                                                                                    disabled={!(workspace.self || type === "create")}
-                                                                                    onChange={e => {setModel(state => {
-                                                                                                        const stateCopy = [...state]
+                                                                                // Disables the select tag only if a non-creator is viewing the workspce or if the workspace isn't being created
+                                                                                disabled={!(workspace.self || type === "create")}
+                                                                                // Detects a change of option selection
+                                                                                onChange={e => {setModel(state => {
+                                                                                                    // Stores the previous model array state
+                                                                                                    const stateCopy = [...state]
                                                                                                     
-                                                                                                        stateCopy[selectedNode] = {
-                                                                                                            ...stateCopy[selectedNode],
-                                                                                                            activation: e.target.value
-                                                                                                        }
-                                                                                                    
-                                                                                                        return stateCopy
-                                                                                                    })
-                                                                                                    setChangedSettings(true)
-                                                                                                    setRefreshDiagram(new Date().getTime())}}>
-                                                                                    <option disabled defaultValue value=""></option>
-                                                                                    <option value="sigmoid">Sigmoid</option>
-                                                                                    <option value="softmax">Softmax</option>
-                                                                                    <option value="softplus">Softplus</option>
-                                                                                    <option value="softsign">Softsign</option>
-                                                                                    <option value="swish">Swish</option>
-                                                                                    <option value="selu">Selu</option>
-                                                                                    <option value="tanh">Tanh</option>
-                                                                                    <option value="elu">Elu</option>
-                                                                                    <option value="exponential">Exponential</option>
-                                                                                    <option value="gelu">Gelu</option>
-                                                                                    <option value="hard_sigmoid">Hard Sigmoid</option>
-                                                                                    <option value="linear">Linear</option>
-                                                                                    <option value="relu">Relu</option>
+                                                                                                    // Retrieves the object layer from the array and updates only the activation attribute
+                                                                                                    stateCopy[selectedNode] = {
+                                                                                                        ...stateCopy[selectedNode],
+                                                                                                        activation: e.target.value
+                                                                                                    }
+                                                                                                
+                                                                                                    return stateCopy
+                                                                                                })
+                                                                                                // Undisables the save button to save the workspace in the MongoDB database
+                                                                                                setChangedSettings(true)
+                                                                                                // Updates model diagram
+                                                                                                setRefreshDiagram(new Date().getTime())}}>
+                                                                                <option disabled defaultValue value=""></option>
+                                                                                <option value="sigmoid">Sigmoid</option>
+                                                                                <option value="softmax">Softmax</option>
+                                                                                <option value="softplus">Softplus</option>
+                                                                                <option value="softsign">Softsign</option>
+                                                                                <option value="swish">Swish</option>
+                                                                                <option value="selu">Selu</option>
+                                                                                <option value="tanh">Tanh</option>
+                                                                                <option value="elu">Elu</option>
+                                                                                <option value="exponential">Exponential</option>
+                                                                                <option value="gelu">Gelu</option>
+                                                                                <option value="hard_sigmoid">Hard Sigmoid</option>
+                                                                                <option value="linear">Linear</option>
+                                                                                <option value="relu">Relu</option>
                                                                             </select>
                                                                         </div>
                                                                     }

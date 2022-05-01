@@ -8,6 +8,7 @@ import MessageContextProvider from './Contexts/messageContext';
 
 ReactDOM.render(
     <React.StrictMode>
+        {/* Wraps all context providers around the application to be accessed */}
         <CurrentUserContextProvider>
             <OpenItemsContextProvider>
                 <CardFormatContextProvider>

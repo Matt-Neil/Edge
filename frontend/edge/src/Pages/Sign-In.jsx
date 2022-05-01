@@ -17,27 +17,30 @@ const SignIn = () => {
 
     const signinUser = async (e) => {
         e.preventDefault();
-
+    
         try {
+            // Creates a POST request to the endpoint "/api/users/signin" with the email and password in the body
             const response = await authAPI.post("/signin", 
             {
                 email: email,
                 password: password
             });
-
-            if (response.data.data && typeof window !== 'undefined') {
+    
+            // Checks if the user was successfully signed in
+            if (response.data.data && typeof window !== "undefined") {
+                // Set the currently signed in user context provider to the user received in the response
                 changeCurrentUser({
                     id: response.data.data._id,
                     name: response.data.data.name,
                     email: response.data.data.email,
                     password: response.data.data.password
                 })
-
+    
+                // Redirect to the home page
                 window.location = `/home`
             }
         } catch (err) {
-            setMessage("Error occurred")
-            displayMessageInterval()
+            console.log(err)
         }
     }
 

@@ -21,13 +21,17 @@ ChartJS.register(
     Legend
 );
 
+// Receives x and y axis data along with the type of chart through props
 const ChartComponent = ({x, y1, y2, type}) => {
     return (
         <div className="chart">
+            {/* Sets chart title */}
             <p className="chart-title">{type} / Epochs</p>
             <Line 
                 data={{
+                    // Sets x axis data
                     labels: x,
+                    // Sets both y axis data and their styles
                     datasets: [
                         {
                             label: `Training ${type}`,
@@ -49,11 +53,13 @@ const ChartComponent = ({x, y1, y2, type}) => {
                 }} 
                 options={{
                     plugins: {
+                        // Sets position of legend
                         legend: {
                             display: true,
                             position: 'right'
                         }
                     },
+                    // Sets styles of x and y axis scales
                     scales: {
                         x: {
                             display: true,
@@ -74,10 +80,14 @@ const ChartComponent = ({x, y1, y2, type}) => {
                             }
                         }
                     },
+                    // Prevents chart from resizing canvas when window is resized
                     maintainAspectRatio: false,
+                    // Prevents chart from resizing when container is resized
                     responsive: false,
+                    // Prevents chart animations
                     animation: false
                 }}
+                // Sets chart dimensions
                 height={400} 
                 width={650}
             />

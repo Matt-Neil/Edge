@@ -17,12 +17,16 @@ const Search = ({searchPhrase, setSearchPhrase, currentUser}) => {
     const urlPhrase = useParams().id;
     const history = useHistory();
 
+    // Whenever the search page is rendered the useEffect hook is executed to fetch search results
     useEffect(() => {
         const fetchData = async () => {
+            // Check if the search phrase is empty
             if (searchPhrase === null) {
+                // Check if search phrase in the URL is empty
                 if (urlPhrase) {
+                    // Create GET request to fetch all results using the search phrase in the URL
                     const items = await globalAPI.get(`/search?phrase=${urlPhrase}`);
-
+                    
                     if (items.data.data.length < 21) {
                         setFinishedItems(true)
                     }
@@ -32,13 +36,15 @@ const Search = ({searchPhrase, setSearchPhrase, currentUser}) => {
                 } else {
                     history.push("/home");
                 }
+            // Else use the search phrase
             } else {
+                // Create GET request to fetch all results using the search phrase
                 const items = await globalAPI.get(`/search?phrase=${searchPhrase}`);
-
+    
                 if (items.data.data.length < 21) {
                     setFinishedItems(true)
                 }
-
+    
                 setItems(items.data.data);
                 setLoaded(true);
             }
@@ -63,12 +69,14 @@ const Search = ({searchPhrase, setSearchPhrase, currentUser}) => {
     const fetchDataItems = async (id) => {
         if (!finishedItems) {
             try {
+                // Create a GET request for more search results with an ID less than the last result already fetched
                 const fetchedItems = await globalAPI.get(`/search?phrase=${urlPhrase}&id=${id}`);
-    
+                
                 if (fetchedItems.data.data.length < 21) {
                     setFinishedItems(true)
                 }
-
+    
+                // Append new search results to current search results
                 setItems(items => [...items, ...fetchedItems.data.data]);
             } catch (err) {}
         }
