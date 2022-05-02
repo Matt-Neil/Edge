@@ -19,7 +19,8 @@ const SignIn = () => {
         e.preventDefault();
     
         try {
-            // Creates a POST request to the endpoint "/api/users/signin" with the email and password in the body
+            // Creates a POST request to the endpoint "/api/users/signin" with the email and password in the
+            // request body
             const response = await authAPI.post("/signin", 
             {
                 email: email,
@@ -39,9 +40,7 @@ const SignIn = () => {
                 // Redirect to the home page
                 window.location = `/home`
             }
-        } catch (err) {
-            console.log(err)
-        }
+        } catch (err) {}
     }
 
     const signupUser = async (e) => {
@@ -49,6 +48,8 @@ const SignIn = () => {
 
         if (createName !== "" || createEmail !== "" || createPassword !== "") {
             try {
+                // Creates a POST request to the endpoint "/api/users/signup" with the name, email and password in the 
+                // request body
                 const response = await authAPI.post("/signup", 
                 {
                     name: createName,
@@ -56,6 +57,7 @@ const SignIn = () => {
                     password: createPassword
                 });
 
+                // Checks if the user account was successfully created
                 if (response.data.data && typeof window !== 'undefined') {
                     changeCurrentUser({
                         id: response.data.data._id,
@@ -93,6 +95,7 @@ const SignIn = () => {
                 }
             }
 
+            // Displays message with relevant validation error
             setMessage(error)
             displayMessageInterval()
         }

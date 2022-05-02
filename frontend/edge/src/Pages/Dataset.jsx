@@ -67,9 +67,12 @@ const Dataset = ({currentUser, type}) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
+                // Checks if the dataset is being created
                 if (type === "create") {
+                    // Gets all the signed-in user's created datasets
                     const dataset = await usersAPI.get("/created?type=dataset");
     
+                    // Creates an array to store all created dataset's title
                     dataset.data.data.map((dataset) => {
                         setDataset(previous => [...previous, dataset.title]);
                     })
@@ -77,8 +80,10 @@ const Dataset = ({currentUser, type}) => {
                     setExist(true)
                     setLoaded(true)
                 } else {
+                    // Gets the current dataset information from the database
                     const dataset = await itemsAPI.get(`/${datasetID}?type=dataset`);
 
+                    // Adds dataset to open items in context provider
                     if (dataset.data.data.self) {
                         addOpenItems(dataset.data.data._id, dataset.data.data.title, dataset.data.data.type)
                     }
@@ -97,9 +102,13 @@ const Dataset = ({currentUser, type}) => {
                     setHeight(dataset.data.data.height)
                     setWidth(dataset.data.data.width)
                     
+                    // Fetch the dataset's label.json file
                     fetch(`http://127.0.0.1:5000/datasets/${dataset.data.data.imageDir}/labels.json`)
+                        // Convert file content to JSON
                         .then(response => response.json())
                         .then(images => {
+                            // Loops through each object and sets the local state to store both image filenames and
+                            // assigned labels in their respective arrays
                             images.map(image => {
                                 setUploadedImages(state => [...state, image.filename])
                                 setAssignedLabels(state => [...state, image.label])
@@ -119,6 +128,7 @@ const Dataset = ({currentUser, type}) => {
         fetchData();
     }, [])
 
+    // Converts created dataset's last updated date to a more user readable format
     useEffect(() => {
         if (loaded && exist) {
             const updatedDate = new Date(updated);
@@ -140,6 +150,7 @@ const Dataset = ({currentUser, type}) => {
         }
     }, [loaded, updated])
 
+    // Checks if the component has been rendered already when viewing a created dataset
     useEffect(() => {
         if (!firstRender.current && loaded && type !== "create") {
             updateDataset()
@@ -148,6 +159,7 @@ const Dataset = ({currentUser, type}) => {
         }
     }, [labels])
 
+    // Creates a timer to display message after copying dataset ID
     const copiedInterval = () => {
         clearInterval(copyInterval.current)
         navigator.clipboard.writeText(dataset.datafile);
@@ -158,12 +170,15 @@ const Dataset = ({currentUser, type}) => {
         return ()=> {clearInterval(copyInterval.current)};
     }
 
+    // Creates a new label
     const addLabelKey = async (e) => {
         if (e.key === "Enter" && addLabel !== "" && !labels.includes(addLabel)) {
+            // Adds new label to array in the local state
             setLabels(state => [...state, addLabel])
             setChangedSettings(true)
             setAddLabel("")
             
+            // If dataset is already created the new label is sent to Flask server to be added
             if (type !== "create") {
                 const formData = new FormData();
     
@@ -176,8 +191,11 @@ const Dataset = ({currentUser, type}) => {
         }
     }
 
+    // Deletes a label
     const deleteLabel = async (index) => {
         try {
+            // Updates elements in array containing assigned labels to represent no label if currently assigned to the 
+            // deleted label
             assignedLabels.map((assignedLabel, j) => {
                 if (assignedLabel === labels[index]) {
                     setAssignedLabels(state => {
@@ -190,17 +208,22 @@ const Dataset = ({currentUser, type}) => {
                 }
             })
 
-            const formData = new FormData();
+            // If dataset is already created the deleted label is sent to Flask server to be removed
+            if (type !== "create") {
+                const formData = new FormData();
 
-            formData.append('id', dataset.imageDir)
-            formData.append('datasetID', datasetID)
-            formData.append('label', labels[index])
+                formData.append('id', dataset.imageDir)
+                formData.append('datasetID', datasetID)
+                formData.append('label', labels[index])
+    
+                await fileAPI.post("/delete-label", formData).then(() => {
+                    // Dataset is updated in mongoDB
+                    updateDataset()
+                });
+            }
 
+            // Removes label from array in local state
             labels.splice(index, 1)
-
-            await fileAPI.post("/delete-label", formData).then(() => {
-                updateDataset()
-            });
 
             setRefreshLabels(new Date().getTime())
             setRefreshData(new Date().getTime())
@@ -210,7 +233,9 @@ const Dataset = ({currentUser, type}) => {
         }
     }
 
+    // Updating image's assigned label
     const updateLabel = async (e, index) => {
+        // Image's assigned label is updated in the local state
         setAssignedLabels(state => {
             const stateCopy = [...state]
         
@@ -219,6 +244,7 @@ const Dataset = ({currentUser, type}) => {
             return stateCopy
         })
 
+        // If dataset is already created the image's updated assigned label is sent to Flask server to be updated
         if (type !== "create") {
             try {
                 const formData = new FormData();
@@ -241,16 +267,20 @@ const Dataset = ({currentUser, type}) => {
         }
     }
 
+    // Updates whether the currently signed-in user has upvoted the dataset
     const updateUpvote = async () => {
         try {
+            // Creates an PUT request to the associated API endpoint with the state of the upvote as a query parameter
             await globalAPI.put(`/upvote/${datasetID}?state=${upvoted}`);
 
+            // Updates the local state variable containing the number of upvotes
             if (upvoted) {
                 setUpvotes(state => state-1)
             } else {
                 setUpvotes(state => state+1)
             }
 
+            // Updates the local state variable containing the upvote state
             setUpvoted(state => !state)
         } catch (err) {
             setMessage("Error occurred")
@@ -258,10 +288,13 @@ const Dataset = ({currentUser, type}) => {
         }
     }
 
+    // Updates whether the currently signed-in user has bookmarked the dataset
     const updateBookmark = async () => {
         try {
+            // Creates a PUT request to the associated API endpoint with the bookmark state as a query parameter
             await globalAPI.put(`/bookmark/${datasetID}?state=${bookmarked}`);
             
+            // Updates the local state variable containing the bookmark state
             setBookmarked(state => !state)
         } catch (err) {
             setMessage("Error occurred")
@@ -269,10 +302,13 @@ const Dataset = ({currentUser, type}) => {
         }
     }
 
+    // Updates whether the dataset is public or not
     const updateVisibility = async () => {
         try {
+            // Creates a PUT request to he associated API endpoint to update the workspace or dataset visibility
             await globalAPI.put(`/visibility/${datasetID}`);
 
+            // Updates the local state variable containing the visibility state
             setVisibility(state => !state)
         } catch (err) {
             setMessage("Error occurred")
@@ -280,6 +316,7 @@ const Dataset = ({currentUser, type}) => {
         }
     }
 
+    // Displays the previous page of images if applicable
     const previousPage = () => {
         if (page > 1) {
             setStart((page-2)*30)
@@ -289,6 +326,7 @@ const Dataset = ({currentUser, type}) => {
         }
     }
     
+    // Displays the next page of images if applicable
     const nextPage = () => {
         if (page*30 < uploadedImages.length && uploadedImages.length > 30) {
             setPage(state => state+1)
@@ -298,10 +336,13 @@ const Dataset = ({currentUser, type}) => {
         }
     }
 
+    // Deletes uploaded image
     const deleteImage = async (filename, index, label) => {
+        // Image and its assigned label are removed from local state
         uploadedImages.splice(index, 1)
         assignedLabels.splice(index, 1)
 
+        // If dataset is already created the image is also deleted from the Flask server
         if (type === "view") {
             const formData = new FormData();
 
@@ -311,6 +352,7 @@ const Dataset = ({currentUser, type}) => {
             formData.append('label', label)
             formData.append('filename', filename)
 
+            // Dataset is updated in mongoDB
             updateDataset()
 
             try {
@@ -327,36 +369,44 @@ const Dataset = ({currentUser, type}) => {
         setRefreshData(new Date().getTime())
     }
 
+    // Adds more images to the existing dataset
     const addImages = async () => {
+        // Adds the new images to the local state
         for (let i = 0; i < imageFiles.length; i++) {
             setUploadedImages(state => [...state, imageFiles[i]])
         }
 
+        // Adds "No label" assigned label for each new image
         setAssignedLabels(Array(imageFiles.length).fill("No label"))
         setPage(1)
         setRefreshData(new Date().getTime())
         setImageFiles([])
     }
 
+    // Replacing all existing images in dataset
     const replaceImages = () => {
         if (type === "create") {
+            // Sets current local state containing images to empty array
             setUploadedImages([])
 
+            // Adds new images to local state
             for (let i = 0; i < imageFiles.length; i++) {
                 setUploadedImages(state => [...state, imageFiles[i]])
             }
-
-            setAssignedLabels(Array(imageFiles.length).fill("No label"))
         } else {
+            // Adds new images to a temporary variable in local state to be assigned a label
             for (let i = 0; i < imageFiles.length; i++) {
                 setNewImages(state => [...state, imageFiles[i]])
             }
     
-            setNewLabels(Array(imageFiles.length).fill("No label"))
             setImageFiles([])
         }
+
+        // Adds "No label" assigned label for each new image
+        setNewLabels(Array(imageFiles.length).fill("No label"))
     }
 
+    // Assign a label to each new image and upload to Flask server
     const uploadReplaced = async () => {
         setUploadedImages([])
         setAssignedLabels([])
@@ -371,11 +421,13 @@ const Dataset = ({currentUser, type}) => {
             formData.append('labels[]', newLabels[i]);
         }
 
+        // Updates dataset in MongoDB
         updateDataset()
 
         try {
             await fileAPI.post("/replace-image", formData);
 
+            // Updates images and their assigned label to the local state
             for (let i = 0; i < newImages.length; i++) {
                 setUploadedImages(state => [...state, i])
                 setAssignedLabels(state => [...state, newLabels[i]])
@@ -394,28 +446,35 @@ const Dataset = ({currentUser, type}) => {
         setRefreshData(new Date().getTime())
     }
     
+
     const appendImages = () => {
         if (type === "create") {
+            // Adds new images to beginning of array in the local state
             for (let i = 0; i < imageFiles.length; i++) {
                 setUploadedImages(state => [imageFiles[i], ...state])
             }
 
+            // Adds "No label" assigned label for each new image to beginning of array in lcoal state
             setAssignedLabels(state => [...Array(imageFiles.length).fill("No label"), ...state])
         } else {
+            // Adds new images to a temporary variable in local state to be assigned a label
             for (let i = 0; i < imageFiles.length; i++) {
                 setNewImages(state => [...state, imageFiles[i]])
             }
     
+            // Adds "No label" assigned label for each new image
             setNewLabels(Array(imageFiles.length).fill("No label"))
             setImageFiles([])
         }
     }
 
     const deleteNewImages = (index) => {
+        // Delete images and their labels in the temporary local state variable
         newImages.splice(index, 1)
         newLabels.splice(index, 1)
     }
 
+    // Assign a label to each new image and upload to Flask server
     const uploadAppended = async () => {
         let filenames = []
 
@@ -451,6 +510,7 @@ const Dataset = ({currentUser, type}) => {
         setRefreshData(new Date().getTime())
     }
 
+    // Upload images and their assigned label to the Flask server on creation
     const uploadImage = async () => {
         setDisabledCreate(true)
 
@@ -493,6 +553,7 @@ const Dataset = ({currentUser, type}) => {
         }
     }
 
+    // Upload dataset information to MongoDB
     const uploadDataset = async (imageName, id) => {
         try {
             const datasetResponse = await itemsAPI.post("/", {
@@ -514,6 +575,7 @@ const Dataset = ({currentUser, type}) => {
 
             setMessage("Dataset created")
             displayMessageInterval()
+            // Redirects to page to view created dataset
             history.push(`/dataset/${datasetResponse.data.data}`)
         } catch (err) {
             setMessage("Error occurred")
@@ -521,15 +583,18 @@ const Dataset = ({currentUser, type}) => {
         }
     }
 
+    // Updates dataset in MongoDB
     const updateDataset = async () => {
         if (image) {
             try {
+                // Updates thumbnail image for dataset in ExpressJS server
                 const formImage = new FormData();
                 formImage.append('image', image);
     
                 const tempPicture = picture
                 const imageResponse = await imageAPI.post("/upload", formImage);
 
+                // Creates a PUT request to update dataset in MongoDB
                 await itemsAPI.put(`/${datasetID}?type=dataset`, {
                     title: title,
                     description: description,
@@ -574,6 +639,7 @@ const Dataset = ({currentUser, type}) => {
         setChangedSettings(false)
     }
 
+    // Deletes dataset from both MongoDB and Flask server
     const deleteDataset = async () => {
         try {
             const formData = new formData()
@@ -615,8 +681,10 @@ const Dataset = ({currentUser, type}) => {
                                     }}
                                     disabled={!(dataset.self || type === "create")}
                                     value={description} />
+                        {/* Checks if creator is viewing dataset */}
                         {(dataset.self || type === "create") &&
                             <>
+                                {/* Set the thumbnail picture */}
                                 <div className="create-item-setup">
                                     <label className="create-item-setup-label">Picture</label>
                                     <input className="create-item-setup-input"
@@ -627,17 +695,17 @@ const Dataset = ({currentUser, type}) => {
                                                 setChangedSettings(true)
                                             }} />
                                 </div>
-                                {type === "create" &&
-                                    <div className="create-item-setup">
-                                        <label className="create-item-setup-label">Public?</label>
-                                        <input type="checkbox" 
-                                                onChange={() => {
-                                                    setVisibility(previous => !previous)
-                                                    setChangedSettings(true)
-                                                }}
-                                                checked={visibility} />
-                                    </div>
-                                }
+                                {/* Edit the visibility of the dataset */}
+                                <div className="create-item-setup">
+                                    <label className="create-item-setup-label">Public?</label>
+                                    <input type="checkbox" 
+                                            onChange={() => {
+                                                setVisibility(previous => !previous)
+                                                setChangedSettings(true)
+                                            }}
+                                            checked={visibility} />
+                                </div>
+                                {/* Set the colour mode of the images */}
                                 <div className="create-item-setup">
                                     <label className="create-item-setup-label">RGB Images?</label>
                                     <input type="checkbox" 
@@ -647,6 +715,7 @@ const Dataset = ({currentUser, type}) => {
                                             }}
                                             checked={rgb} />
                                 </div>
+                                {/* Set the image height */}
                                 <div className="create-item-setup">
                                     <label className="create-item-setup-label">Image Height</label>
                                     <input className="create-item-setup-dimension"
@@ -658,6 +727,7 @@ const Dataset = ({currentUser, type}) => {
                                                 setChangedSettings(true)
                                             }} />
                                 </div>
+                                {/* Set the image width */}
                                 <div className="create-item-setup">
                                     <label className="create-item-setup-label">Image Width</label>
                                     <input className="create-item-setup-dimension"
@@ -682,7 +752,8 @@ const Dataset = ({currentUser, type}) => {
                                 </>
                             }
                             {!dataset.self && type !== "create" && <BookmarkIcon className={`item-icon ${bookmarked ? "blue2" : "white"}`} onClick={() => {updateBookmark()}} />}
-                            {dataset.self && type !== "create" && 
+                            {/* Set the visibility of the dataset */}
+                            {(dataset.self || type !== "create") && 
                                 <>
                                     {visibility ? 
                                         <VisibilityIcon className="item-visibility" onClick={() => {updateVisibility()}} />
@@ -705,6 +776,7 @@ const Dataset = ({currentUser, type}) => {
                                 </div>
                             </>
                         }
+                        {/* Download dataset zip file */}
                         {type === "view" && !dataset.self &&
                             <>
                                 <div className="sidebar-divided" />
@@ -727,22 +799,18 @@ const Dataset = ({currentUser, type}) => {
                                 <Shortcut type={"related"} datasetID={datasetID} />
                             </>
                         }
-                        {type === "view" &&
+                        {type === "view" && dataset.self &&
                             <>
-                                {dataset.self &&
-                                    <>
-                                        <div className="sidebar-divided" />
-                                        <button className="blue-button item-save"
-                                                disabled={!changedSettings && !changedData}
-                                                onClick={() => {
-                                                    updateDataset()
-                                                    setMessage("Dataset saved")
-                                                    displayMessageInterval()
-                                                }}>Save Dataset</button>
-                                        <button className="text-button item-delete"
-                                                onClick={() => {deleteDataset()}}>Delete</button>
-                                    </>
-                                }
+                                <div className="sidebar-divided" />
+                                <button className="blue-button item-save"
+                                        disabled={!changedSettings && !changedData}
+                                        onClick={() => {
+                                            updateDataset()
+                                            setMessage("Dataset saved")
+                                            displayMessageInterval()
+                                        }}>Save Dataset</button>
+                                <button className="text-button item-delete"
+                                        onClick={() => {deleteDataset()}}>Delete</button>
                             </>
                         }
                     </div>
@@ -762,6 +830,7 @@ const Dataset = ({currentUser, type}) => {
                                                 </div>
                                             }
                                             <div className="create-dataset-upload">
+                                                {/* Input for uploading images */}
                                                 <input type="file" 
                                                         name="data"
                                                         accept="image/*"
@@ -808,6 +877,7 @@ const Dataset = ({currentUser, type}) => {
                                                 }
                                             </div>
                                         </div>
+                                        {/* JSX to display temporary images */}
                                         {(type === "create" || dataset.self) && newImages.length !== 0 && 
                                             <div className="create-dataset-appended">
                                                 <div className="create-dataset-appended-header">
@@ -859,6 +929,7 @@ const Dataset = ({currentUser, type}) => {
                                             </div>
                                         }
                                         <div className="create-dataset-images-list" key={refreshData}>
+                                            {/* Displays all uploaded images and their assigned label to dataset */}
                                             {uploadedImages.map((image, i) => {
                                                 if (i >= start && i < end) {
                                                     return (
@@ -874,9 +945,11 @@ const Dataset = ({currentUser, type}) => {
                                                                         } 
                                                             />
                                                             <div>
+                                                                {/* Change the assigned label */}
                                                                 <select value={assignedLabels[i]}
                                                                         onChange={e => {updateLabel(e, i)}}>
                                                                     <option value="No label">No label</option>
+                                                                    {/* Map labels as select tag options */}
                                                                     {labels.map((label, j) => 
                                                                         <option value={label} key={j}>{label}</option>
                                                                     )}
@@ -897,6 +970,7 @@ const Dataset = ({currentUser, type}) => {
                                             <h1>Dataset</h1>
                                         </div>
                                         <div className="create-dataset-images-list" key={refreshData}>
+                                            {/* Displays images and their assigned label */}
                                             {uploadedImages.map((image, i) => {
                                                 if (i >= start && i < end) {
                                                     return (
@@ -917,6 +991,7 @@ const Dataset = ({currentUser, type}) => {
                             <div className="create-workspace-data">
                                 <p className="create-workspace-data-header">Labels:</p>
                                 <div className="sidebar-divided" />
+                                {/* Add new label input */}
                                 {(type === "create" || dataset.self) &&
                                     <input className="create-dataset-label-input"
                                             placeholder="Add Label"
@@ -924,11 +999,13 @@ const Dataset = ({currentUser, type}) => {
                                             onKeyPress={addLabelKey}
                                             value={addLabel} />
                                 }
+                                {/* Display created labels */}
                                 <div className="create-dataset-labels-list" key={refreshLabels}>
                                     {labels.map((label, i) => {
                                         return (
                                             <div className={`create-dataset-label ${colours[i % colours.length]}`} key={i}>
                                                 <p>{label}</p>
+                                                {/* Delete label */}
                                                 {(type === "create" || dataset.self) &&
                                                     <div onClick={() => {deleteLabel(i)}}>
                                                         <CloseIcon className="create-dataset-label-icon" /> 

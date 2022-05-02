@@ -22,6 +22,7 @@ const Account = ({setSearchPhrase}) => {
     const {displayMessage, displayMessageInterval} = useContext(MessageContext);
     const history = useHistory()
 
+    // Fetches the currently signed-in user information
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -37,39 +38,54 @@ const Account = ({setSearchPhrase}) => {
         fetchData();
     }, [])
 
+    // Searches for user input when enter key is pressed
     const searchFunctionKey = (e) => {
         if (e.key === "Enter" && input !== "") {
+            // Sets application local state variable to contain user input
             setSearchPhrase(input);
+            // Redirects to search page
             history.push(`/search-results/${input}`);
         }
     }
 
+    // Searches for user input when search button is clicked
     const searchFunctionButton = () => {
         if (input !== "") {
+            // Sets application local state variable to contain user input
             setSearchPhrase(input);
+            // Redirects to search page
             history.push(`/search-results/${input}`);
         }
     }
 
+    // Signs out user
     const signout = async () => {
+        // Creates GET request to sign out user
         await authAPI.get("/signout");
 
+        // Sets context provider to clear all user information
         removeCurrentUser();
+        // Removes all opened items in the header
         clearItems();
 
+        // Redirects to the sign-in page
         if (typeof window !== 'undefined') {
             window.location = `/sign-in`
         }
     }
 
+    // Updates user password
     const updateAccount = async () => {
         try {
             if (password !== "") {
+                // Creates PUT request to update password with new password in request body
                 await usersAPI.put("/", {password: password})
 
+                // Displays confirmation message if successfully updated
                 setMessage("Account Updated")
                 displayMessageInterval()
             } else {
+                // Displays input validation error
                 setMessage("Password is blank")
                 displayMessageInterval()
             }
@@ -81,6 +97,7 @@ const Account = ({setSearchPhrase}) => {
 
     const deleteAccount = async () => {
         try {
+            // Creates DELETE request to delete user account
             await usersAPI.delete("/")
 
             signout()

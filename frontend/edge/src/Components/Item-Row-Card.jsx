@@ -15,6 +15,7 @@ const ItemRowCard = ({item, created, creator, currentUserID}) => {
     const {addOpenItems} = useContext(OpenItemsContext);
     const [date, setDate] = useState("");
 
+    // Converts the ISO date the workspace or dataset was last updated into a better format for user readability
     useEffect(() => {
         const updatedDate = new Date(item.updated);
         const currentDate = new Date();
@@ -34,38 +35,49 @@ const ItemRowCard = ({item, created, creator, currentUserID}) => {
         }
     }, [])
 
+    // Sends the workspace or dataset information to the context provider to be added
     const addHeader = () => {
         if (item.creator === currentUserID) {
             addOpenItems(item._id, item.title, item.type)
         }
     }
 
+    // Updates whether the currently signed-in user has upvoted the workspace or dataset
     const updateUpvote = async () => {
         try {
+            // Creates an PUT request to the associated API endpoint with the state of the upvote as a query parameter
             await globalAPI.put(`/upvote/${item._id}?state=${upvoted}`);
 
+            // Updates the local state variable containing the number of upvotes
             if (upvoted) {
                 setUpvotes(state => state-1)
             } else {
                 setUpvotes(state => state+1)
             }
 
+            // Updates the local state variable containing the upvote state
             setUpvoted(state => !state)
         } catch (err) {}
     }
 
+    // Updates whether the currently signed-in user has bookmarked the workspace or dataset
     const updateBookmark = async () => {
         try {
+            // Creates a PUT request to the associated API endpoint with the bookmark state as a query parameter
             await globalAPI.put(`/bookmark/${item._id}?state=${bookmarked}`);
             
+            // Updates the local state variable containing the bookmark state
             setBookmarked(state => !state)
         } catch (err) {}
     }
 
+    // Updates whether the workspace or dataset is public or not
     const updateVisibility = async () => {
         try {
+            // Creates a PUT request to he associated API endpoint to update the workspace or dataset visibility
             await globalAPI.put(`/visibility/${item._id}`);
 
+            // Updates the local state variable containing the visibility state
             setVisibility(state => !state)
         } catch (err) {}
     }
@@ -88,9 +100,12 @@ const ItemRowCard = ({item, created, creator, currentUserID}) => {
             <div>
                 <ThumbUpIcon className={`item-row-card-icon ${upvoted ? "blue2" : "white"}`} onClick={() => {updateUpvote()}} />
                 <p className={`item-row-card-upvotes ${upvoted ? "blue2" : "white"}`}>{upvotes}</p>
-                {!created && item.creator !== currentUserID && <BookmarkIcon className={`item-row-card-icon ${bookmarked ? "blue2" : "white"}`} onClick={() => {updateBookmark()}} />}
-                {created && 
+                {/* Only displays the button to bookmark the workspace or dataset if the user viewing the card isn't the creator */}
+                {!created ?
+                    <BookmarkIcon className={`item-row-card-icon ${bookmarked ? "blue2" : "white"}`} onClick={() => {updateBookmark()}} />
+                :
                     <>
+                        {/* Only displays button to change visibility if the creator is viewing the card */}
                         {visibility ? 
                             <VisibilityIcon className="item-row-card-visibility" onClick={() => {updateVisibility()}} />
                         :

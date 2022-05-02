@@ -10,18 +10,23 @@ const Shortcut = ({type, currentUserID, datasetID}) => {
     const [items, setItems] = useState();
     const [loaded, setLoaded] = useState(false);
 
+    // Fetches the workspaces and datasets for the page type specified in the component props
     useEffect(() => {
         const fetchData = async () => {
             try {
                 let items;
 
                 if (type === "workspaces") {
+                    // Creates GET request to get the user's created workspaces
                     items = await usersAPI.get(`/created-shortcut?type=workspace`);
                 } else if (type === "datasets") {
+                    // Creates GET request to get the user's created datasets
                     items = await usersAPI.get(`/created-shortcut?type=dataset`);
                 } else if (type === "bookmarked") {
+                    // Creates GET request to get the user's bookmarked workspaces and datatsets
                     items = await usersAPI.get(`/bookmarked-shortcut`);
                 } else {
+                    // Creates GET request to get workspaces that use the dataset specified as a query parameter
                     items = await itemsAPI.get(`/associated-workspaces?id=${datasetID}`);
                 }
 
@@ -32,6 +37,7 @@ const Shortcut = ({type, currentUserID, datasetID}) => {
         fetchData();
     }, [])
 
+    // Sends the workspace or dataset information to the context provider to be added
     const addHeader = (item) => {
         if (item.creator === currentUserID) {
             addOpenItems(item._id, item.title, item.type)

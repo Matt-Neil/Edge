@@ -29,16 +29,22 @@ const Home = ({setSearchPhrase}) => {
         fetchData();
     }, [])
 
+    // Searches for user input when enter key is pressed
     const searchFunctionKey = (e) => {
         if (e.key === "Enter" && input !== "") {
+            // Sets application local state variable to contain user input
             setSearchPhrase(input);
+            // Redirects to search page
             history.push(`/search-results/${input}`);
         }
     }
 
+    // Searches for user input when search button is clicked
     const searchFunctionButton = () => {
         if (input !== "") {
+            // Sets application local state variable to contain user input
             setSearchPhrase(input);
+            // Redirects to search page
             history.push(`/search-results/${input}`);
         }
     }

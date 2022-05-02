@@ -52,16 +52,22 @@ const Search = ({searchPhrase, setSearchPhrase, currentUser}) => {
         fetchData();
     }, [])
 
+    // Searches for user input when enter key is pressed
     const searchFunctionKey = (e) => {
         if (e.key === "Enter" && input !== "") {
+            // Sets application local state variable to contain user input
             setSearchPhrase(input);
+            // Redirects to search page
             history.push(`/search-results/${input}`);
         }
     }
 
+    // Searches for user input when search button is clicked
     const searchFunctionButton = () => {
         if (input !== "") {
+            // Sets application local state variable to contain user input
             setSearchPhrase(input);
+            // Redirects to search page
             history.push(`/search-results/${input}`);
         }
     }
@@ -129,8 +135,10 @@ const Search = ({searchPhrase, setSearchPhrase, currentUser}) => {
                             </div>
                             <p className="view-items-results">{`${items.length} Results`}</p>
                             <div className="view-items-list">
+                                {/* Loop through each search result */}
                                 {items.length > 0 &&
                                     <>
+                                        {/* Map each element a card to be displayed */}
                                         {items.map((item, i) => {
                                             return cardFormat ? 
                                                 <ItemRowCard item={item} creator={item.creatorName.name} currentUserID={currentUser.id} created={currentUser.id === item.creator} key={i} /> 
@@ -140,9 +148,11 @@ const Search = ({searchPhrase, setSearchPhrase, currentUser}) => {
                                     </>
                                 }
                             </div>
+                            {/* Check if there are any more search results for pagination */}
                             {items.length >= 0 && finishedItems ?
                                 <p className="end-items">End reached</p>
                                 :
+                                // Load more search results on the next page
                                 <p className="load-items" onClick={() => {loadMore()}}>Load more</p>
                             }
                         </div>
