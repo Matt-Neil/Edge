@@ -396,8 +396,6 @@ const Workspace = ({currentUser, type}) => {
                 type: "workspace"
             });
 
-            setMessage("Workspace created")
-            displayMessageInterval()
             history.push(`/workspace/${workspaceResponse.data.data}`)
         } catch (err) {
             setMessage("Error occurred")
