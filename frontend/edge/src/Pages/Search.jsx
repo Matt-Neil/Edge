@@ -112,7 +112,7 @@ const Search = ({searchPhrase, setSearchPhrase, currentUser}) => {
                             <p>Public Workspaces</p>
                             <ArrowForwardIosIcon className="home-options-icon" />
                         </Link>
-                        <Link className="home-options-link" to="public-datasets">
+                        <Link className="home-options-link" to="/public-datasets">
                             <p>Public Datasets</p>
                             <ArrowForwardIosIcon className="home-options-icon" />
                         </Link>

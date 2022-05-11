@@ -7,7 +7,7 @@ import training_model
 import prediction_model
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http:#localhost:3000"}})
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 # Predicts a label for an image on a trained model
 @app.route('/api/predict-model', methods=['POST'])
@@ -17,7 +17,7 @@ def predict_model():
     
     # Calls prediction function
     results = make_response(prediction_model.predict(body, file))
-    results.headers.add('Access-Control-Allow-Origin', 'http:#localhost:3000')
+    results.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
     results.headers.add('Access-Control-Allow-Credentials', 'true')
 
     try:
@@ -31,7 +31,7 @@ def train_model():
     body = request.form
     
     results = make_response(training_model.train(body))
-    results.headers.add('Access-Control-Allow-Origin', 'http:#localhost:3000')
+    results.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
     results.headers.add('Access-Control-Allow-Credentials', 'true')
 
     try:
@@ -281,7 +281,7 @@ def remove_model():
 @app.route('/datasets/<path:path>')
 def get_labels(path):
     file = send_from_directory('datasets', path)
-    file.headers.add('Access-Control-Allow-Origin', 'http:localhost:3000')
+    file.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
     file.headers.add('Access-Control-Allow-Credentials', 'true')
 
     return file
@@ -290,7 +290,7 @@ def get_labels(path):
 @app.route('/models/<path:path>')
 def get_model(path):
     file = send_from_directory('models', path)
-    file.headers.add('Access-Control-Allow-Origin', 'http:localhost:3000')
+    file.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
     file.headers.add('Access-Control-Allow-Credentials', 'true')
 
     return file
