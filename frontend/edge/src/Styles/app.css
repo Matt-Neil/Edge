@@ -3096,7 +3096,8 @@ input, textarea {
           justify-content: center;
   margin: 0 15px 0 25px;
   text-decoration: none;
-  font-family: 'Poppins', sans-serif;
+  height: 16px;
+  width: 16px;
   color: #FBFBFB;
   -webkit-touch-callout: none;
   -webkit-user-select: none;

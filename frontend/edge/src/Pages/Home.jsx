@@ -91,7 +91,7 @@ const Home = ({setSearchPhrase}) => {
                             <div className="view-items-list">
                                 {recent.length > 0 &&
                                     <>
-                                        // Loops through all workspaces and datasets fetched
+                                        {/* Loops through all workspaces and datasets fetched */}
                                         {recent.map((item, i) => {
                                             // Displays workspaces and datasets in a card
                                             return cardFormat ? <ItemRowCard item={item} created={true} key={i} /> : <ItemSquareCard item={item} created={true} key={i} />

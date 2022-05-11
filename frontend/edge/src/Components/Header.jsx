@@ -6,7 +6,9 @@ import HeaderOpenItem from '../Components/Header-Open-Item'
 const Header = ({openItems}) => {
     return (
         <div className="header">
-            <Link to="/home" className="header-link">Home</Link>
+            <Link to="/home" className="header-home">
+                <img src="http://localhost:3000/home-icon.png" />
+            </Link>
             <div className="header-open">
                 {openItems.length !== 0 &&
                     <>  

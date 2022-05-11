@@ -16,7 +16,7 @@ const cookieParser = require('cookie-parser');
 connectDB();
 
 // Initialising CORS middleware
-app.use(cors({ credentials: true, origin: "localhost:3000" }));
+app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 // Initialises body parser middleware functions .json() and .urlencoded()
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
