@@ -162,7 +162,7 @@ const Dataset = ({currentUser, type}) => {
     // Creates a timer to display message after copying dataset ID
     const copiedInterval = () => {
         clearInterval(copyInterval.current)
-        navigator.clipboard.writeText(dataset.datafile);
+        navigator.clipboard.writeText(datasetID);
         setCopyData(false);
         copyInterval.current = setInterval(() => {
             setCopyData(true);
@@ -217,13 +217,12 @@ const Dataset = ({currentUser, type}) => {
                 formData.append('label', labels[index])
     
                 await fileAPI.post("/delete-label", formData).then(() => {
+                    // Removes label from array in local state
+                    labels.splice(index, 1)
                     // Dataset is updated in mongoDB
                     updateDataset()
                 });
             }
-
-            // Removes label from array in local state
-            labels.splice(index, 1)
 
             setRefreshLabels(new Date().getTime())
             setRefreshData(new Date().getTime())
@@ -523,11 +522,15 @@ const Dataset = ({currentUser, type}) => {
 
             for (let i = 0; i < uploadedImages.length; i++) {
                 formData.append('data[]', uploadedImages[i]);
-                formData.append('labels[]', assignedLabels[i]);
+                formData.append('assignedLabels[]', assignedLabels[i]);
+            }
+
+            for (let i = 0; i < labels.length; i++) {
+                formData.append('createdLabels[]', labels[i]);
             }
 
             try {
-                await fileAPI.post("/upload", formData);
+                await fileAPI.post("/upload-image", formData);
             } catch (err) {
                 setMessage("Error occurred")
                 displayMessageInterval()
@@ -573,8 +576,6 @@ const Dataset = ({currentUser, type}) => {
                 type: "dataset"
             });
 
-            setMessage("Dataset created")
-            displayMessageInterval()
             // Redirects to page to view created dataset
             history.push(`/dataset/${datasetResponse.data.data}`)
         } catch (err) {
@@ -777,7 +778,7 @@ const Dataset = ({currentUser, type}) => {
                             </>
                         }
                         {/* Download dataset zip file */}
-                        {type === "view" && !dataset.self &&
+                        {type === "view" &&
                             <>
                                 <div className="sidebar-divided" />
                                 <div className="sidebar-dataset-copy">

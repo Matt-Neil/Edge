@@ -276,7 +276,7 @@ const Workspace = ({currentUser, type}) => {
             if (checkPublic.data.success && (checkPublic.data.data.visibility || 
                     checkPublic.data.data.creator === currentUser.id)) {
                 // Fetches the labels.json file for the selected dataset
-                fetch(`http://127.0.0.1:5000/datasets/${workspace.data.data.dataset.imageDir}/labels.json`)
+                fetch(`http://127.0.0.1:5000/datasets/${checkPublic.data.data.imageDir}/labels.json`)
                 .then(response => response.json())
                 .then(images => {
                     images.map(image => {
@@ -297,6 +297,7 @@ const Workspace = ({currentUser, type}) => {
                 displayMessageInterval()
             }
         } catch (err) {
+            console.log(err)
             setMessage("Error occurred")
             displayMessageInterval()
         }

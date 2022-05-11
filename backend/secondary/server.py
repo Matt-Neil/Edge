@@ -43,7 +43,8 @@ def train_model():
 @app.route('/api/file/upload-image', methods = ['POST'])
 def upload_images():
     images = request.files.getlist("data[]")
-    assignedLabels = request.form.getlist("labels[]")
+    assignedLabels = request.form.getlist("assignedLabels[]")
+    createdLabels = request.form.getlist("createdLabels[]")
     # Creates new directory for the dataset
     os.makedirs('datasets/' + request.form['id'])
     # Creates sub-directory for training images in the dataset
@@ -53,7 +54,7 @@ def upload_images():
     labels = []
 
     # Creates a sub-directory for each label in the training images sub-directory
-    for label in assignedLabels:
+    for label in createdLabels:
         os.makedirs('datasets/' + request.form['id'] + '/images/' + label)
 
     # Loops through each image uploaded
@@ -111,18 +112,20 @@ def delete_image():
 @app.route('/api/file/replace-image', methods = ['POST'])
 def replace_images():
     images = request.files.getlist("data[]")
-    assignedLabels = request.form.getlist("labels[]")
+    assignedLabels = request.form.getlist("assignedLabels[]")
+    createdLabels = request.form.getlist("createdLabels[]")
     # Deletes whole current dataset directory
     shutil.rmtree('datasets/{}'.format(request.form['id']))
-    # Creates new dataset directory
+    # Creates new directory for the dataset
     os.makedirs('datasets/' + request.form['id'])
-    # Creates new sub-directory for training images in the dataset
+    # Creates sub-directory for training images in the dataset
     os.makedirs('datasets/' + request.form['id'] + '/images')
-    # Creates new sub-directory for images with no assigned labels in the dataset
+    # Creates sub-directory for images with no assigned labels in the dataset
     os.makedirs('datasets/' + request.form['id'] + '/no-label')
     labels = []
 
-    for label in assignedLabels:
+    # Creates a sub-directory for each label in the training images sub-directory
+    for label in createdLabels:
         os.makedirs('datasets/' + request.form['id'] + '/images/' + label)
 
     for i in range(len(images)):
@@ -159,6 +162,7 @@ def append_images():
             'filename': filenames[i],
             'label': assignedLabels[i]
         })
+
         # Adds new images to their corresponding sub-directory
         images[i].save('datasets/{}/images/{}/{}.jpg'.format(request.form['id'], assignedLabels[i], filenames[i]))
 
