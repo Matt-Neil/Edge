@@ -93,7 +93,7 @@ const ItemRowCard = ({item, created, creator, currentUserID}) => {
                     <Link to={item.type === "workspace" ? `/workspace/${item._id}` : `/dataset/${item._id}`} className="item-row-card-title">{item.title}</Link>
                 </div>
                 <div>
-                    {!created && <p className="item-row-card-meta">{creator}</p>}
+                    <p className="item-row-card-meta">{!created ? creator : "You"}</p>
                     <p className="item-row-card-meta">{date}</p>
                 </div>
             </div>

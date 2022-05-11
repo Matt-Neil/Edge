@@ -34,7 +34,7 @@ exports.getSearch = async (req, res, next) => {
                     "title": 1,
                     "picture": 1,
                     // Returns boolean if currently signed-in user has bookmarked a workspace or dataset
-                    "bookmarks": { $in: [res.locals.currentUser._id, "$bookmarks"] },
+                    "bookmarked": { $in: [res.locals.currentUser._id, "$bookmarks"] },
                     // Returns boolean if currently signed-in user has upvoted a workspace or dataset
                     "upvoted": { $in: [res.locals.currentUser._id, "$upvotes"] },
                     // Returns the number of upvotes
